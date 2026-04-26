@@ -1,0 +1,23 @@
+[0.552s] Invoking command in '/home/casbot/action_data_offset_ws_old/action_data_offset_ws/src/action_data_offset': PYTHONPATH=/home/casbot/action_data_offset_ws_old/action_data_offset_ws/build/action_data_offset/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/casbot/action_data_offset_ws_old/action_data_offset_ws/install/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/action_data_offset build --build-base /home/casbot/action_data_offset_ws_old/action_data_offset_ws/build/action_data_offset/build install --record /home/casbot/action_data_offset_ws_old/action_data_offset_ws/build/action_data_offset/install.log --single-version-externally-managed install_data
+[0.763s] running egg_info
+[0.764s] writing ../../build/action_data_offset/action_data_offset.egg-info/PKG-INFO
+[0.764s] writing dependency_links to ../../build/action_data_offset/action_data_offset.egg-info/dependency_links.txt
+[0.764s] writing entry points to ../../build/action_data_offset/action_data_offset.egg-info/entry_points.txt
+[0.764s] writing requirements to ../../build/action_data_offset/action_data_offset.egg-info/requires.txt
+[0.764s] writing top-level names to ../../build/action_data_offset/action_data_offset.egg-info/top_level.txt
+[0.768s] reading manifest file '../../build/action_data_offset/action_data_offset.egg-info/SOURCES.txt'
+[0.772s] writing manifest file '../../build/action_data_offset/action_data_offset.egg-info/SOURCES.txt'
+[0.772s] running build
+[0.772s] running build_py
+[0.773s] running install
+[0.773s] running install_lib
+[0.774s] running install_data
+[0.778s] running install_egg_info
+[0.779s] removing '/home/casbot/action_data_offset_ws_old/action_data_offset_ws/install/lib/python3.10/site-packages/action_data_offset-0.1.0-py3.10.egg-info' (and everything under it)
+[0.779s] Copying ../../build/action_data_offset/action_data_offset.egg-info to /home/casbot/action_data_offset_ws_old/action_data_offset_ws/install/lib/python3.10/site-packages/action_data_offset-0.1.0-py3.10.egg-info
+[0.780s] running install_scripts
+[0.796s] Installing arm_trajectory_transform script to /home/casbot/action_data_offset_ws_old/action_data_offset_ws/install/lib/action_data_offset
+[0.796s] Installing arm_trajectory_transform_jacobian script to /home/casbot/action_data_offset_ws_old/action_data_offset_ws/install/lib/action_data_offset
+[0.796s] Installing mujoco_trajectory_sim script to /home/casbot/action_data_offset_ws_old/action_data_offset_ws/install/lib/action_data_offset
+[0.797s] writing list of installed files to '/home/casbot/action_data_offset_ws_old/action_data_offset_ws/build/action_data_offset/install.log'
+[0.816s] Invoked command in '/home/casbot/action_data_offset_ws_old/action_data_offset_ws/src/action_data_offset' returned '0': PYTHONPATH=/home/casbot/action_data_offset_ws_old/action_data_offset_ws/build/action_data_offset/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/casbot/action_data_offset_ws_old/action_data_offset_ws/install/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/action_data_offset build --build-base /home/casbot/action_data_offset_ws_old/action_data_offset_ws/build/action_data_offset/build install --record /home/casbot/action_data_offset_ws_old/action_data_offset_ws/build/action_data_offset/install.log --single-version-externally-managed install_data

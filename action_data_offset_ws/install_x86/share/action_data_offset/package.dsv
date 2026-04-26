@@ -1,0 +1,3 @@
+source;share/action_data_offset/hook/pythonpath.ps1
+source;share/action_data_offset/hook/pythonpath.dsv
+source;share/action_data_offset/hook/pythonpath.sh

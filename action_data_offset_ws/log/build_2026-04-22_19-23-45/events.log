@@ -1,0 +1,7 @@
+[0.000000] (-) TimerEvent: {}
+[0.000282] (-) JobUnselected: {'identifier': 'action_data_offset'}
+[0.000470] (-) JobUnselected: {'identifier': 'crb_ros_msg'}
+[0.000606] (casbot_arm_calibration_web) JobQueued: {'identifier': 'casbot_arm_calibration_web', 'dependencies': OrderedDict([('action_data_offset', '/home/casbot/action_data_offset_ws_old/action_data_offset_ws/install'), ('crb_ros_msg', '/home/casbot/action_data_offset_ws_old/action_data_offset_ws/install')])}
+[0.000750] (casbot_arm_calibration_web) JobStarted: {'identifier': 'casbot_arm_calibration_web'}
+[0.009090] (casbot_arm_calibration_web) JobEnded: {'identifier': 'casbot_arm_calibration_web', 'rc': 1}
+[0.019627] (-) EventReactorShutdown: {}

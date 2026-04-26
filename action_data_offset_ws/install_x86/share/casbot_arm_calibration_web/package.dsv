@@ -1,0 +1,12 @@
+source;share/casbot_arm_calibration_web/hook/cmake_prefix_path.ps1
+source;share/casbot_arm_calibration_web/hook/cmake_prefix_path.dsv
+source;share/casbot_arm_calibration_web/hook/cmake_prefix_path.sh
+source;share/casbot_arm_calibration_web/hook/ld_library_path_lib.ps1
+source;share/casbot_arm_calibration_web/hook/ld_library_path_lib.dsv
+source;share/casbot_arm_calibration_web/hook/ld_library_path_lib.sh
+source;share/casbot_arm_calibration_web/hook/pythonpath.ps1
+source;share/casbot_arm_calibration_web/hook/pythonpath.dsv
+source;share/casbot_arm_calibration_web/hook/pythonpath.sh
+source;share/casbot_arm_calibration_web/hook/ament_prefix_path.ps1
+source;share/casbot_arm_calibration_web/hook/ament_prefix_path.dsv
+source;share/casbot_arm_calibration_web/hook/ament_prefix_path.sh

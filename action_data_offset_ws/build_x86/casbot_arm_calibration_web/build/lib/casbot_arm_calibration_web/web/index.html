@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CASBOT 手臂位姿标定</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="app">
+  <header class="page-header">
+    <div class="page-header-inner">
+      <h1 class="page-title">CASBOT 手臂位姿标定</h1>
+    </div>
+  </header>
+
+  <main class="panels">
+    <section class="arm-panel" data-arm="left">
+      <h2 class="arm-header">
+        <span class="arm-header-title">左手臂</span>
+        <button
+          type="button"
+          class="btn-refresh-initial"
+          data-arm="left"
+          title="把当前末端 XYZ（m）与 RX/RY/RZ（°）写入「初始值」"
+        >刷新初始值</button>
+      </h2>
+      <div class="arm-panel__body">
+        <h3 class="arm-section-title">空间位置偏移</h3>
+        <div class="axis-block" data-axis="x">
+          <div class="axis-block__head">
+            <div class="axis-id">
+              <span class="axis-badge">X</span>
+              <span class="axis-label">前后</span>
+            </div>
+            <div class="axis-jog" aria-label="X 轴示教">
+              <button type="button" class="btn-inc" data-dir="-">−</button>
+              <button type="button" class="btn-inc" data-dir="+">+</button>
+            </div>
+          </div>
+          <div class="fields">
+            <label class="field field--step">
+              <span>步进值</span>
+              <div class="step-input-wrap">
+                <button type="button" class="btn-step btn-step-dec" aria-label="步进减 0.5">−</button>
+                <input type="text" class="inp-step" inputmode="decimal" value="1" autocomplete="off" />
+                <button type="button" class="btn-step btn-step-inc" aria-label="步进加 0.5">+</button>
+              </div>
+            </label>
+            <label class="field"><span>初始值</span><span class="field-display inp-initial" aria-live="polite"></span></label>
+            <label class="field"><span>当前值</span><span class="field-display inp-current" aria-live="polite"></span></label>
+            <label class="field"><span>偏移量</span><span class="field-display inp-delta" aria-live="polite"></span></label>
+          </div>
+        </div>
+        <div class="axis-block" data-axis="y">
+          <div class="axis-block__head">
+            <div class="axis-id">
+              <span class="axis-badge">Y</span>
+              <span class="axis-label">左右</span>
+            </div>
+            <div class="axis-jog" aria-label="Y 轴示教">
+              <button type="button" class="btn-inc" data-dir="-">−</button>
+              <button type="button" class="btn-inc" data-dir="+">+</button>
+            </div>
+          </div>
+          <div class="fields">
+            <label class="field field--step">
+              <span>步进值</span>
+              <div class="step-input-wrap">
+                <button type="button" class="btn-step btn-step-dec" aria-label="步进减 0.5">−</button>
+                <input type="text" class="inp-step" inputmode="decimal" value="1" autocomplete="off" />
+                <button type="button" class="btn-step btn-step-inc" aria-label="步进加 0.5">+</button>
+              </div>
+            </label>
+            <label class="field"><span>初始值</span><span class="field-display inp-initial" aria-live="polite"></span></label>
+            <label class="field"><span>当前值</span><span class="field-display inp-current" aria-live="polite"></span></label>
+            <label class="field"><span>偏移量</span><span class="field-display inp-delta" aria-live="polite"></span></label>
+          </div>
+        </div>
+        <div class="axis-block" data-axis="z">
+          <div class="axis-block__head">
+            <div class="axis-id">
+              <span class="axis-badge">Z</span>
+              <span class="axis-label">上下</span>
+            </div>
+            <div class="axis-jog" aria-label="Z 轴示教">
+              <button type="button" class="btn-inc" data-dir="-">−</button>
+              <button type="button" class="btn-inc" data-dir="+">+</button>
+            </div>
+          </div>
+          <div class="fields">
+            <label class="field field--step">
+              <span>步进值</span>
+              <div class="step-input-wrap">
+                <button type="button" class="btn-step btn-step-dec" aria-label="步进减 0.5">−</button>
+                <input type="text" class="inp-step" inputmode="decimal" value="1" autocomplete="off" />
+                <button type="button" class="btn-step btn-step-inc" aria-label="步进加 0.5">+</button>
+              </div>
+            </label>
+            <label class="field"><span>初始值</span><span class="field-display inp-initial" aria-live="polite"></span></label>
+            <label class="field"><span>当前值</span><span class="field-display inp-current" aria-live="polite"></span></label>
+            <label class="field"><span>偏移量</span><span class="field-display inp-delta" aria-live="polite"></span></label>
+          </div>
+        </div>
+      </div>
+      <div class="arm-panel__body">
+        <h3 class="arm-section-title">空间姿态偏移</h3>
+        <div class="axis-block axis-block--rot" data-rot-axis="rx">
+          <div class="axis-block__head">
+            <div class="axis-id">
+              <span class="axis-badge">RX</span>
+              <span class="axis-label">绕 base X</span>
+            </div>
+            <div class="axis-jog" aria-label="RX 轴示教">
+              <button type="button" class="btn-inc" data-dir="-">−</button>
+              <button type="button" class="btn-inc" data-dir="+">+</button>
+            </div>
+          </div>
+          <div class="fields">
+            <label class="field field--step">
+              <span>步进值</span>
+              <div class="step-input-wrap step-input-wrap--deg" data-step-spin="0.1">
+                <button type="button" class="btn-step btn-step-dec" aria-label="步进减 0.1°">−</button>
+                <input type="text" class="inp-step inp-step-deg" inputmode="decimal" value="0.1" size="5" autocomplete="off" />
+                <button type="button" class="btn-step btn-step-inc" aria-label="步进加 0.1°">+</button>
+              </div>
+            </label>
+            <label class="field"><span>初始值</span><span class="field-display inp-initial" aria-live="polite"></span></label>
+            <label class="field"><span>当前值</span><span class="field-display inp-current" aria-live="polite"></span></label>
+            <label class="field"><span>偏移量</span><span class="field-display inp-delta" aria-live="polite"></span></label>
+          </div>
+        </div>
+        <div class="axis-block axis-block--rot" data-rot-axis="ry">
+          <div class="axis-block__head">
+            <div class="axis-id">
+              <span class="axis-badge">RY</span>
+              <span class="axis-label">绕 base Y</span>
+            </div>
+            <div class="axis-jog" aria-label="RY 轴示教">
+              <button type="button" class="btn-inc" data-dir="-">−</button>
+              <button type="button" class="btn-inc" data-dir="+">+</button>
+            </div>
+          </div>
+          <div class="fields">
+            <label class="field field--step">
+              <span>步进值</span>
+              <div class="step-input-wrap step-input-wrap--deg" data-step-spin="0.1">
+                <button type="button" class="btn-step btn-step-dec" aria-label="步进减 0.1°">−</button>
+                <input type="text" class="inp-step inp-step-deg" inputmode="decimal" value="0.1" size="5" autocomplete="off" />
+                <button type="button" class="btn-step btn-step-inc" aria-label="步进加 0.1°">+</button>
+              </div>
+            </label>
+            <label class="field"><span>初始值</span><span class="field-display inp-initial" aria-live="polite"></span></label>
+            <label class="field"><span>当前值</span><span class="field-display inp-current" aria-live="polite"></span></label>
+            <label class="field"><span>偏移量</span><span class="field-display inp-delta" aria-live="polite"></span></label>
+          </div>
+        </div>
+        <div class="axis-block axis-block--rot" data-rot-axis="rz">
+          <div class="axis-block__head">
+            <div class="axis-id">
+              <span class="axis-badge">RZ</span>
+              <span class="axis-label">绕 base Z</span>
+            </div>
+            <div class="axis-jog" aria-label="RZ 轴示教">
+              <button type="button" class="btn-inc" data-dir="-">−</button>
+              <button type="button" class="btn-inc" data-dir="+">+</button>
+            </div>
+          </div>
+          <div class="fields">
+            <label class="field field--step">
+              <span>步进值</span>
+              <div class="step-input-wrap step-input-wrap--deg" data-step-spin="0.1">
+                <button type="button" class="btn-step btn-step-dec" aria-label="步进减 0.1°">−</button>
+                <input type="text" class="inp-step inp-step-deg" inputmode="decimal" value="0.1" size="5" autocomplete="off" />
+                <button type="button" class="btn-step btn-step-inc" aria-label="步进加 0.1°">+</button>
+              </div>
+            </label>
+            <label class="field"><span>初始值</span><span class="field-display inp-initial" aria-live="polite"></span></label>
+            <label class="field"><span>当前值</span><span class="field-display inp-current" aria-live="polite"></span></label>
+            <label class="field"><span>偏移量</span><span class="field-display inp-delta" aria-live="polite"></span></label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="arm-panel" data-arm="right">
+      <h2 class="arm-header">
+        <span class="arm-header-title">右手臂</span>
+        <button
+          type="button"
+          class="btn-refresh-initial"
+          data-arm="right"
+          title="把当前末端 XYZ（m）与 RX/RY/RZ（°）写入「初始值」"
+        >刷新初始值</button>
+      </h2>
+      <div class="arm-panel__body">
+        <h3 class="arm-section-title">空间位置偏移</h3>
+        <div class="axis-block" data-axis="x">
+          <div class="axis-block__head">
+            <div class="axis-id">
+              <span class="axis-badge">X</span>
+              <span class="axis-label">前后</span>
+            </div>
+            <div class="axis-jog" aria-label="X 轴示教">
+              <button type="button" class="btn-inc" data-dir="-">−</button>
+              <button type="button" class="btn-inc" data-dir="+">+</button>
+            </div>
+          </div>
+          <div class="fields">
+            <label class="field field--step">
+              <span>步进值</span>
+              <div class="step-input-wrap">
+                <button type="button" class="btn-step btn-step-dec" aria-label="步进减 0.5">−</button>
+                <input type="text" class="inp-step" inputmode="decimal" value="1" autocomplete="off" />
+                <button type="button" class="btn-step btn-step-inc" aria-label="步进加 0.5">+</button>
+              </div>
+            </label>
+            <label class="field"><span>初始值</span><span class="field-display inp-initial" aria-live="polite"></span></label>
+            <label class="field"><span>当前值</span><span class="field-display inp-current" aria-live="polite"></span></label>
+            <label class="field"><span>偏移量</span><span class="field-display inp-delta" aria-live="polite"></span></label>
+          </div>
+        </div>
+        <div class="axis-block" data-axis="y">
+          <div class="axis-block__head">
+            <div class="axis-id">
+              <span class="axis-badge">Y</span>
+              <span class="axis-label">左右</span>
+            </div>
+            <div class="axis-jog" aria-label="Y 轴示教">
+              <button type="button" class="btn-inc" data-dir="-">−</button>
+              <button type="button" class="btn-inc" data-dir="+">+</button>
+            </div>
+          </div>
+          <div class="fields">
+            <label class="field field--step">
+              <span>步进值</span>
+              <div class="step-input-wrap">
+                <button type="button" class="btn-step btn-step-dec" aria-label="步进减 0.5">−</button>
+                <input type="text" class="inp-step" inputmode="decimal" value="1" autocomplete="off" />
+                <button type="button" class="btn-step btn-step-inc" aria-label="步进加 0.5">+</button>
+              </div>
+            </label>
+            <label class="field"><span>初始值</span><span class="field-display inp-initial" aria-live="polite"></span></label>
+            <label class="field"><span>当前值</span><span class="field-display inp-current" aria-live="polite"></span></label>
+            <label class="field"><span>偏移量</span><span class="field-display inp-delta" aria-live="polite"></span></label>
+          </div>
+        </div>
+        <div class="axis-block" data-axis="z">
+          <div class="axis-block__head">
+            <div class="axis-id">
+              <span class="axis-badge">Z</span>
+              <span class="axis-label">上下</span>
+            </div>
+            <div class="axis-jog" aria-label="Z 轴示教">
+              <button type="button" class="btn-inc" data-dir="-">−</button>
+              <button type="button" class="btn-inc" data-dir="+">+</button>
+            </div>
+          </div>
+          <div class="fields">
+            <label class="field field--step">
+              <span>步进值</span>
+              <div class="step-input-wrap">
+                <button type="button" class="btn-step btn-step-dec" aria-label="步进减 0.5">−</button>
+                <input type="text" class="inp-step" inputmode="decimal" value="1" autocomplete="off" />
+                <button type="button" class="btn-step btn-step-inc" aria-label="步进加 0.5">+</button>
+              </div>
+            </label>
+            <label class="field"><span>初始值</span><span class="field-display inp-initial" aria-live="polite"></span></label>
+            <label class="field"><span>当前值</span><span class="field-display inp-current" aria-live="polite"></span></label>
+            <label class="field"><span>偏移量</span><span class="field-display inp-delta" aria-live="polite"></span></label>
+          </div>
+        </div>
+      </div>
+      <div class="arm-panel__body">
+        <h3 class="arm-section-title">空间姿态偏移</h3>
+        <div class="axis-block axis-block--rot" data-rot-axis="rx">
+          <div class="axis-block__head">
+            <div class="axis-id">
+              <span class="axis-badge">RX</span>
+              <span class="axis-label">绕 base X</span>
+            </div>
+            <div class="axis-jog" aria-label="RX 轴示教">
+              <button type="button" class="btn-inc" data-dir="-">−</button>
+              <button type="button" class="btn-inc" data-dir="+">+</button>
+            </div>
+          </div>
+          <div class="fields">
+            <label class="field field--step">
+              <span>步进值</span>
+              <div class="step-input-wrap step-input-wrap--deg" data-step-spin="0.1">
+                <button type="button" class="btn-step btn-step-dec" aria-label="步进减 0.1°">−</button>
+                <input type="text" class="inp-step inp-step-deg" inputmode="decimal" value="0.1" size="5" autocomplete="off" />
+                <button type="button" class="btn-step btn-step-inc" aria-label="步进加 0.1°">+</button>
+              </div>
+            </label>
+            <label class="field"><span>初始值</span><span class="field-display inp-initial" aria-live="polite"></span></label>
+            <label class="field"><span>当前值</span><span class="field-display inp-current" aria-live="polite"></span></label>
+            <label class="field"><span>偏移量</span><span class="field-display inp-delta" aria-live="polite"></span></label>
+          </div>
+        </div>
+        <div class="axis-block axis-block--rot" data-rot-axis="ry">
+          <div class="axis-block__head">
+            <div class="axis-id">
+              <span class="axis-badge">RY</span>
+              <span class="axis-label">绕 base Y</span>
+            </div>
+            <div class="axis-jog" aria-label="RY 轴示教">
+              <button type="button" class="btn-inc" data-dir="-">−</button>
+              <button type="button" class="btn-inc" data-dir="+">+</button>
+            </div>
+          </div>
+          <div class="fields">
+            <label class="field field--step">
+              <span>步进值</span>
+              <div class="step-input-wrap step-input-wrap--deg" data-step-spin="0.1">
+                <button type="button" class="btn-step btn-step-dec" aria-label="步进减 0.1°">−</button>
+                <input type="text" class="inp-step inp-step-deg" inputmode="decimal" value="0.1" size="5" autocomplete="off" />
+                <button type="button" class="btn-step btn-step-inc" aria-label="步进加 0.1°">+</button>
+              </div>
+            </label>
+            <label class="field"><span>初始值</span><span class="field-display inp-initial" aria-live="polite"></span></label>
+            <label class="field"><span>当前值</span><span class="field-display inp-current" aria-live="polite"></span></label>
+            <label class="field"><span>偏移量</span><span class="field-display inp-delta" aria-live="polite"></span></label>
+          </div>
+        </div>
+        <div class="axis-block axis-block--rot" data-rot-axis="rz">
+          <div class="axis-block__head">
+            <div class="axis-id">
+              <span class="axis-badge">RZ</span>
+              <span class="axis-label">绕 base Z</span>
+            </div>
+            <div class="axis-jog" aria-label="RZ 轴示教">
+              <button type="button" class="btn-inc" data-dir="-">−</button>
+              <button type="button" class="btn-inc" data-dir="+">+</button>
+            </div>
+          </div>
+          <div class="fields">
+            <label class="field field--step">
+              <span>步进值</span>
+              <div class="step-input-wrap step-input-wrap--deg" data-step-spin="0.1">
+                <button type="button" class="btn-step btn-step-dec" aria-label="步进减 0.1°">−</button>
+                <input type="text" class="inp-step inp-step-deg" inputmode="decimal" value="0.1" size="5" autocomplete="off" />
+                <button type="button" class="btn-step btn-step-inc" aria-label="步进加 0.1°">+</button>
+              </div>
+            </label>
+            <label class="field"><span>初始值</span><span class="field-display inp-initial" aria-live="polite"></span></label>
+            <label class="field"><span>当前值</span><span class="field-display inp-current" aria-live="polite"></span></label>
+            <label class="field"><span>偏移量</span><span class="field-display inp-delta" aria-live="polite"></span></label>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-controls">
+      <div class="instrument-block">
+        <span class="instrument-label">乐器（单选）</span>
+        <div class="instrument-dropdown" id="instrument-dropdown">
+          <button
+            type="button"
+            id="instrument-dropdown-toggle"
+            class="instrument-dropdown-btn"
+            aria-expanded="false"
+            aria-controls="instrument-dropdown-panel"
+            aria-haspopup="listbox"
+          >
+            <span id="instrument-dropdown-label">请选择一种乐器</span>
+            <span class="instrument-dropdown-caret" aria-hidden="true">▼</span>
+          </button>
+          <div
+            id="instrument-dropdown-panel"
+            class="instrument-dropdown-panel"
+            role="radiogroup"
+            aria-label="乐器"
+            hidden
+          >
+            <label class="instrument-check">
+              <input type="radio" name="instrument" value="drum" /> 架子鼓
+            </label>
+            <label class="instrument-check">
+              <input type="radio" name="instrument" value="bass" /> 贝斯
+            </label>
+            <label class="instrument-check">
+              <input type="radio" name="instrument" value="guitar" /> 吉他
+            </label>
+            <label class="instrument-check">
+              <input type="radio" name="instrument" value="keyboard" /> 电子琴
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="footer-btns">
+        <button type="button" id="btn-calib-start" class="btn-ctrl">开始标定</button>
+        <button type="button" id="btn-calib-end" class="btn-ctrl">结束标定</button>
+        <button type="button" id="btn-upper-body-debug-off" class="btn-ctrl">关闭上半身调试模式</button>
+        <button
+          type="button"
+          id="btn-save"
+          class="btn-save"
+          title="保存左右臂末端 6D 偏移量 (x,y,z[mm] + rx,ry,rz[rad] 外旋 XYZ) 到 web_saved_offsets.json"
+        >保存</button>
+      </div>
+    </div>
+    <section class="trajectory-panel">
+      <h3 class="trajectory-title">标定数据偏移生成播放</h3>
+      <div class="trajectory-row">
+        <label class="trajectory-label">
+          <span>数据来源</span>
+          <select id="trajectory-mode" class="trajectory-select">
+            <option value="resource_start">resource 开始标定</option>
+            <option value="resource_end">resource 结束标定</option>
+            <option value="action_data">action_data_offset / data</option>
+            <option value="offset_data">本包 offest_data / new_offset_data</option>
+            <option value="custom">自定义绝对路径</option>
+          </select>
+        </label>
+      </div>
+      <div class="trajectory-row" id="row-action-data" hidden>
+        <label class="trajectory-label">
+          <span>data 文件</span>
+          <select id="action-data-select" class="trajectory-select"></select>
+        </label>
+      </div>
+      <div class="trajectory-row" id="row-offset-data" hidden>
+        <label class="trajectory-label">
+          <span>偏移数据文件</span>
+          <select id="offset-data-select" class="trajectory-select"></select>
+        </label>
+      </div>
+      <div class="trajectory-row" id="row-custom-path" hidden>
+        <label class="trajectory-label trajectory-label--grow">
+          <span>绝对路径</span>
+          <input type="text" id="custom-trajectory-path" class="trajectory-input" size="72" placeholder="/path/to/file.data" autocomplete="off" />
+        </label>
+      </div>
+      <div class="trajectory-row">
+        <label class="trajectory-label trajectory-label--grow">
+          <span>输出文件名（仅生成偏移数据时使用，可空）</span>
+          <input type="text" id="output-basename" class="trajectory-input" placeholder="例：DZQ_xxx_web_offset.data" autocomplete="off" />
+        </label>
+      </div>
+      <div class="trajectory-row trajectory-actions">
+        <button type="button" id="btn-offset-produce" class="btn-ctrl">生成偏移数据</button>
+        <button type="button" id="btn-play-selected" class="btn-ctrl">播放所选轨迹</button>
+      </div>
+      <div id="offset-produce-progress" class="offset-produce-progress" hidden>
+        <p class="offset-produce-progress__label">正在计算并生成偏移轨迹，请稍候…</p>
+        <div class="offset-produce-progress__track" aria-hidden="true">
+          <div class="offset-produce-progress__bar"></div>
+        </div>
+      </div>
+    </section>
+    <section class="trajectory-panel band-panel">
+      <h3 class="trajectory-title">乐队多片段数据偏移生成播放</h3>
+      <div class="trajectory-row band-row">
+        <label class="trajectory-label trajectory-label--grow">
+          <span>数据来源目录（绝对路径）</span>
+          <input
+            type="text"
+            id="band-source-dir"
+            class="trajectory-input"
+            placeholder="/abs/path/to/band_raw_data"
+            autocomplete="off"
+          />
+        </label>
+        <button type="button" id="btn-band-list-source" class="btn-ctrl">列出来源</button>
+      </div>
+      <div class="trajectory-row" id="band-source-row" hidden>
+        <label class="trajectory-label trajectory-label--grow">
+          <span>选择动作数据文件（可多选，Ctrl/Cmd / Shift 多选，仅 .data / .csv）</span>
+          <select
+            id="band-source-select"
+            class="trajectory-select band-multi-select"
+            multiple
+            size="8"
+          ></select>
+        </label>
+      </div>
+      <div class="trajectory-row band-row">
+        <label class="trajectory-label trajectory-label--grow">
+          <span>保存目录（绝对路径，留空则使用默认 new_offset_data）</span>
+          <input
+            type="text"
+            id="band-save-dir"
+            class="trajectory-input"
+            placeholder="/abs/path/to/band_offset_out"
+            autocomplete="off"
+          />
+        </label>
+        <button type="button" id="btn-band-produce" class="btn-ctrl">批量生成偏移数据</button>
+      </div>
+      <div id="band-produce-progress" class="offset-produce-progress" hidden>
+        <p class="offset-produce-progress__label">正在批量计算并生成偏移轨迹，请稍候…</p>
+        <div class="offset-produce-progress__track" aria-hidden="true">
+          <div class="offset-produce-progress__bar"></div>
+        </div>
+      </div>
+      <div class="trajectory-row band-row">
+        <label class="trajectory-label trajectory-label--grow">
+          <span>已生成 / 待播放偏移数据（点击选择，序号即为播放顺序；再次点击取消）</span>
+          <div id="band-generated-list" class="band-generated-list" aria-live="polite">
+            <p class="band-generated-empty">尚无条目；先"批量生成"或点"扫描保存目录"。</p>
+          </div>
+        </label>
+        <div class="band-generated-actions">
+          <button type="button" id="btn-band-list-generated" class="btn-ctrl" title="扫描保存目录下的 .data / .csv 文件">扫描保存目录</button>
+          <button type="button" id="btn-band-clear-order" class="btn-ctrl" title="清空当前顺序选择">清空顺序</button>
+        </div>
+      </div>
+      <div class="trajectory-row trajectory-actions">
+        <button type="button" id="btn-band-play" class="btn-ctrl">按顺序播放</button>
+      </div>
+    </section>
+    <p class="page-footer-note pose-section-hint">
+      说明事项：上方<strong>外旋 XYZ 欧拉角偏移（度）</strong>（与「保存」一致）。下方 RX/RY/RZ 为<strong>旋转向量分量（度）</strong>，与欧拉角数值一般不同；纯绕某一 base 轴小角度时通常对应轴的旋转向量接近指令角。
+    </p>
+  </footer>
+
+  <div id="app-modal-root" class="app-modal-root" hidden>
+    <div class="app-modal-backdrop" aria-hidden="true"></div>
+    <div
+      class="app-modal-dialog"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="app-modal-message"
+    >
+      <p id="app-modal-message" class="app-modal-message"></p>
+      <div class="app-modal-actions">
+        <button type="button" class="app-modal-btn app-modal-btn--secondary" id="app-modal-cancel" hidden>
+          取消
+        </button>
+        <button type="button" class="app-modal-btn app-modal-btn--primary" id="app-modal-ok">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

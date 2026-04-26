@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>casbot_arm_calibration_web</name>
+  <version>0.1.0</version>
+  <description>CASBOT 手臂位姿标定 Web 界面（ROS2）</description>
+
+  <maintainer email="casbot@example.com">casbot</maintainer>
+  <license>Proprietary</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-flask</exec_depend>
+  <!-- 正运动学可选后端；与系统 Python pinocchio / numpy 版本需匹配 -->
+  <exec_depend>ros-humble-pinocchio</exec_depend>
+  <!-- tracikpy 无官方 deb，需在镜像/宿主机 pip 安装（见 docker_generate_x86_2204.002.dockerfile） -->
+  <exec_depend>crb_ros_msg</exec_depend>
+  <exec_depend>action_data_offset</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

@@ -1,0 +1,23 @@
+[0.431s] Invoking command in '/workspace/action_data_offset_ws/src/action_data_offset': PYTHONPATH=/workspace/action_data_offset_ws/build/action_data_offset/prefix_override:/usr/local/lib/python3.10/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/action_data_offset_ws/install/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build_x86/action_data_offset build --build-base /workspace/action_data_offset_ws/build/action_data_offset/build install --record /workspace/action_data_offset_ws/build/action_data_offset/install.log --single-version-externally-managed install_data
+[0.584s] running egg_info
+[0.585s] writing ../../build_x86/action_data_offset/action_data_offset.egg-info/PKG-INFO
+[0.585s] writing dependency_links to ../../build_x86/action_data_offset/action_data_offset.egg-info/dependency_links.txt
+[0.585s] writing entry points to ../../build_x86/action_data_offset/action_data_offset.egg-info/entry_points.txt
+[0.585s] writing requirements to ../../build_x86/action_data_offset/action_data_offset.egg-info/requires.txt
+[0.585s] writing top-level names to ../../build_x86/action_data_offset/action_data_offset.egg-info/top_level.txt
+[0.587s] reading manifest file '../../build_x86/action_data_offset/action_data_offset.egg-info/SOURCES.txt'
+[0.591s] writing manifest file '../../build_x86/action_data_offset/action_data_offset.egg-info/SOURCES.txt'
+[0.591s] running build
+[0.591s] running build_py
+[0.591s] running install
+[0.591s] running install_lib
+[0.593s] running install_data
+[0.597s] running install_egg_info
+[0.599s] removing '/workspace/action_data_offset_ws/install/lib/python3.10/site-packages/action_data_offset-0.1.0-py3.10.egg-info' (and everything under it)
+[0.599s] Copying ../../build_x86/action_data_offset/action_data_offset.egg-info to /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/action_data_offset-0.1.0-py3.10.egg-info
+[0.600s] running install_scripts
+[0.614s] Installing arm_trajectory_transform script to /workspace/action_data_offset_ws/install/lib/action_data_offset
+[0.614s] Installing arm_trajectory_transform_jacobian script to /workspace/action_data_offset_ws/install/lib/action_data_offset
+[0.614s] Installing mujoco_trajectory_sim script to /workspace/action_data_offset_ws/install/lib/action_data_offset
+[0.615s] writing list of installed files to '/workspace/action_data_offset_ws/build/action_data_offset/install.log'
+[0.632s] Invoked command in '/workspace/action_data_offset_ws/src/action_data_offset' returned '0': PYTHONPATH=/workspace/action_data_offset_ws/build/action_data_offset/prefix_override:/usr/local/lib/python3.10/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/action_data_offset_ws/install/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build_x86/action_data_offset build --build-base /workspace/action_data_offset_ws/build/action_data_offset/build install --record /workspace/action_data_offset_ws/build/action_data_offset/install.log --single-version-externally-managed install_data

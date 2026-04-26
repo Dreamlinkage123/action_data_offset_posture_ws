@@ -1,0 +1,40 @@
+[0.453s] Invoking command in '/workspace/action_data_offset_ws/src/action_data_offset': PYTHONPATH=/workspace/action_data_offset_ws/build/action_data_offset/prefix_override:/usr/local/lib/python3.10/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/action_data_offset_ws/install/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build_x86/action_data_offset build --build-base /workspace/action_data_offset_ws/build/action_data_offset/build install --record /workspace/action_data_offset_ws/build/action_data_offset/install.log --single-version-externally-managed install_data
+[0.620s] running egg_info
+[0.621s] writing ../../build_x86/action_data_offset/action_data_offset.egg-info/PKG-INFO
+[0.621s] writing dependency_links to ../../build_x86/action_data_offset/action_data_offset.egg-info/dependency_links.txt
+[0.621s] writing entry points to ../../build_x86/action_data_offset/action_data_offset.egg-info/entry_points.txt
+[0.621s] writing requirements to ../../build_x86/action_data_offset/action_data_offset.egg-info/requires.txt
+[0.621s] writing top-level names to ../../build_x86/action_data_offset/action_data_offset.egg-info/top_level.txt
+[0.623s] reading manifest file '../../build_x86/action_data_offset/action_data_offset.egg-info/SOURCES.txt'
+[0.628s] writing manifest file '../../build_x86/action_data_offset/action_data_offset.egg-info/SOURCES.txt'
+[0.628s] running build
+[0.629s] running build_py
+[0.629s] copying action_data_paths.py -> /workspace/action_data_offset_ws/build/action_data_offset/build/lib
+[0.629s] copying arm_pinocchio_kin.py -> /workspace/action_data_offset_ws/build/action_data_offset/build/lib
+[0.629s] copying arm_trajectory_transform.py -> /workspace/action_data_offset_ws/build/action_data_offset/build/lib
+[0.629s] copying arm_trajectory_transform_jacobian.py -> /workspace/action_data_offset_ws/build/action_data_offset/build/lib
+[0.629s] copying mujoco_trajectory_sim.py -> /workspace/action_data_offset_ws/build/action_data_offset/build/lib
+[0.629s] running install
+[0.630s] running install_lib
+[0.630s] copying /workspace/action_data_offset_ws/build/action_data_offset/build/lib/arm_pinocchio_kin.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages
+[0.630s] copying /workspace/action_data_offset_ws/build/action_data_offset/build/lib/action_data_paths.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages
+[0.630s] copying /workspace/action_data_offset_ws/build/action_data_offset/build/lib/arm_trajectory_transform_jacobian.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages
+[0.631s] copying /workspace/action_data_offset_ws/build/action_data_offset/build/lib/arm_trajectory_transform.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages
+[0.631s] copying /workspace/action_data_offset_ws/build/action_data_offset/build/lib/mujoco_trajectory_sim.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages
+[0.631s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/arm_pinocchio_kin.py to arm_pinocchio_kin.cpython-310.pyc
+[0.633s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/action_data_paths.py to action_data_paths.cpython-310.pyc
+[0.634s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/arm_trajectory_transform_jacobian.py to arm_trajectory_transform_jacobian.cpython-310.pyc
+[0.635s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/arm_trajectory_transform.py to arm_trajectory_transform.cpython-310.pyc
+[0.636s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/mujoco_trajectory_sim.py to mujoco_trajectory_sim.cpython-310.pyc
+[0.638s] running install_data
+[0.638s] copying package.xml -> /workspace/action_data_offset_ws/install/share/action_data_offset
+[0.640s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/CASBOT02_ENCOS_7dof_shell_20251015_P1L.urdf -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf
+[0.644s] running install_egg_info
+[0.646s] removing '/workspace/action_data_offset_ws/install/lib/python3.10/site-packages/action_data_offset-0.1.0-py3.10.egg-info' (and everything under it)
+[0.646s] Copying ../../build_x86/action_data_offset/action_data_offset.egg-info to /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/action_data_offset-0.1.0-py3.10.egg-info
+[0.648s] running install_scripts
+[0.673s] Installing arm_trajectory_transform script to /workspace/action_data_offset_ws/install/lib/action_data_offset
+[0.673s] Installing arm_trajectory_transform_jacobian script to /workspace/action_data_offset_ws/install/lib/action_data_offset
+[0.673s] Installing mujoco_trajectory_sim script to /workspace/action_data_offset_ws/install/lib/action_data_offset
+[0.674s] writing list of installed files to '/workspace/action_data_offset_ws/build/action_data_offset/install.log'
+[0.692s] Invoked command in '/workspace/action_data_offset_ws/src/action_data_offset' returned '0': PYTHONPATH=/workspace/action_data_offset_ws/build/action_data_offset/prefix_override:/usr/local/lib/python3.10/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/action_data_offset_ws/install/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build_x86/action_data_offset build --build-base /workspace/action_data_offset_ws/build/action_data_offset/build install --record /workspace/action_data_offset_ws/build/action_data_offset/install.log --single-version-externally-managed install_data

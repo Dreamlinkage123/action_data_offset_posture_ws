@@ -1,0 +1,199 @@
+[0.735s] Invoking command in '/workspace/action_data_offset_ws/src/action_data_offset': PYTHONPATH=/workspace/action_data_offset_ws/build/action_data_offset/prefix_override:/usr/local/lib/python3.10/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/action_data_offset_ws/install/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build_x86/action_data_offset build --build-base /workspace/action_data_offset_ws/build/action_data_offset/build install --record /workspace/action_data_offset_ws/build/action_data_offset/install.log --single-version-externally-managed install_data
+[0.904s] running egg_info
+[0.904s] creating ../../build_x86/action_data_offset/action_data_offset.egg-info
+[0.904s] writing ../../build_x86/action_data_offset/action_data_offset.egg-info/PKG-INFO
+[0.904s] writing dependency_links to ../../build_x86/action_data_offset/action_data_offset.egg-info/dependency_links.txt
+[0.905s] writing entry points to ../../build_x86/action_data_offset/action_data_offset.egg-info/entry_points.txt
+[0.905s] writing requirements to ../../build_x86/action_data_offset/action_data_offset.egg-info/requires.txt
+[0.905s] writing top-level names to ../../build_x86/action_data_offset/action_data_offset.egg-info/top_level.txt
+[0.905s] writing manifest file '../../build_x86/action_data_offset/action_data_offset.egg-info/SOURCES.txt'
+[0.907s] reading manifest file '../../build_x86/action_data_offset/action_data_offset.egg-info/SOURCES.txt'
+[0.909s] writing manifest file '../../build_x86/action_data_offset/action_data_offset.egg-info/SOURCES.txt'
+[0.910s] running build
+[0.910s] running build_py
+[0.910s] creating /workspace/action_data_offset_ws/build/action_data_offset/build
+[0.910s] creating /workspace/action_data_offset_ws/build/action_data_offset/build/lib
+[0.910s] copying action_data_paths.py -> /workspace/action_data_offset_ws/build/action_data_offset/build/lib
+[0.911s] copying arm_transform_common.py -> /workspace/action_data_offset_ws/build/action_data_offset/build/lib
+[0.911s] copying arm_pinocchio_kin.py -> /workspace/action_data_offset_ws/build/action_data_offset/build/lib
+[0.911s] copying arm_trajectory_transform.py -> /workspace/action_data_offset_ws/build/action_data_offset/build/lib
+[0.911s] copying arm_trajectory_transform_jacobian.py -> /workspace/action_data_offset_ws/build/action_data_offset/build/lib
+[0.911s] copying mujoco_trajectory_sim.py -> /workspace/action_data_offset_ws/build/action_data_offset/build/lib
+[0.912s] copying piano_key_audio.py -> /workspace/action_data_offset_ws/build/action_data_offset/build/lib
+[0.912s] running install
+[0.913s] running install_lib
+[0.914s] copying /workspace/action_data_offset_ws/build/action_data_offset/build/lib/arm_transform_common.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages
+[0.914s] copying /workspace/action_data_offset_ws/build/action_data_offset/build/lib/arm_pinocchio_kin.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages
+[0.914s] copying /workspace/action_data_offset_ws/build/action_data_offset/build/lib/action_data_paths.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages
+[0.915s] copying /workspace/action_data_offset_ws/build/action_data_offset/build/lib/arm_trajectory_transform_jacobian.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages
+[0.915s] copying /workspace/action_data_offset_ws/build/action_data_offset/build/lib/arm_trajectory_transform.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages
+[0.915s] copying /workspace/action_data_offset_ws/build/action_data_offset/build/lib/piano_key_audio.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages
+[0.915s] copying /workspace/action_data_offset_ws/build/action_data_offset/build/lib/mujoco_trajectory_sim.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages
+[0.916s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/arm_transform_common.py to arm_transform_common.cpython-310.pyc
+[0.919s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/arm_pinocchio_kin.py to arm_pinocchio_kin.cpython-310.pyc
+[0.920s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/action_data_paths.py to action_data_paths.cpython-310.pyc
+[0.921s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/arm_trajectory_transform_jacobian.py to arm_trajectory_transform_jacobian.cpython-310.pyc
+[0.923s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/arm_trajectory_transform.py to arm_trajectory_transform.cpython-310.pyc
+[0.926s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/piano_key_audio.py to piano_key_audio.cpython-310.pyc
+[0.928s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/mujoco_trajectory_sim.py to mujoco_trajectory_sim.cpython-310.pyc
+[0.931s] running install_data
+[0.931s] creating /workspace/action_data_offset_ws/install/share
+[0.931s] creating /workspace/action_data_offset_ws/install/share/ament_index
+[0.931s] creating /workspace/action_data_offset_ws/install/share/ament_index/resource_index
+[0.931s] creating /workspace/action_data_offset_ws/install/share/ament_index/resource_index/packages
+[0.931s] copying resource/action_data_offset -> /workspace/action_data_offset_ws/install/share/ament_index/resource_index/packages
+[0.931s] creating /workspace/action_data_offset_ws/install/share/action_data_offset
+[0.931s] copying package.xml -> /workspace/action_data_offset_ws/install/share/action_data_offset
+[0.931s] creating /workspace/action_data_offset_ws/install/share/action_data_offset/doc
+[0.932s] copying /workspace/action_data_offset_ws/src/action_data_offset/使用教程.md -> /workspace/action_data_offset_ws/install/share/action_data_offset/doc
+[0.932s] creating /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[0.932s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_GuangHuiSuiYue_20260411_18_02_100HZ_offset_new_mm.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[0.941s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/光辉岁月-20260413_offset.csv -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[0.945s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_PianYi_100HZ_transform2.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[0.946s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_GuangHuiSuiYue_20260411_18_02_100HZ_offset_right.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[0.953s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_PianYi_100HZ.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[0.953s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/BS_GuangHuiSuiYue_20260418_17_41_100HZ_full_offset.csv -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[0.964s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_PianYi_100HZ_transform_jacobian2.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[0.965s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_GuangHuiSuiYue_20260411_18_02_100HZ_offset_new.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[0.970s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_GuangHuiSuiYue_20260411_18_02_100HZ_offset_left_mm.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[0.975s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_YiShengYouNi_100HZ_offset2.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[0.976s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_GuangHuiSuiYue_20260411_18_02_100HZ_offset.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[0.997s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/光辉岁月-20260413.csv -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[0.999s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/表头.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[0.999s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_PianYi_100HZ_transform.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[1.000s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_GuangHuiSuiYue_20260411_18_02_100HZ.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[1.005s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_GuangHuiSuiYue_20260411_18_02_100HZ_offset1.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[1.024s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_YiShengYouNi_100HZ.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[1.026s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_GuangHuiSuiYue_20260411_18_02_100HZ_offset_left_mm2.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[1.032s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_GuangHuiSuiYue_20260411_18_02_100HZ_offset_left.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[1.037s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/BS_GuangHuiSuiYue_20260418_17_41_100HZ_full_offset2.csv -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[1.046s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_GuangHuiSuiYue_20260411_18_02_100HZ_offset_offset.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[1.051s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_GuangHuiSuiYue_20260411_18_02_100HZ_offset_46.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[1.058s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/BS_GuangHuiSuiYue_20260418_17_41_100HZ_full.csv -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[1.082s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_YiShengYouNi_100HZ_offset1.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[1.083s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/DZQ_PianYi_100HZ_transform_jacobian.data -> /workspace/action_data_offset_ws/install/share/action_data_offset/data
+[1.084s] creating /workspace/action_data_offset_ws/install/share/action_data_offset/data/bass
+[1.084s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/bass/glory-bass1_0_20260418_151400.csv -> /workspace/action_data_offset_ws/install/share/action_data_offset/data/bass
+[1.085s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/bass/glory-bass1.txt -> /workspace/action_data_offset_ws/install/share/action_data_offset/data/bass
+[1.085s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/bass/glory-bass1_1_20260418_151400.csv -> /workspace/action_data_offset_ws/install/share/action_data_offset/data/bass
+[1.086s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/bass/glory-bass1_0_20260418_151400_all_offset.csv -> /workspace/action_data_offset_ws/install/share/action_data_offset/data/bass
+[1.089s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/bass/glory-bass1_2_20260418_151400.csv -> /workspace/action_data_offset_ws/install/share/action_data_offset/data/bass
+[1.089s] copying /workspace/action_data_offset_ws/src/action_data_offset/data/bass/glory-bass1_0_20260418_151400_all.csv -> /workspace/action_data_offset_ws/install/share/action_data_offset/data/bass
+[1.092s] creating /workspace/action_data_offset_ws/install/share/action_data_offset/urdf
+[1.092s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/CASBOT02_ENCOS_7dof_shell_20251015_P1L.urdf -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf
+[1.093s] creating /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.093s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_index_mcp_link5.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.093s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_thumb_tip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.094s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_index_dip_link6.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.094s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_shoulder_roll_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.095s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_leg_pelvic_roll_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.096s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_pinky_dip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.096s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_thumb_dip_link4.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.097s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_thumb_mcp_roll_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.097s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_index_mcp_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.098s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_palm_base_link1.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.099s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_elbow_pitch_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.100s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_thumb_distal_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.101s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_thumb_proximal_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.101s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_thumb_metacarpal_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.101s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_palm_base_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.103s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_pinky_mcp_link11.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.103s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_wrist_yaw_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.105s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_index_mcp_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.105s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_leg_pelvic_yaw_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.107s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_index_dip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.108s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_leg_ankle_roll_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.109s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_pinky_mcp_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.110s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_thumb_mcp_roll_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.110s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_middle_dip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.111s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_pinky_tip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.111s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_middle_mcp_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.112s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_ring_mcp_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.112s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_thumb_mcp_roll_link2.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.113s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_ring_dip_link10.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.114s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/base_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.116s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_thumb_dip_link4.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.117s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_middle_tip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.117s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_fake_hand_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.118s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_middle_mcp_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.119s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_base_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.121s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_thumb_mcp_pitch_link3.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.125s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_ring_tip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.127s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_pinky_tip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.128s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_middle_mcp_link7.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.134s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_middle_dip_link8.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.137s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_leg_ankle_roll_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.139s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_wrist_pitch_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.139s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/base_link_collision.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.143s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_leg_knee_pitch_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.144s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_pinky_mcp_link11.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.145s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_thumb_mcp_pitch_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.146s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_ring_dip_link10.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.146s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_ring_mcp_link9.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.147s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_middle_mcp_link7.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.147s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_leg_pelvic_pitch_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.148s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_middle_tip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.148s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_middle_dip_link8.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.149s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_base_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.151s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_wrist_roll_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.151s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_palm_base_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.153s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_shoulder_yaw_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.153s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_thumb_dip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.154s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/waist_yaw_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.156s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_index_tip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.156s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_ring_dip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.157s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_palm_base_link1.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.158s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_index_dip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.159s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_elbow_pitch_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.160s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/head_yaw_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.162s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_shoulder_pitch_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.163s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_thumb_mcp_roll_link2.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.163s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_pinky_dip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.164s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_ring_dip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.164s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/head_pitch_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.166s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_index_dip_link6.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.166s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_ring_mcp_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.167s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_ring_tip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.167s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_shoulder_yaw_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.168s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_index_tip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.168s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_index_mcp_link5.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.168s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_ring_mcp_link9.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.169s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_wrist_roll_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.170s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_wrist_pitch_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.170s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_shoulder_roll_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.171s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_pinky_dip_link12.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.172s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_thumb_mcp_pitch_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.172s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_leg_ankle_pitch_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.173s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_middle_dip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.173s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_leg_ankle_pitch_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.173s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/waist_yaw_link_bass.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.176s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_leg_pelvic_pitch_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.177s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_pinky_mcp_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.178s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_thumb_mcp_pitch_link3.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.178s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_leg_pelvic_roll_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.179s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/waist_yaw_link_guitar.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.181s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_thumb_tip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.181s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_leg_pelvic_yaw_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.183s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_thumb_dip_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.184s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_wrist_yaw_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.185s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/right_pinky_dip_link12.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.185s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_shoulder_pitch_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.186s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/meshes/left_leg_knee_pitch_link.STL -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/meshes
+[1.187s] creating /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/xml
+[1.187s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/xml/CASBOT02_ENCOS_7dof_shell_20251015_P1L.xml -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/xml
+[1.187s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/xml/CASBOT02_ENCOS_7dof_shell_20251015_P1L_keyboard.xml -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/xml
+[1.188s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/xml/CASBOT02_ENCOS_7dof_shell_20251015_P1L_bass.xml -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/xml
+[1.188s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/xml/CASBOT02_ENCOS_7dof_shell_20251015_P1L_guitar.xml -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/xml
+[1.188s] copying /workspace/action_data_offset_ws/src/action_data_offset/urdf/xml/CASBOT02_bass_sim.xml -> /workspace/action_data_offset_ws/install/share/action_data_offset/urdf/xml
+[1.188s] creating /workspace/action_data_offset_ws/install/share/action_data_offset/examples
+[1.188s] copying /workspace/action_data_offset_ws/src/action_data_offset/examples/data_transform_z.csv -> /workspace/action_data_offset_ws/install/share/action_data_offset/examples
+[1.188s] copying /workspace/action_data_offset_ws/src/action_data_offset/examples/sample_track.csv -> /workspace/action_data_offset_ws/install/share/action_data_offset/examples
+[1.188s] copying /workspace/action_data_offset_ws/src/action_data_offset/examples/data_transform.csv -> /workspace/action_data_offset_ws/install/share/action_data_offset/examples
+[1.188s] running install_egg_info
+[1.190s] Copying ../../build_x86/action_data_offset/action_data_offset.egg-info to /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/action_data_offset-0.1.0-py3.10.egg-info
+[1.190s] running install_scripts
+[1.205s] Installing arm_trajectory_transform script to /workspace/action_data_offset_ws/install/lib/action_data_offset
+[1.205s] Installing arm_trajectory_transform_jacobian script to /workspace/action_data_offset_ws/install/lib/action_data_offset
+[1.205s] Installing mujoco_trajectory_sim script to /workspace/action_data_offset_ws/install/lib/action_data_offset
+[1.206s] writing list of installed files to '/workspace/action_data_offset_ws/build/action_data_offset/install.log'
+[1.223s] Invoked command in '/workspace/action_data_offset_ws/src/action_data_offset' returned '0': PYTHONPATH=/workspace/action_data_offset_ws/build/action_data_offset/prefix_override:/usr/local/lib/python3.10/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/action_data_offset_ws/install/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build_x86/action_data_offset build --build-base /workspace/action_data_offset_ws/build/action_data_offset/build install --record /workspace/action_data_offset_ws/build/action_data_offset/install.log --single-version-externally-managed install_data

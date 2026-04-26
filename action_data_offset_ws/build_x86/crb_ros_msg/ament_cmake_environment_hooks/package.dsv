@@ -1,0 +1,4 @@
+source;share/crb_ros_msg/local_setup.bash
+source;share/crb_ros_msg/local_setup.dsv
+source;share/crb_ros_msg/local_setup.sh
+source;share/crb_ros_msg/local_setup.zsh

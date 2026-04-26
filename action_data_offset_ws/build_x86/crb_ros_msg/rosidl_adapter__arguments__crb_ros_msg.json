@@ -1,0 +1,6 @@
+{
+  "package_name": "crb_ros_msg",
+  "non_idl_tuples": [
+    "/workspace/action_data_offset_ws/src/crb_ros_msg:msg/UpperJointData.msg"
+  ]
+}

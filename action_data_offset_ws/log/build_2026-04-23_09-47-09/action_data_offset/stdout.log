@@ -1,0 +1,21 @@
+running egg_info
+writing ../../build_x86/action_data_offset/action_data_offset.egg-info/PKG-INFO
+writing dependency_links to ../../build_x86/action_data_offset/action_data_offset.egg-info/dependency_links.txt
+writing entry points to ../../build_x86/action_data_offset/action_data_offset.egg-info/entry_points.txt
+writing requirements to ../../build_x86/action_data_offset/action_data_offset.egg-info/requires.txt
+writing top-level names to ../../build_x86/action_data_offset/action_data_offset.egg-info/top_level.txt
+reading manifest file '../../build_x86/action_data_offset/action_data_offset.egg-info/SOURCES.txt'
+writing manifest file '../../build_x86/action_data_offset/action_data_offset.egg-info/SOURCES.txt'
+running build
+running build_py
+running install
+running install_lib
+running install_data
+running install_egg_info
+removing '/workspace/action_data_offset_ws/install/lib/python3.10/site-packages/action_data_offset-0.1.0-py3.10.egg-info' (and everything under it)
+Copying ../../build_x86/action_data_offset/action_data_offset.egg-info to /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/action_data_offset-0.1.0-py3.10.egg-info
+running install_scripts
+Installing arm_trajectory_transform script to /workspace/action_data_offset_ws/install/lib/action_data_offset
+Installing arm_trajectory_transform_jacobian script to /workspace/action_data_offset_ws/install/lib/action_data_offset
+Installing mujoco_trajectory_sim script to /workspace/action_data_offset_ws/install/lib/action_data_offset
+writing list of installed files to '/workspace/action_data_offset_ws/build/action_data_offset/install.log'
