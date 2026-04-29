@@ -1,0 +1,12 @@
+Metadata-Version: 2.1
+Name: action-data-offset
+Version: 0.1.0
+Summary: Trajectory offset utilities (Pinocchio FK/IK) and MuJoCo replay (x86 only) for CASBOT action data.
+Home-page: UNKNOWN
+Maintainer: CASBOT
+Maintainer-email: support@example.com
+License: Apache-2.0
+Platform: UNKNOWN
+
+UNKNOWN
+

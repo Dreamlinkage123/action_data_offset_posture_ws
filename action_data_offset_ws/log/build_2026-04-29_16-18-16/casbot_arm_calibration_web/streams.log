@@ -1,0 +1,21 @@
+[0.601s] Invoking command in '/workspace/action_data_offset_ws/src/casbot_arm_calibration_web': AMENT_PREFIX_PATH=/workspace/action_data_offset_ws/install:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/action_data_offset_ws/install LD_LIBRARY_PATH=/workspace/action_data_offset_ws/install/lib:${LD_LIBRARY_PATH} PATH=/workspace/action_data_offset_ws/install/bin:${PATH} PYTHONPATH=/workspace/action_data_offset_ws/build/casbot_arm_calibration_web/prefix_override:/usr/local/lib/python3.10/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/action_data_offset_ws/install/lib/python3.10/site-packages:/workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages:/workspace/action_data_offset_ws/install/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build_aarch64/casbot_arm_calibration_web build --build-base /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build install --record /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/install.log --single-version-externally-managed install_data
+[0.832s] running egg_info
+[0.832s] writing ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/PKG-INFO
+[0.832s] writing dependency_links to ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/dependency_links.txt
+[0.832s] writing entry points to ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/entry_points.txt
+[0.833s] writing requirements to ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/requires.txt
+[0.833s] writing top-level names to ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/top_level.txt
+[0.837s] reading manifest file '../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/SOURCES.txt'
+[0.839s] writing manifest file '../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/SOURCES.txt'
+[0.839s] running build
+[0.839s] running build_py
+[0.842s] running install
+[0.842s] running install_lib
+[0.845s] running install_data
+[0.846s] running install_egg_info
+[0.848s] removing '/workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web-0.1.0-py3.10.egg-info' (and everything under it)
+[0.849s] Copying ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info to /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web-0.1.0-py3.10.egg-info
+[0.850s] running install_scripts
+[0.872s] Installing arm_calibration_web script to /workspace/action_data_offset_ws/install/lib/casbot_arm_calibration_web
+[0.872s] writing list of installed files to '/workspace/action_data_offset_ws/build/casbot_arm_calibration_web/install.log'
+[0.894s] Invoked command in '/workspace/action_data_offset_ws/src/casbot_arm_calibration_web' returned '0': AMENT_PREFIX_PATH=/workspace/action_data_offset_ws/install:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/action_data_offset_ws/install LD_LIBRARY_PATH=/workspace/action_data_offset_ws/install/lib:${LD_LIBRARY_PATH} PATH=/workspace/action_data_offset_ws/install/bin:${PATH} PYTHONPATH=/workspace/action_data_offset_ws/build/casbot_arm_calibration_web/prefix_override:/usr/local/lib/python3.10/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/action_data_offset_ws/install/lib/python3.10/site-packages:/workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages:/workspace/action_data_offset_ws/install/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build_aarch64/casbot_arm_calibration_web build --build-base /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build install --record /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/install.log --single-version-externally-managed install_data

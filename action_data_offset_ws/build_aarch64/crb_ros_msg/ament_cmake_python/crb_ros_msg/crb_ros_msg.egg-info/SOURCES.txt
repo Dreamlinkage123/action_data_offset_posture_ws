@@ -1,0 +1,8 @@
+setup.py
+crb_ros_msg/__init__.py
+crb_ros_msg.egg-info/PKG-INFO
+crb_ros_msg.egg-info/SOURCES.txt
+crb_ros_msg.egg-info/dependency_links.txt
+crb_ros_msg.egg-info/top_level.txt
+crb_ros_msg/msg/__init__.py
+crb_ros_msg/msg/_upper_joint_data.py
