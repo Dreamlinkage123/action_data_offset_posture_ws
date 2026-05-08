@@ -70,6 +70,7 @@ include CMakeFiles/crb_ros_msg.dir/compiler_depend.make
 include CMakeFiles/crb_ros_msg.dir/progress.make
 
 CMakeFiles/crb_ros_msg: /workspace/action_data_offset_ws/src/crb_ros_msg/msg/UpperJointData.msg
+CMakeFiles/crb_ros_msg: /workspace/action_data_offset_ws/src/crb_ros_msg/action/ActionPlay.action
 CMakeFiles/crb_ros_msg: /opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/Bool.idl
 CMakeFiles/crb_ros_msg: /opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/Byte.idl
 CMakeFiles/crb_ros_msg: /opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/ByteMultiArray.idl
@@ -128,6 +129,10 @@ CMakeFiles/crb_ros_msg: /opt/rootfs_2204_aarch64/opt/ros/humble/share/sensor_msg
 CMakeFiles/crb_ros_msg: /opt/rootfs_2204_aarch64/opt/ros/humble/share/sensor_msgs/msg/Temperature.idl
 CMakeFiles/crb_ros_msg: /opt/rootfs_2204_aarch64/opt/ros/humble/share/sensor_msgs/msg/TimeReference.idl
 CMakeFiles/crb_ros_msg: /opt/rootfs_2204_aarch64/opt/ros/humble/share/sensor_msgs/srv/SetCameraInfo.idl
+CMakeFiles/crb_ros_msg: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalInfo.idl
+CMakeFiles/crb_ros_msg: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalStatus.idl
+CMakeFiles/crb_ros_msg: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalStatusArray.idl
+CMakeFiles/crb_ros_msg: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/srv/CancelGoal.idl
 
 crb_ros_msg: CMakeFiles/crb_ros_msg
 crb_ros_msg: CMakeFiles/crb_ros_msg.dir/build.make

@@ -1037,6 +1037,300 @@ document.getElementById("btn-band-play")?.addEventListener("click", async () => 
   }
 });
 
+/* ================== 乐队多片段 csv 数据偏移生成播放（ActionPlay） ================== */
+const bandCsvOrder = {
+  paths: /** @type {string[]} */ ([]),
+  items: /** @type {{path: string, name: string}[]} */ ([]),
+};
+
+const bandCsvSourcePick = {
+  items: /** @type {{path: string, name: string}[]} */ ([]),
+  paths: /** @type {string[]} */ ([]),
+};
+
+function renderBandCsvSourceList() {
+  const host = document.getElementById("band-csv-source-list");
+  if (!host) return;
+  host.innerHTML = "";
+  if (!bandCsvSourcePick.items.length) {
+    const p = document.createElement("p");
+    p.className = "band-generated-empty";
+    p.textContent = "请先点「列出来源」";
+    host.appendChild(p);
+    return;
+  }
+  bandCsvSourcePick.items.forEach((it) => {
+    const row = document.createElement("div");
+    row.className = "band-generated-item";
+    row.setAttribute("data-path", it.path);
+    const orderIdx = bandCsvSourcePick.paths.indexOf(it.path);
+    const selected = orderIdx >= 0;
+    if (selected) row.classList.add("is-selected");
+    const ordinal = document.createElement("span");
+    ordinal.className = "band-ordinal";
+    ordinal.textContent = selected ? String(orderIdx + 1) : "";
+    const name = document.createElement("span");
+    name.className = "band-item-name";
+    name.textContent = it.name;
+    const path = document.createElement("span");
+    path.className = "band-item-path";
+    path.textContent = it.path;
+    row.appendChild(ordinal);
+    row.appendChild(name);
+    row.appendChild(path);
+    row.addEventListener("click", () => {
+      const idx = bandCsvSourcePick.paths.indexOf(it.path);
+      if (idx >= 0) bandCsvSourcePick.paths.splice(idx, 1);
+      else bandCsvSourcePick.paths.push(it.path);
+      renderBandCsvSourceList();
+    });
+    host.appendChild(row);
+  });
+}
+
+/** @returns {string[]} 绝对路径列表（来源点击顺序） */
+function buildBandCsvRawPlayPaths() {
+  return bandCsvSourcePick.paths.slice();
+}
+
+function setBandCsvProduceProgress(visible) {
+  const wrap = document.getElementById("band-csv-produce-progress");
+  const btn = document.getElementById("btn-band-csv-produce");
+  if (wrap) wrap.hidden = !visible;
+  if (btn) btn.disabled = !!visible;
+}
+
+function getBandCsvSaveDirOrEmpty() {
+  const el = document.getElementById("band-csv-save-dir");
+  return el ? el.value.trim() : "";
+}
+
+function getBandCsvSourceDirOrEmpty() {
+  const el = document.getElementById("band-csv-source-dir");
+  return el ? el.value.trim() : "";
+}
+
+function renderBandCsvGeneratedList() {
+  const host = document.getElementById("band-csv-generated-list");
+  if (!host) return;
+  host.innerHTML = "";
+  if (!bandCsvOrder.items.length) {
+    const p = document.createElement("p");
+    p.className = "band-generated-empty";
+    p.textContent = '尚无条目；先"批量生成"或点"扫描保存目录"。';
+    host.appendChild(p);
+    return;
+  }
+  bandCsvOrder.items.forEach((it) => {
+    const row = document.createElement("div");
+    row.className = "band-generated-item";
+    row.setAttribute("data-path", it.path);
+    const orderIdx = bandCsvOrder.paths.indexOf(it.path);
+    const selected = orderIdx >= 0;
+    if (selected) row.classList.add("is-selected");
+    const ordinal = document.createElement("span");
+    ordinal.className = "band-ordinal";
+    ordinal.textContent = selected ? String(orderIdx + 1) : "";
+    const name = document.createElement("span");
+    name.className = "band-item-name";
+    name.textContent = it.name;
+    const path = document.createElement("span");
+    path.className = "band-item-path";
+    path.textContent = it.path;
+    row.appendChild(ordinal);
+    row.appendChild(name);
+    row.appendChild(path);
+    row.addEventListener("click", () => {
+      const idx = bandCsvOrder.paths.indexOf(it.path);
+      if (idx >= 0) bandCsvOrder.paths.splice(idx, 1);
+      else bandCsvOrder.paths.push(it.path);
+      renderBandCsvGeneratedList();
+    });
+    host.appendChild(row);
+  });
+}
+
+function mergeBandCsvItems(newItems) {
+  const seen = new Set(bandCsvOrder.items.map((x) => x.path));
+  for (const it of newItems) {
+    if (!it || !it.path) continue;
+    if (seen.has(it.path)) continue;
+    seen.add(it.path);
+    bandCsvOrder.items.push({ path: it.path, name: it.name || it.path.split("/").pop() || it.path });
+  }
+}
+
+document.getElementById("btn-band-csv-list-source")?.addEventListener("click", async () => {
+  const dir = getBandCsvSourceDirOrEmpty();
+  if (!dir) {
+    await modalAlert("请先填写数据来源目录（绝对路径）");
+    return;
+  }
+  try {
+    const j = await postJson("/api/band_csv/list_dir", { dir });
+    const row = document.getElementById("band-csv-source-row");
+    const base = String(j.dir || dir)
+      .trim()
+      .replace(/\/+$/, "");
+    bandCsvSourcePick.items = (j.files || []).map((f) => ({
+      name: f,
+      path: `${base}/${f}`.replace(/\\/g, "/"),
+    }));
+    bandCsvSourcePick.paths = [];
+    renderBandCsvSourceList();
+    if (row) row.hidden = false;
+    if (!(j.files || []).length) {
+      await modalAlert(`目录内未发现 .csv 文件：\n${j.dir || dir}`);
+    }
+  } catch (e) {
+    console.warn("band_csv list_dir (source) failed", e);
+    await modalAlert(`列出来源失败：${e.message || String(e)}`);
+  }
+});
+
+document.getElementById("btn-band-csv-list-generated")?.addEventListener("click", async () => {
+  const dir = getBandCsvSaveDirOrEmpty();
+  if (!dir) {
+    await modalAlert("请先填写保存目录（绝对路径），或先通过「批量生成」自动定位");
+    return;
+  }
+  try {
+    const j = await postJson("/api/band_csv/list_dir", { dir });
+    const items = (j.files || []).map((name) => ({
+      name,
+      path: `${j.dir || dir}/${name}`.replace(/\\/g, "/"),
+    }));
+    if (!items.length) {
+      bandCsvOrder.items = [];
+      bandCsvOrder.paths = [];
+      renderBandCsvGeneratedList();
+      await modalAlert(`目录内未发现 .csv 文件：\n${j.dir || dir}`);
+      return;
+    }
+    mergeBandCsvItems(items);
+    renderBandCsvGeneratedList();
+  } catch (e) {
+    console.warn("band_csv list_dir (save) failed", e);
+    await modalAlert(`扫描保存目录失败：${e.message || String(e)}`);
+  }
+});
+
+document.getElementById("btn-band-csv-clear-source-order")?.addEventListener("click", () => {
+  bandCsvSourcePick.paths = [];
+  renderBandCsvSourceList();
+});
+
+document.getElementById("btn-band-csv-clear-order")?.addEventListener("click", () => {
+  bandCsvOrder.paths = [];
+  renderBandCsvGeneratedList();
+});
+
+document.getElementById("btn-band-csv-produce")?.addEventListener("click", async () => {
+  const sourceDir = getBandCsvSourceDirOrEmpty();
+  const saveDir = getBandCsvSaveDirOrEmpty();
+  const filenames = bandCsvSourcePick.paths.map((p) => basenameOnly(p));
+  if (!sourceDir) {
+    await modalAlert("请先填写数据来源目录（绝对路径）");
+    return;
+  }
+  if (!filenames.length) {
+    await modalAlert('请先在「来源动作数据」列表中按顺序点选至少一个 .csv 文件');
+    return;
+  }
+  const tailTarget = saveDir || "默认 new_offset_data 目录（首个可写位置）";
+  if (
+    !(await modalConfirm(
+      "请先保存位姿偏移量，确定批量生成偏移数据？\n\n" +
+        `来源：${sourceDir}\n` +
+        `保存：${tailTarget}\n` +
+        `文件数：${filenames.length}（仅 .csv）`
+    ))
+  ) {
+    return;
+  }
+  setBandCsvProduceProgress(true);
+  try {
+    const j = await postJson("/api/band_csv/produce", {
+      source_dir: sourceDir,
+      filenames,
+      save_dir: saveDir,
+    });
+    const results = Array.isArray(j.results) ? j.results : [];
+    const okRows = results.filter((r) => r && r.ok);
+    const failRows = results.filter((r) => r && !r.ok);
+    const newItems = okRows.map((r) => ({
+      name: r.output_name || (r.output_path || "").split("/").pop(),
+      path: r.output_path,
+    }));
+    mergeBandCsvItems(newItems);
+    renderBandCsvGeneratedList();
+    const lines = [
+      j.ok ? "批量生成成功" : "批量生成部分失败",
+      "",
+      `保存目录：${j.save_dir || saveDir || "-"}`,
+      `成功：${okRows.length}，失败：${failRows.length}`,
+    ];
+    if (failRows.length) {
+      lines.push("");
+      lines.push("失败条目：");
+      failRows.slice(0, 20).forEach((r) => {
+        lines.push(`  - ${r.input}: ${r.message || "未知错误"}`);
+      });
+      if (failRows.length > 20) lines.push(`  …（共 ${failRows.length} 条，仅显示前 20 条）`);
+    }
+    await modalAlert(lines.join("\n"));
+    await loadTrajectoryFileLists();
+  } catch (e) {
+    console.warn("band_csv produce failed", e);
+    await modalAlert(`批量生成失败：${e.message || String(e)}`);
+  } finally {
+    setBandCsvProduceProgress(false);
+  }
+});
+
+document.getElementById("btn-band-csv-play")?.addEventListener("click", async () => {
+  const modeEl = document.querySelector('input[name="band-csv-play-mode"]:checked');
+  const mode = modeEl ? modeEl.value : "offset";
+  /** @type {string[]} */
+  let files = [];
+  if (mode === "raw") {
+    files = buildBandCsvRawPlayPaths();
+    if (!files.length) {
+      await modalAlert(
+        "请先在「数据来源目录」点「列出来源」，并在「来源动作数据」列表中按顺序点选至少一个文件"
+      );
+      return;
+    }
+  } else {
+    files = bandCsvOrder.paths.slice();
+    if (!files.length) {
+      await modalAlert("请先在「已生成 / 待播放偏移数据」列表里按顺序点选至少一个文件");
+      return;
+    }
+  }
+  const modeLabel = mode === "raw" ? "来源目录原数据（未做偏移）" : "已生成偏移数据";
+  if (
+    !(await modalConfirm(
+      "将按所选顺序依次发送 ActionPlay（后台执行，每段结束后自动发下一段）。\n\n" +
+        `内容：${modeLabel}\n` +
+        `片段数：${files.length}\n\n` +
+        "请确保动作服务端已就绪；与标定轨迹 Web 播放互斥。\n\n" +
+        "点击「确定」执行；「取消」则不执行。"
+    ))
+  ) {
+    return;
+  }
+  try {
+    await postJson("/api/band_csv/play_sequence", { files });
+    await modalAlert(
+      "已启动顺序播放任务（后台线程）。请查看终端日志中的 [band_csv] ActionPlay 与机器人状态。"
+    );
+  } catch (e) {
+    console.warn("band_csv play failed", e);
+    await modalAlert(`播放失败：${e.message || String(e)}`);
+  }
+});
+
 function wireRefreshInitialButtons() {
   document.querySelectorAll(".btn-refresh-initial").forEach((btn) => {
     btn.addEventListener("click", async () => {

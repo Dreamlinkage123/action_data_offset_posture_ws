@@ -86,6 +86,7 @@ rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h: /opt/rootfs_2204_aarch64/
 rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h: /opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_generator_c/resource/msg__type_support.h.em
 rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h: /opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_generator_c/resource/srv__type_support.h.em
 rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h: rosidl_adapter/crb_ros_msg/msg/UpperJointData.idl
+rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h: rosidl_adapter/crb_ros_msg/action/ActionPlay.idl
 rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h: /opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/Bool.idl
 rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h: /opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/Byte.idl
 rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h: /opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/ByteMultiArray.idl
@@ -178,6 +179,11 @@ rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h: /opt/rootfs_2204_aarch64/
 rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h: /opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/VelocityStamped.idl
 rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h: /opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/Wrench.idl
 rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h: /opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/WrenchStamped.idl
+rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalInfo.idl
+rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalStatus.idl
+rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalStatusArray.idl
+rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/srv/CancelGoal.idl
+rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h: /opt/rootfs_2204_aarch64/opt/ros/humble/share/unique_identifier_msgs/msg/UUID.idl
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating C code for ROS interfaces"
 	/usr/bin/python3 /opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_generator_c/cmake/../../../lib/rosidl_generator_c/rosidl_generator_c --generator-arguments-file /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_generator_c__arguments.json
 
@@ -190,8 +196,23 @@ rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__struct.h: rosidl_gen
 rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__type_support.h: rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__type_support.h
 
+rosidl_generator_c/crb_ros_msg/action/action_play.h: rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_c/crb_ros_msg/action/action_play.h
+
+rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.h: rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.h
+
+rosidl_generator_c/crb_ros_msg/action/detail/action_play__struct.h: rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_c/crb_ros_msg/action/detail/action_play__struct.h
+
+rosidl_generator_c/crb_ros_msg/action/detail/action_play__type_support.h: rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_c/crb_ros_msg/action/detail/action_play__type_support.h
+
 rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__functions.c: rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__functions.c
+
+rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c: rosidl_generator_c/crb_ros_msg/msg/upper_joint_data.h
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c
 
 CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__functions.c.o: CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/flags.make
 CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__functions.c.o: rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__functions.c
@@ -207,23 +228,41 @@ CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/ms
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__functions.c.s"
 	/usr/bin/aarch64-linux-gnu-gcc --sysroot=/opt/rootfs_2204_aarch64/ $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__functions.c -o CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__functions.c.s
 
+CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c.o: CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/flags.make
+CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c.o: rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c
+CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c.o: CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c.o"
+	/usr/bin/aarch64-linux-gnu-gcc --sysroot=/opt/rootfs_2204_aarch64/ $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c.o -MF CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c.o.d -o CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c.o -c /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c
+
+CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c.i"
+	/usr/bin/aarch64-linux-gnu-gcc --sysroot=/opt/rootfs_2204_aarch64/ $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c > CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c.i
+
+CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c.s"
+	/usr/bin/aarch64-linux-gnu-gcc --sysroot=/opt/rootfs_2204_aarch64/ $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c -o CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c.s
+
 # Object files for target crb_ros_msg__rosidl_generator_c
 crb_ros_msg__rosidl_generator_c_OBJECTS = \
-"CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__functions.c.o"
+"CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__functions.c.o" \
+"CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c.o"
 
 # External object files for target crb_ros_msg__rosidl_generator_c
 crb_ros_msg__rosidl_generator_c_EXTERNAL_OBJECTS =
 
 libcrb_ros_msg__rosidl_generator_c.so: CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__functions.c.o
+libcrb_ros_msg__rosidl_generator_c.so: CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c.o
 libcrb_ros_msg__rosidl_generator_c.so: CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/build.make
 libcrb_ros_msg__rosidl_generator_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libsensor_msgs__rosidl_generator_c.so
 libcrb_ros_msg__rosidl_generator_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libgeometry_msgs__rosidl_generator_c.so
+libcrb_ros_msg__rosidl_generator_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libaction_msgs__rosidl_generator_c.so
+libcrb_ros_msg__rosidl_generator_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libunique_identifier_msgs__rosidl_generator_c.so
 libcrb_ros_msg__rosidl_generator_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libstd_msgs__rosidl_generator_c.so
 libcrb_ros_msg__rosidl_generator_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libbuiltin_interfaces__rosidl_generator_c.so
 libcrb_ros_msg__rosidl_generator_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/librosidl_runtime_c.so
 libcrb_ros_msg__rosidl_generator_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/librcutils.so
 libcrb_ros_msg__rosidl_generator_c.so: CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C shared library libcrb_ros_msg__rosidl_generator_c.so"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking C shared library libcrb_ros_msg__rosidl_generator_c.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -234,6 +273,11 @@ CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/clean:
 	$(CMAKE_COMMAND) -P CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/cmake_clean.cmake
 .PHONY : CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/clean
 
+CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/depend: rosidl_generator_c/crb_ros_msg/action/action_play.h
+CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/depend: rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c
+CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/depend: rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.h
+CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/depend: rosidl_generator_c/crb_ros_msg/action/detail/action_play__struct.h
+CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/depend: rosidl_generator_c/crb_ros_msg/action/detail/action_play__type_support.h
 CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/depend: rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__functions.c
 CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/depend: rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__functions.h
 CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/depend: rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__struct.h

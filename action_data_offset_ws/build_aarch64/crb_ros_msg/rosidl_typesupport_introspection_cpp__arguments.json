@@ -3,7 +3,8 @@
   "output_dir": "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_typesupport_introspection_cpp/crb_ros_msg",
   "template_dir": "/opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_typesupport_introspection_cpp/resource",
   "idl_tuples": [
-    "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_adapter/crb_ros_msg:msg/UpperJointData.idl"
+    "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_adapter/crb_ros_msg:msg/UpperJointData.idl",
+    "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_adapter/crb_ros_msg:action/ActionPlay.idl"
   ],
   "ros_interface_dependencies": [
     "std_msgs:/opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/Bool.idl",
@@ -97,7 +98,12 @@
     "geometry_msgs:/opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/Vector3Stamped.idl",
     "geometry_msgs:/opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/VelocityStamped.idl",
     "geometry_msgs:/opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/Wrench.idl",
-    "geometry_msgs:/opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/WrenchStamped.idl"
+    "geometry_msgs:/opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/WrenchStamped.idl",
+    "action_msgs:/opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalInfo.idl",
+    "action_msgs:/opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalStatus.idl",
+    "action_msgs:/opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalStatusArray.idl",
+    "action_msgs:/opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/srv/CancelGoal.idl",
+    "unique_identifier_msgs:/opt/rootfs_2204_aarch64/opt/ros/humble/share/unique_identifier_msgs/msg/UUID.idl"
   ],
   "target_dependencies": [
     "/opt/rootfs_2204_aarch64/opt/ros/humble/lib/rosidl_typesupport_introspection_cpp/rosidl_typesupport_introspection_cpp",
@@ -109,6 +115,7 @@
     "/opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_typesupport_introspection_cpp/resource/srv__rosidl_typesupport_introspection_cpp.hpp.em",
     "/opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_typesupport_introspection_cpp/resource/srv__type_support.cpp.em",
     "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_adapter/crb_ros_msg/msg/UpperJointData.idl",
+    "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_adapter/crb_ros_msg/action/ActionPlay.idl",
     "/opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/Bool.idl",
     "/opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/Byte.idl",
     "/opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/ByteMultiArray.idl",
@@ -200,6 +207,11 @@
     "/opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/Vector3Stamped.idl",
     "/opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/VelocityStamped.idl",
     "/opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/Wrench.idl",
-    "/opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/WrenchStamped.idl"
+    "/opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/WrenchStamped.idl",
+    "/opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalInfo.idl",
+    "/opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalStatus.idl",
+    "/opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalStatusArray.idl",
+    "/opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/srv/CancelGoal.idl",
+    "/opt/rootfs_2204_aarch64/opt/ros/humble/share/unique_identifier_msgs/msg/UUID.idl"
   ]
 }

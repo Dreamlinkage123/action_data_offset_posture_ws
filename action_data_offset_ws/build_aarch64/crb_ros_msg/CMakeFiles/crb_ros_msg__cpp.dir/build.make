@@ -74,6 +74,11 @@ CMakeFiles/crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/msg/detail/upper_j
 CMakeFiles/crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/msg/detail/upper_joint_data__struct.hpp
 CMakeFiles/crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/msg/detail/upper_joint_data__traits.hpp
 CMakeFiles/crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/msg/detail/upper_joint_data__type_support.hpp
+CMakeFiles/crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/action/action_play.hpp
+CMakeFiles/crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__builder.hpp
+CMakeFiles/crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__struct.hpp
+CMakeFiles/crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__traits.hpp
+CMakeFiles/crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__type_support.hpp
 CMakeFiles/crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/msg/rosidl_generator_cpp__visibility_control.hpp
 
 rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/rosidl_generator_cpp/rosidl_generator_cpp
@@ -92,6 +97,7 @@ rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: /opt/rootfs_2204_aarc
 rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_generator_cpp/resource/srv__struct.hpp.em
 rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_generator_cpp/resource/srv__traits.hpp.em
 rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: rosidl_adapter/crb_ros_msg/msg/UpperJointData.idl
+rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: rosidl_adapter/crb_ros_msg/action/ActionPlay.idl
 rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/Bool.idl
 rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/Byte.idl
 rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/ByteMultiArray.idl
@@ -184,6 +190,11 @@ rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: /opt/rootfs_2204_aarc
 rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/VelocityStamped.idl
 rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/Wrench.idl
 rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/WrenchStamped.idl
+rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalInfo.idl
+rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalStatus.idl
+rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalStatusArray.idl
+rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/srv/CancelGoal.idl
+rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/unique_identifier_msgs/msg/UUID.idl
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating C++ code for ROS interfaces"
 	/usr/bin/python3 /opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_generator_cpp/cmake/../../../lib/rosidl_generator_cpp/rosidl_generator_cpp --generator-arguments-file /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_generator_cpp__arguments.json
 
@@ -199,7 +210,27 @@ rosidl_generator_cpp/crb_ros_msg/msg/detail/upper_joint_data__traits.hpp: rosidl
 rosidl_generator_cpp/crb_ros_msg/msg/detail/upper_joint_data__type_support.hpp: rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/crb_ros_msg/msg/detail/upper_joint_data__type_support.hpp
 
+rosidl_generator_cpp/crb_ros_msg/action/action_play.hpp: rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/crb_ros_msg/action/action_play.hpp
+
+rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__builder.hpp: rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__builder.hpp
+
+rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__struct.hpp: rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__struct.hpp
+
+rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__traits.hpp: rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__traits.hpp
+
+rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__type_support.hpp: rosidl_generator_cpp/crb_ros_msg/msg/upper_joint_data.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__type_support.hpp
+
 crb_ros_msg__cpp: CMakeFiles/crb_ros_msg__cpp
+crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/action/action_play.hpp
+crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__builder.hpp
+crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__struct.hpp
+crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__traits.hpp
+crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__type_support.hpp
 crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/msg/detail/upper_joint_data__builder.hpp
 crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/msg/detail/upper_joint_data__struct.hpp
 crb_ros_msg__cpp: rosidl_generator_cpp/crb_ros_msg/msg/detail/upper_joint_data__traits.hpp

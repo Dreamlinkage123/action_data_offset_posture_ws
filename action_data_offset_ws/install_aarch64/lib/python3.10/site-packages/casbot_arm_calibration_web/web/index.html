@@ -529,6 +529,86 @@
         <button type="button" id="btn-band-play" class="btn-ctrl">按顺序播放</button>
       </div>
     </section>
+    <section class="trajectory-panel band-panel">
+      <h3 class="trajectory-title">乐队多片段csv数据偏移生成播放</h3>
+      <div class="trajectory-row band-row">
+        <label class="trajectory-label trajectory-label--grow">
+          <span>数据来源目录（绝对路径）</span>
+          <input
+            type="text"
+            id="band-csv-source-dir"
+            class="trajectory-input"
+            value="/workspace/action_data/csv/"
+            placeholder="/workspace/action_data/csv/"
+            autocomplete="off"
+          />
+        </label>
+        <button type="button" id="btn-band-csv-list-source" class="btn-ctrl">列出来源</button>
+      </div>
+      <div class="trajectory-row band-row" id="band-csv-source-row" hidden>
+        <label class="trajectory-label trajectory-label--grow">
+          <span>来源动作数据（.csv；点击显示序号；再点取消；用于批量生成与「原数据」顺序播放）</span>
+          <div id="band-csv-source-list" class="band-generated-list" aria-live="polite">
+            <p class="band-generated-empty">请先点「列出来源」</p>
+          </div>
+        </label>
+        <div class="band-generated-actions">
+          <button type="button" id="btn-band-csv-clear-source-order" class="btn-ctrl" title="清空来源文件的选择顺序">
+            清空来源顺序
+          </button>
+        </div>
+      </div>
+      <div class="trajectory-row band-row">
+        <label class="trajectory-label trajectory-label--grow">
+          <span>保存目录（绝对路径，留空则使用默认 new_offset_data）</span>
+          <input
+            type="text"
+            id="band-csv-save-dir"
+            class="trajectory-input"
+            value="/workspace/action_data/cali_csv/"
+            placeholder="/workspace/action_data/cali_csv/"
+            autocomplete="off"
+          />
+        </label>
+        <button type="button" id="btn-band-csv-produce" class="btn-ctrl">批量生成偏移数据</button>
+      </div>
+      <div id="band-csv-produce-progress" class="offset-produce-progress" hidden>
+        <p class="offset-produce-progress__label">正在批量计算并生成偏移轨迹，请稍候…</p>
+        <div class="offset-produce-progress__track" aria-hidden="true">
+          <div class="offset-produce-progress__bar"></div>
+        </div>
+      </div>
+      <div class="trajectory-row band-row">
+        <label class="trajectory-label trajectory-label--grow">
+          <span>已生成 / 待播放偏移数据（.csv；点击选择，序号即为播放顺序；再次点击取消）</span>
+          <div id="band-csv-generated-list" class="band-generated-list" aria-live="polite">
+            <p class="band-generated-empty">尚无条目；先"批量生成"或点"扫描保存目录"。</p>
+          </div>
+        </label>
+        <div class="band-generated-actions">
+          <button type="button" id="btn-band-csv-list-generated" class="btn-ctrl" title="扫描保存目录下的 .csv 文件">扫描保存目录</button>
+          <button type="button" id="btn-band-csv-clear-order" class="btn-ctrl" title="清空当前顺序选择">清空顺序</button>
+        </div>
+      </div>
+      <div class="trajectory-row band-row band-play-mode-row">
+        <span class="trajectory-label band-play-mode-label">顺序播放</span>
+        <label class="band-play-mode-option">
+          <input type="radio" name="band-csv-play-mode" id="band-csv-play-mode-offset" value="offset" checked />
+          <span>偏移数据（下方列表点击排序）</span>
+        </label>
+        <label class="band-play-mode-option">
+          <input type="radio" name="band-csv-play-mode" id="band-csv-play-mode-raw" value="raw" />
+          <span>来源目录原数据（与待播放偏移相同：点击列表项排顺序）</span>
+        </label>
+      </div>
+      <p class="band-play-mode-hint pose-section-hint">
+        播放通过 ROS2 Action <code>/motion/action/play</code>（<code>crb_ros_msg/action/ActionPlay</code>），<code>action_name</code> 为所选文件去掉
+        <code>.csv</code> 后的基名（与命令行示例一致）。与「乐队多片段数据偏移生成播放」互斥：一边播放时另一边不可用。
+      </p>
+      <div class="trajectory-row trajectory-actions">
+        <button type="button" id="btn-band-csv-play" class="btn-ctrl">按顺序播放</button>
+      </div>
+    </section>
     <p class="page-footer-note pose-section-hint">
       说明事项：上方<strong>外旋 XYZ 欧拉角偏移（度）</strong>（与「保存」一致）。下方 RX/RY/RZ 为<strong>旋转向量分量（度）</strong>，与欧拉角数值一般不同；纯绕某一 base 轴小角度时通常对应轴的旋转向量接近指令角。
     </p>

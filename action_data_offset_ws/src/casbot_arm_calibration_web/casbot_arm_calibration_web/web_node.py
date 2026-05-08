@@ -20,11 +20,22 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import rclpy
+from rclpy.action import ActionClient
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Header
 from std_srvs.srv import SetBool
+
+try:
+    from action_msgs.msg import GoalStatus
+except ImportError:
+    GoalStatus = None  # type: ignore[misc, assignment]
+
+try:
+    from crb_ros_msg.action import ActionPlay as ActionPlayMsg
+except ImportError:
+    ActionPlayMsg = None  # type: ignore[misc, assignment]
 
 try:
     from crb_ros_msg.msg import UpperJointData
@@ -53,14 +64,16 @@ from casbot_arm_calibration_web.calibration_data import JOINT_NAMES_PUBLISH, JOI
 from casbot_arm_calibration_web.offset_jacobian import format_offset_6, run_arm_trajectory_transform_jacobian
 from casbot_arm_calibration_web.trajectory_sources import (
     calibration_web_package_root,
+    find_resource_biaoding_file,
     list_action_data_basenames,
     list_offset_data_relative_paths,
+    list_resource_biaoding_files,
     new_offset_data_write_targets,
     offset_data_root,
     resolve_trajectory_path,
 )
 
-# 前端 value -> resource 子目录名（与文件名 keyboard_start_calibration.data 等一致）
+# 前端 value -> resource 子目录名（resource/<subdir>/BiaoDingA_*.data、BiaoDingB_*.data）
 INSTRUMENT_TO_SUBDIR = {
     "drum": "drum",
     "bass": "bass",
@@ -580,6 +593,17 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
         except Exception:
             return []
 
+    def _list_csv_files_in(d: Path) -> List[str]:
+        """列出目录内 ``.csv`` 文件名（仅当前层；按字典序；不递归）。"""
+        try:
+            return sorted(
+                f.name
+                for f in d.iterdir()
+                if f.is_file() and f.suffix.lower() == ".csv"
+            )
+        except Exception:
+            return []
+
     @app.post("/api/band/list_dir")
     def api_band_list_dir():
         """列出目录下 ``.data``/``.csv`` 文件（顶层，不递归）。前端用于"来源/保存"两个目录。"""
@@ -619,6 +643,11 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
             save_p = targets[0]
         # 仅在进入长耗时路径前校验一次播放状态
         with _api_lock:
+            with node._band_csv_state_lock:
+                if node._band_csv_playing:
+                    return jsonify(
+                        {"ok": False, "message": "CSV Action 顺序播放中，请结束后再生成"}
+                    ), 409
             with node._traj_lock:
                 if node._playing:
                     return jsonify({"ok": False, "message": "轨迹播放中，请结束后再生成"}), 409
@@ -734,6 +763,11 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
                 return jsonify({"ok": False, "message": f"文件不存在: {p}"}), 400
             abs_list.append(p.resolve())
         with _api_lock:
+            with node._band_csv_state_lock:
+                if node._band_csv_playing:
+                    return jsonify(
+                        {"ok": False, "message": "CSV Action 顺序播放中，请等待完成后再试"}
+                    ), 409
             with node._traj_lock:
                 if node._playing:
                     return jsonify(
@@ -762,6 +796,196 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
                     "segments": per_file_frames,
                 }
             )
+
+    @app.post("/api/band_csv/list_dir")
+    def api_band_csv_list_dir():
+        """列出目录下 ``.csv`` 文件（顶层，不递归）；用于 CSV 乐队面板的来源/保存目录。"""
+        body = request.get_json(silent=True) or {}
+        p, err = _resolve_user_dir(str(body.get("dir", "")), must_exist=True)
+        if p is None:
+            return jsonify({"ok": False, "message": err}), 400
+        files = _list_csv_files_in(p)
+        return jsonify({"ok": True, "dir": str(p), "files": files})
+
+    @app.post("/api/band_csv/produce")
+    def api_band_csv_produce():
+        """与 ``/api/band/produce`` 相同流程，但仅接受 ``.csv`` 输入/输出（逐文件同名写入 save_dir）。"""
+        body = request.get_json(silent=True) or {}
+        node.get_logger().info(f"[Web][band_csv] 批量生成: body={body!r}")
+        names = body.get("filenames") or []
+        if not isinstance(names, list) or not names:
+            return jsonify({"ok": False, "message": "filenames 为空"}), 400
+        src_p, err = _resolve_user_dir(str(body.get("source_dir", "")), must_exist=True)
+        if src_p is None:
+            return jsonify({"ok": False, "message": f"source_dir 无效: {err}"}), 400
+        raw_save = str(body.get("save_dir", "")).strip()
+        if raw_save:
+            save_p, err = _resolve_user_dir(raw_save, must_exist=False, create=True)
+            if save_p is None:
+                return jsonify({"ok": False, "message": f"save_dir 无效: {err}"}), 400
+        else:
+            targets = new_offset_data_write_targets()
+            if not targets:
+                return jsonify({"ok": False, "message": "未解析到默认 new_offset_data 目录"}), 500
+            save_p = targets[0]
+        with _api_lock:
+            with node._band_csv_state_lock:
+                if node._band_csv_playing:
+                    return jsonify(
+                        {"ok": False, "message": "CSV Action 顺序播放中，请结束后再生成"}
+                    ), 409
+            with node._traj_lock:
+                if node._playing:
+                    return jsonify({"ok": False, "message": "轨迹播放中，请结束后再生成"}), 409
+            saved = node.load_saved_offsets()
+            if saved is not None:
+                left_6, right_6 = saved
+                source_hint = "saved"
+            else:
+                left_6, right_6, oerr = node.get_pose_offsets_6()
+                if oerr:
+                    return jsonify(
+                        {"ok": False, "message": f"未找到已保存偏移，且实时偏移不可用：{oerr}"}
+                    ), 400
+                source_hint = "live"
+        ol, ort = format_offset_6(left_6, right_6)
+        try:
+            urdf = node.resolve_urdf_path_for_transform()
+        except Exception as ex:
+            return jsonify({"ok": False, "message": f"URDF 路径解析失败: {ex}"}), 500
+
+        results: List[Dict[str, Any]] = []
+        all_ok = True
+
+        for raw_name in names:
+            name = str(raw_name or "").strip()
+            if not name or "/" in name or "\\" in name or name.startswith("."):
+                results.append({"input": name, "ok": False, "message": "非法文件名"})
+                all_ok = False
+                continue
+            if Path(name).suffix.lower() != ".csv":
+                results.append({"input": name, "ok": False, "message": "仅支持 .csv 文件"})
+                all_ok = False
+                continue
+            in_path = (src_p / name).resolve()
+            try:
+                in_path.relative_to(src_p)
+            except ValueError:
+                results.append({"input": name, "ok": False, "message": "越界路径"})
+                all_ok = False
+                continue
+            if not in_path.is_file():
+                results.append({"input": name, "ok": False, "message": f"文件不存在: {in_path}"})
+                all_ok = False
+                continue
+            out_name = name
+            out_path = (save_p / out_name).resolve()
+            try:
+                out_path.relative_to(save_p)
+            except ValueError:
+                results.append({"input": name, "ok": False, "message": "输出越界"})
+                all_ok = False
+                continue
+            ok, msg = run_arm_trajectory_transform_jacobian(
+                urdf,
+                str(in_path),
+                str(out_path),
+                offset_left=ol,
+                offset_right=ort,
+            )
+            if not ok:
+                node.get_logger().error(f"[band_csv] {name} 生成失败: {msg}")
+                results.append(
+                    {"input": name, "ok": False, "message": (msg or "未知错误")[:2000]}
+                )
+                all_ok = False
+                continue
+            results.append(
+                {
+                    "input": name,
+                    "input_path": str(in_path),
+                    "output_path": str(out_path),
+                    "output_name": out_name,
+                    "ok": True,
+                }
+            )
+            try:
+                out_rel = out_path.relative_to(save_p).as_posix()
+                for nroot in new_offset_data_write_targets():
+                    if save_p == nroot:
+                        node.record_generated_offset_rel(f"new_offset_data/{out_rel}")
+                        break
+            except Exception:
+                pass
+        return jsonify(
+            {
+                "ok": all_ok,
+                "message": ("批量生成完成" if all_ok else "批量生成部分失败，详见 results"),
+                "offset_source": source_hint,
+                "save_dir": str(save_p),
+                "offset_left": ol,
+                "offset_right": ort,
+                "results": results,
+            }
+        )
+
+    @app.post("/api/band_csv/play_sequence")
+    def api_band_csv_play_sequence():
+        """按 ``files`` 绝对路径顺序，依次向 ``/motion/action/play`` 发送 ActionPlay（action_name = 无扩展名基名）。"""
+        body = request.get_json(silent=True) or {}
+        node.get_logger().info(f"[Web][band_csv] Action 顺序播放: body={body!r}")
+        if node._action_play_client is None:
+            return jsonify(
+                {
+                    "ok": False,
+                    "message": "ActionPlay 不可用（请编译并 source crb_ros_msg）",
+                }
+            ), 503
+        files = body.get("files") or []
+        if not isinstance(files, list) or not files:
+            return jsonify({"ok": False, "message": "files 为空"}), 400
+        abs_list: List[Path] = []
+        for raw in files:
+            p = Path(str(raw or "").strip()).expanduser()
+            if not p.is_absolute():
+                return jsonify({"ok": False, "message": f"需要绝对路径: {raw}"}), 400
+            if not p.is_file():
+                return jsonify({"ok": False, "message": f"文件不存在: {p}"}), 400
+            if p.suffix.lower() != ".csv":
+                return jsonify({"ok": False, "message": f"需要 .csv 文件: {p}"}), 400
+            abs_list.append(p.resolve())
+
+        seg_info = [{"path": str(p), "action_name": p.stem} for p in abs_list]
+
+        def _worker() -> None:
+            try:
+                for p in abs_list:
+                    an = p.stem
+                    ok, msg = node._action_play_sync(an, node._band_csv_action_timeout_sec)
+                    node.get_logger().info(f"[band_csv] ActionPlay 片段: {an} ok={ok} {msg}")
+                    if not ok:
+                        node.get_logger().error(f"[band_csv] 顺序播放中止: {an} — {msg}")
+                        break
+            finally:
+                with node._band_csv_state_lock:
+                    node._band_csv_playing = False
+
+        with _api_lock:
+            with node._band_csv_state_lock:
+                if node._band_csv_playing:
+                    return jsonify(
+                        {"ok": False, "message": "CSV Action 顺序播放已在进行中"}
+                    ), 409
+            with node._traj_lock:
+                if node._playing:
+                    return jsonify(
+                        {"ok": False, "message": "标定轨迹正在播放中，请等待完成后再试"}
+                    ), 409
+            with node._band_csv_state_lock:
+                node._band_csv_playing = True
+            threading.Thread(target=_worker, daemon=True).start()
+
+        return jsonify({"ok": True, "started": True, "segments": seg_info})
 
     @app.post("/api/upper_body_debug")
     def api_upper_body_debug():
@@ -849,6 +1073,8 @@ class ArmCalibrationWebNode(Node):
 
         self.declare_parameter("host", "0.0.0.0")
         self.declare_parameter("port", 8080)
+        self.declare_parameter("action_play_topic", "/motion/action/play")
+        self.declare_parameter("band_csv_action_timeout_sec", 7200.0)
         # 空字符串：使用 share/casbot_arm_calibration_web/urdf/<默认 .urdf>（见 _package_urdf_dir）
         self.declare_parameter("robot_urdf_path", "")
         self.declare_parameter("joint_states_topic", "/joint_states")
@@ -980,6 +1206,21 @@ class ArmCalibrationWebNode(Node):
         self._resource_root = _resource_root()
         self._debug_cli = self.create_client(SetBool, "/motion/upper_body_debug")
 
+        self._band_csv_playing = False
+        self._band_csv_state_lock = threading.Lock()
+        ap_topic = str(self.get_parameter("action_play_topic").value)
+        self._band_csv_action_timeout_sec = float(
+            self.get_parameter("band_csv_action_timeout_sec").value
+        )
+        if ActionPlayMsg is not None:
+            self._action_play_client = ActionClient(self, ActionPlayMsg, ap_topic)
+            self.get_logger().info(f"[band_csv] ActionPlay 客户端: {ap_topic}")
+        else:
+            self._action_play_client = None
+            self.get_logger().warn(
+                "未导入 crb_ros_msg.action.ActionPlay：「乐队 CSV」Action 播放不可用；请编译 crb_ros_msg 后重新 source。"
+            )
+
         if UpperJointData is not None:
             self._joint_pub = self.create_publisher(
                 UpperJointData, "/upper_body_debug/joint_cmd", 10
@@ -1013,6 +1254,58 @@ class ArmCalibrationWebNode(Node):
         )
         self._thread.start()
         _log_calibration_web_urls(self.get_logger(), host, port, self._resource_root)
+
+    def _action_play_sync(self, action_name: str, timeout_sec: float) -> Tuple[bool, str]:
+        """阻塞直到 ActionPlay 执行结束或超时；依赖 MultiThreadedExecutor 处理 Action 回调。"""
+        if ActionPlayMsg is None or self._action_play_client is None:
+            return False, "ActionPlay 不可用"
+        cli = self._action_play_client
+        if not cli.wait_for_server(timeout_sec=10.0):
+            ap = str(self.get_parameter("action_play_topic").value)
+            return False, f"Action 服务端未就绪: {ap}"
+        goal = ActionPlayMsg.Goal()
+        goal.start_time = 0.0
+        goal.action_name = action_name
+        goal.cancel_action_name = ""
+        goal.rl_name = ""
+
+        def _fb(fb: Any) -> None:
+            self.get_logger().info(
+                f"[band_csv] ActionPlay 反馈: state={fb.state} "
+                f"action_index={fb.action_index} exec_time={fb.exec_time:.3f} ({action_name})"
+            )
+
+        send_fut = cli.send_goal_async(goal, feedback_callback=_fb)
+        t0 = time.time()
+        while rclpy.ok() and not send_fut.done() and (time.time() - t0) < 30.0:
+            time.sleep(0.02)
+        if not send_fut.done():
+            return False, "send_goal 超时"
+        goal_handle = send_fut.result()
+        if goal_handle is None:
+            return False, "Goal handle 为空"
+        if not goal_handle.accepted:
+            return False, "Goal 被拒绝"
+        res_fut = goal_handle.get_result_async()
+        t0 = time.time()
+        while rclpy.ok() and not res_fut.done() and (time.time() - t0) < max(1.0, timeout_sec):
+            time.sleep(0.05)
+        if not res_fut.done():
+            try:
+                goal_handle.cancel_goal_async()
+            except Exception:
+                pass
+            return False, "等待动作结束超时"
+        res = res_fut.result()
+        if res is None:
+            return False, "结果为空"
+        st = int(getattr(res, "status", -1))
+        if_success = bool(getattr(getattr(res, "result", None), "if_success", False))
+        succeeded = GoalStatus is not None and st == GoalStatus.STATUS_SUCCEEDED
+        if GoalStatus is None:
+            succeeded = st == 4
+        ok_exec = succeeded and if_success
+        return ok_exec, ("完成" if ok_exec else f"未成功 status={st} if_success={if_success}")
 
     def _on_joint_states(self, msg: JointState) -> None:
         if not msg.name or not msg.position or len(msg.name) != len(msg.position):
@@ -1394,18 +1687,23 @@ class ArmCalibrationWebNode(Node):
         return out_ui
 
     def _load_calibration_rows(self, instruments: List[str], kind: str) -> List[List[float]]:
-        """kind: start | end -> 读取 {subdir}_{kind}_calibration.data，按乐器顺序拼接。"""
+        """kind: start | end → ``BiaoDingA_*.data`` / ``BiaoDingB_*.data``，按乐器顺序拼接。"""
         all_rows: List[List[float]] = []
         for inst in instruments:
             subdir = INSTRUMENT_TO_SUBDIR.get(str(inst))
             if not subdir:
                 self.get_logger().warn(f"未知乐器 id: {inst}")
                 continue
-            fname = f"{subdir}_{kind}_calibration.data"
-            path = self._resource_root / subdir / fname
-            if not path.is_file():
-                self.get_logger().warn(f"缺少标定文件: {path}")
+            path, err = find_resource_biaoding_file(self._resource_root, subdir, kind)
+            if path is None:
+                self.get_logger().warn(err or f"缺少标定文件: {self._resource_root / subdir}")
                 continue
+            matches = list_resource_biaoding_files(self._resource_root, subdir, kind)
+            if len(matches) > 1:
+                pat = "BiaoDingA_*.data" if kind == "start" else "BiaoDingB_*.data"
+                self.get_logger().info(
+                    f"[calib] {subdir} 下发现 {len(matches)} 个 {pat}，使用 {path.name}"
+                )
             try:
                 rows = load_calibration_trajectory(path)
             except Exception as e:

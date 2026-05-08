@@ -14,6 +14,49 @@ INSTRUMENT_TO_SUBDIR = {
     "keyboard": "keyboard",
 }
 
+# resource/<乐器>/ 下：开始标定 = BiaoDingA_*.data，结束标定 = BiaoDingB_*.data
+_BIAODING_PREFIX: dict[str, str] = {"start": "BiaoDingA_", "end": "BiaoDingB_"}
+
+
+def list_resource_biaoding_files(resource_root: Path, subdir: str, kind: str) -> List[Path]:
+    """``resource_root / subdir`` 下所有 ``BiaoDingA_*.data`` 或 ``BiaoDingB_*.data``，已排序。"""
+    k = (kind or "").strip().lower()
+    prefix = _BIAODING_PREFIX.get(k)
+    if not prefix:
+        return []
+    d = resource_root / subdir
+    if not d.is_dir():
+        return []
+    return sorted(
+        p
+        for p in d.iterdir()
+        if p.is_file() and p.name.startswith(prefix) and p.suffix.lower() == ".data"
+    )
+
+
+def find_resource_biaoding_file(
+    resource_root: Path, subdir: str, kind: str
+) -> Tuple[Optional[Path], str]:
+    """
+    在 ``resource_root / subdir /`` 下查找标定轨迹文件。
+
+    - ``kind=start`` → 文件名前缀 ``BiaoDingA_``、扩展名 ``.data``
+    - ``kind=end`` → 前缀 ``BiaoDingB_``
+
+    若匹配多个，按文件名排序后取第一个（稳定可复现）。
+    """
+    k = (kind or "").strip().lower()
+    if k not in _BIAODING_PREFIX:
+        return None, f"无效 kind: {kind!r}（应为 start 或 end）"
+    matches = list_resource_biaoding_files(resource_root, subdir, kind)
+    if not matches:
+        prefix = _BIAODING_PREFIX[k]
+        d = resource_root / subdir
+        if not d.is_dir():
+            return None, f"目录不存在: {d}"
+        return None, f"未找到 {prefix}*.data: {d}"
+    return matches[0], ""
+
 
 def package_share_dir(package_name: str) -> Optional[Path]:
     try:
@@ -263,9 +306,8 @@ def resource_calibration_path(resource_root: Path, instruments: List[str], kind:
     sub = INSTRUMENT_TO_SUBDIR.get(str(instruments[0]))
     if not sub:
         return None
-    fname = f"{sub}_{kind}_calibration.data"
-    path = resource_root / sub / fname
-    return path if path.is_file() else None
+    path, _err = find_resource_biaoding_file(resource_root, sub, kind)
+    return path
 
 
 def resolve_trajectory_path(
@@ -290,12 +332,11 @@ def resolve_trajectory_path(
             sub = INSTRUMENT_TO_SUBDIR.get(str(inst))
             if not sub:
                 continue
-            fname = f"{sub}_{kind}_calibration.data"
-            path = resource_root / sub / fname
-            if path.is_file():
+            path, err = find_resource_biaoding_file(resource_root, sub, kind)
+            if path is not None:
                 all_rows_path.append(path)
             else:
-                return None, f"缺少标定文件: {path}"
+                return None, err or f"缺少标定文件: {resource_root / sub}"
         if not all_rows_path:
             return None, "未找到 resource 标定数据"
         if len(all_rows_path) > 1:

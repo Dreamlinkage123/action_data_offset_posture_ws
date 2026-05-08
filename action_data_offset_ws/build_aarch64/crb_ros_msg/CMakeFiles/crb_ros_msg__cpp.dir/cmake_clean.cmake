@@ -1,5 +1,10 @@
 file(REMOVE_RECURSE
   "CMakeFiles/crb_ros_msg__cpp"
+  "rosidl_generator_cpp/crb_ros_msg/action/action_play.hpp"
+  "rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__builder.hpp"
+  "rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__struct.hpp"
+  "rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__traits.hpp"
+  "rosidl_generator_cpp/crb_ros_msg/action/detail/action_play__type_support.hpp"
   "rosidl_generator_cpp/crb_ros_msg/msg/detail/upper_joint_data__builder.hpp"
   "rosidl_generator_cpp/crb_ros_msg/msg/detail/upper_joint_data__struct.hpp"
   "rosidl_generator_cpp/crb_ros_msg/msg/detail/upper_joint_data__traits.hpp"

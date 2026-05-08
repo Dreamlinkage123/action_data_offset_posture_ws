@@ -128,8 +128,8 @@ export CASBOT_CALIB_WORKSPACE_ROOT=/workspace/<仓库名>
 
 | 按钮 | 功能 |
 |------|------|
-| **开始标定** | 开启上半身调试模式 → 播放对应乐器的 `resource/<乐器>/<乐器>_start_calibration.data` 轨迹 → 播完 1s 后自动采样写入左右臂初始值 |
-| **结束标定** | 播放 `<乐器>_end_calibration.data` 轨迹（不自动关闭调试模式） |
+| **开始标定** | 开启上半身调试模式 → 播放 `resource/<乐器>/BiaoDingA_*.data`（按名字排序取首个）→ 播完 1s 后自动采样写入左右臂初始值 |
+| **结束标定** | 播放 `resource/<乐器>/BiaoDingB_*.data` 轨迹（不自动关闭调试模式） |
 | **关闭上半身调试模式** | 调用 `/motion/upper_body_debug` 服务关闭调试 |
 | **保存** | 将当前左右臂末端 6D 偏移量（X/Y/Z mm + RX/RY/RZ rad 外旋 XYZ）写入 `web_saved_offsets.json` |
 

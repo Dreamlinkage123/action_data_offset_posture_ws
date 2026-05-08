@@ -74,6 +74,8 @@ crb_ros_msg__rs/CMakeFiles/crb_ros_msg__rs: rosidl_generator_rs/crb_ros_msg/rust
 crb_ros_msg__rs/CMakeFiles/crb_ros_msg__rs: rosidl_generator_rs/crb_ros_msg/rust/Cargo.toml
 crb_ros_msg__rs/CMakeFiles/crb_ros_msg__rs: rosidl_generator_rs/crb_ros_msg/rust/src/msg.rs
 crb_ros_msg__rs/CMakeFiles/crb_ros_msg__rs: rosidl_generator_rs/crb_ros_msg/rust/src/msg/rmw.rs
+crb_ros_msg__rs/CMakeFiles/crb_ros_msg__rs: rosidl_generator_rs/crb_ros_msg/rust/src/action.rs
+crb_ros_msg__rs/CMakeFiles/crb_ros_msg__rs: rosidl_generator_rs/crb_ros_msg/rust/src/action/rmw.rs
 
 rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/rosidl_generator_rs/rosidl_generator_rs
 rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: /opt/rootfs_2204_aarch64/opt/ros/humble/local/lib/python3.10/dist-packages/rosidl_generator_rs/__init__.py
@@ -88,7 +90,9 @@ rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: /opt/rootfs_2204_aarch64/opt/ro
 rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: /opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_generator_rs/resource/templates/srv_idiomatic.rs.em
 rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: /opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_generator_rs/resource/templates/srv_rmw.rs.em
 rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: rosidl_adapter/crb_ros_msg/msg/UpperJointData.idl
+rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: rosidl_adapter/crb_ros_msg/action/ActionPlay.idl
 rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: rosidl_adapter/crb_ros_msg/msg/UpperJointData.idl
+rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: rosidl_adapter/crb_ros_msg/action/ActionPlay.idl
 rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: /opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/Bool.idl
 rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: /opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/Byte.idl
 rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: /opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/ByteMultiArray.idl
@@ -181,6 +185,11 @@ rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: /opt/rootfs_2204_aarch64/opt/ro
 rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: /opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/VelocityStamped.idl
 rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: /opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/Wrench.idl
 rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: /opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/WrenchStamped.idl
+rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalInfo.idl
+rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalStatus.idl
+rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalStatusArray.idl
+rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/srv/CancelGoal.idl
+rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs: /opt/rootfs_2204_aarch64/opt/ros/humble/share/unique_identifier_msgs/msg/UUID.idl
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating Rust code for ROS interfaces"
 	cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/crb_ros_msg__rs && /usr/bin/python3 /opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_generator_rs/cmake/../../../lib/rosidl_generator_rs/rosidl_generator_rs --generator-arguments-file /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_generator_rs__arguments.json --typesupport-impls "rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c;rosidl_typesupport_c"
 
@@ -196,9 +205,17 @@ rosidl_generator_rs/crb_ros_msg/rust/src/msg.rs: rosidl_generator_rs/crb_ros_msg
 rosidl_generator_rs/crb_ros_msg/rust/src/msg/rmw.rs: rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_rs/crb_ros_msg/rust/src/msg/rmw.rs
 
+rosidl_generator_rs/crb_ros_msg/rust/src/action.rs: rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_rs/crb_ros_msg/rust/src/action.rs
+
+rosidl_generator_rs/crb_ros_msg/rust/src/action/rmw.rs: rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_rs/crb_ros_msg/rust/src/action/rmw.rs
+
 crb_ros_msg__rs: crb_ros_msg__rs/CMakeFiles/crb_ros_msg__rs
 crb_ros_msg__rs: rosidl_generator_rs/crb_ros_msg/rust/Cargo.toml
 crb_ros_msg__rs: rosidl_generator_rs/crb_ros_msg/rust/build.rs
+crb_ros_msg__rs: rosidl_generator_rs/crb_ros_msg/rust/src/action.rs
+crb_ros_msg__rs: rosidl_generator_rs/crb_ros_msg/rust/src/action/rmw.rs
 crb_ros_msg__rs: rosidl_generator_rs/crb_ros_msg/rust/src/lib.rs
 crb_ros_msg__rs: rosidl_generator_rs/crb_ros_msg/rust/src/msg.rs
 crb_ros_msg__rs: rosidl_generator_rs/crb_ros_msg/rust/src/msg/rmw.rs

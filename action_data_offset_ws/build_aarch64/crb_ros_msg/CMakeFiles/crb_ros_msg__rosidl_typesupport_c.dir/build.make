@@ -79,6 +79,7 @@ rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp: /opt/ro
 rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_typesupport_c/resource/msg__type_support.cpp.em
 rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_typesupport_c/resource/srv__type_support.cpp.em
 rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp: rosidl_adapter/crb_ros_msg/msg/UpperJointData.idl
+rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp: rosidl_adapter/crb_ros_msg/action/ActionPlay.idl
 rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/Bool.idl
 rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/Byte.idl
 rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/ByteMultiArray.idl
@@ -171,8 +172,16 @@ rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp: /opt/ro
 rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/VelocityStamped.idl
 rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/Wrench.idl
 rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/geometry_msgs/msg/WrenchStamped.idl
+rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalInfo.idl
+rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalStatus.idl
+rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/msg/GoalStatusArray.idl
+rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/srv/CancelGoal.idl
+rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp: /opt/rootfs_2204_aarch64/opt/ros/humble/share/unique_identifier_msgs/msg/UUID.idl
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating C type support dispatch for ROS interfaces"
 	/usr/bin/python3 /opt/rootfs_2204_aarch64/opt/ros/humble/lib/rosidl_typesupport_c/rosidl_typesupport_c --generator-arguments-file /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_typesupport_c__arguments.json --typesupports rosidl_typesupport_fastrtps_c rosidl_typesupport_introspection_c
+
+rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp: rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp
 
 CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp.o: CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/flags.make
 CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp.o: rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp
@@ -188,29 +197,49 @@ CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_ms
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp.s"
 	/usr/bin/aarch64-linux-gnu-g++ --sysroot=/opt/rootfs_2204_aarch64/ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp -o CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp.s
 
+CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp.o: CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/flags.make
+CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp.o: rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp
+CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp.o: CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp.o"
+	/usr/bin/aarch64-linux-gnu-g++ --sysroot=/opt/rootfs_2204_aarch64/ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp.o -MF CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp.o.d -o CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp.o -c /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp
+
+CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp.i"
+	/usr/bin/aarch64-linux-gnu-g++ --sysroot=/opt/rootfs_2204_aarch64/ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp > CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp.i
+
+CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp.s"
+	/usr/bin/aarch64-linux-gnu-g++ --sysroot=/opt/rootfs_2204_aarch64/ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp -o CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp.s
+
 # Object files for target crb_ros_msg__rosidl_typesupport_c
 crb_ros_msg__rosidl_typesupport_c_OBJECTS = \
-"CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp.o"
+"CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp.o" \
+"CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp.o"
 
 # External object files for target crb_ros_msg__rosidl_typesupport_c
 crb_ros_msg__rosidl_typesupport_c_EXTERNAL_OBJECTS =
 
 libcrb_ros_msg__rosidl_typesupport_c.so: CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp.o
+libcrb_ros_msg__rosidl_typesupport_c.so: CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp.o
 libcrb_ros_msg__rosidl_typesupport_c.so: CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/build.make
 libcrb_ros_msg__rosidl_typesupport_c.so: libcrb_ros_msg__rosidl_generator_c.so
 libcrb_ros_msg__rosidl_typesupport_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libsensor_msgs__rosidl_typesupport_c.so
 libcrb_ros_msg__rosidl_typesupport_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libgeometry_msgs__rosidl_typesupport_c.so
+libcrb_ros_msg__rosidl_typesupport_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libaction_msgs__rosidl_typesupport_c.so
+libcrb_ros_msg__rosidl_typesupport_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libunique_identifier_msgs__rosidl_typesupport_c.so
 libcrb_ros_msg__rosidl_typesupport_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libstd_msgs__rosidl_typesupport_c.so
-libcrb_ros_msg__rosidl_typesupport_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libbuiltin_interfaces__rosidl_typesupport_c.so
-libcrb_ros_msg__rosidl_typesupport_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/librosidl_typesupport_c.so
 libcrb_ros_msg__rosidl_typesupport_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libsensor_msgs__rosidl_generator_c.so
 libcrb_ros_msg__rosidl_typesupport_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libgeometry_msgs__rosidl_generator_c.so
 libcrb_ros_msg__rosidl_typesupport_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libstd_msgs__rosidl_generator_c.so
+libcrb_ros_msg__rosidl_typesupport_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libbuiltin_interfaces__rosidl_typesupport_c.so
+libcrb_ros_msg__rosidl_typesupport_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/librosidl_typesupport_c.so
+libcrb_ros_msg__rosidl_typesupport_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libaction_msgs__rosidl_generator_c.so
 libcrb_ros_msg__rosidl_typesupport_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libbuiltin_interfaces__rosidl_generator_c.so
+libcrb_ros_msg__rosidl_typesupport_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/libunique_identifier_msgs__rosidl_generator_c.so
 libcrb_ros_msg__rosidl_typesupport_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/librosidl_runtime_c.so
 libcrb_ros_msg__rosidl_typesupport_c.so: /opt/rootfs_2204_aarch64/opt/ros/humble/lib/librcutils.so
 libcrb_ros_msg__rosidl_typesupport_c.so: CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX shared library libcrb_ros_msg__rosidl_typesupport_c.so"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX shared library libcrb_ros_msg__rosidl_typesupport_c.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -221,6 +250,7 @@ CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/clean:
 	$(CMAKE_COMMAND) -P CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/cmake_clean.cmake
 .PHONY : CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/clean
 
+CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/depend: rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp
 CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/depend: rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp
 	cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/depend
