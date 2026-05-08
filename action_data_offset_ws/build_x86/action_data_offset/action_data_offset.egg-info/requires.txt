@@ -1,4 +1,0 @@
-mujoco
-numpy
-scipy
-setuptools

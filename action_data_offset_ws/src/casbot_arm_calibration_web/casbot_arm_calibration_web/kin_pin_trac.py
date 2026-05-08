@@ -1,12 +1,10 @@
 """
-Pinocchio 正运动学 + tracikpy（TRAC‑IK）逆运动学可选后端。
+Pinocchio 正运动学 + 阻尼最小二乘迭代逆运动学（不再依赖 tracikpy）。
 
-- 用于 Web 示教笛卡尔直线 / 姿态旋转：每步对目标位姿做一次 TRAC‑IK，替代数值雅可比 DLS。
-- `/joint_states` 末端位姿可用 Pinocchio 帧正解（比自研 XML FK 快）。
-- 依赖（需自行安装，见类文档）::
-    - ``pinocchio``（ROS 常用 ``ros-humble-pinocchio``）；**NumPy 建议 1.26.x（<2）**，与 Humble 自带扩展 ABI 一致。
-    - ``tracikpy``：https://github.com/mjd3/tracikpy （及 README 中的 libeigen3、kdl、nlopt、urdfdom 等）
-- 若导入或 URDF 初始化失败，:attr:`KinematicsPinTrac.available` 为 False，节点回退到 :mod:`arm_fk`。
+- Web 示教笛卡尔直线 / 姿态旋转：每子步对目标位姿做 Pinocchio 帧雅可比 IK。
+- ``/joint_states`` 末端位姿优先用 Pinocchio 帧正解（失败时回退 :mod:`arm_fk`）。
+- 依赖：``pinocchio``（如 ``ros-humble-pinocchio``）；**NumPy 建议 1.26.x（<2）**，
+  与 Humble 自带扩展 ABI 一致。NumPy 2.x 默认跳过 Pinocchio（见 :func:`_load_pin_module`）。
 """
 
 from __future__ import annotations
@@ -19,22 +17,13 @@ import numpy as np
 
 _log = logging.getLogger(__name__)
 
-try:
-    from tracikpy import TracIKSolver
-except Exception as e:  # noqa: BLE001
-    TracIKSolver = None  # type: ignore[assignment]
-    _trac_import_err = str(e)
-else:
-    _trac_import_err = ""
-
 from casbot_arm_calibration_web.arm_fk import BASE_LINK, LEFT_TIP_LINK, RIGHT_TIP_LINK
 
 
 def _load_pin_module():
     """
-    延迟导入 pinocchio。ROS Humble 自带扩展通常针对 NumPy 1.x（如 1.26.4）；**NumPy 2.x** 下导入可能报错或崩溃，
-    故在检测到 major>=2 时默认跳过，仅用 tracikpy FK。NumPy 1.26.x 时会正常加载 Pinocchio。
-    设置环境变量 ``CASBOT_FORCE_PINOCCHIO=1`` 可在 NumPy 2 上仍尝试加载（可能不稳定）。
+    延迟导入 pinocchio。ROS Humble 自带扩展通常针对 NumPy 1.x；**NumPy 2.x** 下默认跳过，
+    避免 ABI 不兼容。设置 ``CASBOT_FORCE_PINOCCHIO=1`` 可仍尝试加载。
     """
     import os
 
@@ -45,7 +34,7 @@ def _load_pin_module():
             major = 0
         if major >= 2:
             _log.info(
-                "NumPy %s：跳过 Pinocchio 扩展（避免与 NumPy 2 ABI 不兼容）；FK 使用 tracikpy",
+                "NumPy %s：跳过 Pinocchio（避免与 NumPy 2 ABI 不兼容）；示教 IK 将不可用",
                 np.__version__,
             )
             return None
@@ -58,16 +47,20 @@ def _load_pin_module():
         return None
 
 
+def _joint_name_candidates(jn0: str) -> Tuple[str, ...]:
+    s = str(jn0)
+    return (
+        s,
+        s if str(s).endswith("_joint") else f"{s}_joint",
+        str(s).replace("_joint", "") + "_joint",
+    )
+
+
 def _fill_pin_q(pin_mod, model, joint_positions_by_name: Dict[str, float]) -> np.ndarray:
     """将 JointState 风格名→角（rad）填入 Pinocchio 配置向量。"""
     q = pin_mod.neutral(model)
     for jn0, val in joint_positions_by_name.items():
-        candidates = (
-            jn0,
-            jn0 if str(jn0).endswith("_joint") else f"{jn0}_joint",
-            str(jn0).replace("_joint", "") + "_joint",
-        )
-        for cand in candidates:
+        for cand in _joint_name_candidates(jn0):
             if not model.existJointName(cand):
                 continue
             jid = model.getJointId(cand)
@@ -79,8 +72,54 @@ def _fill_pin_q(pin_mod, model, joint_positions_by_name: Dict[str, float]) -> np
     return q
 
 
+def _idx_q_for_joint_name(model, jn0: str) -> Optional[int]:
+    for cand in _joint_name_candidates(jn0):
+        if not model.existJointName(cand):
+            continue
+        jid = model.getJointId(cand)
+        jm = model.joints[jid]
+        if jm.nq == 1:
+            return int(jm.idx_q)
+        continue
+    return None
+
+
+def _velocity_cols_for_joint_names(model, joint_names: List[str]) -> List[int]:
+    """Pinocchio 速度空间下标列表（与 ``computeFrameJacobian`` 列顺序一致）。"""
+    cols: List[int] = []
+    for jn in joint_names:
+        added = False
+        for cand in _joint_name_candidates(jn):
+            if not model.existJointName(cand):
+                continue
+            jid = model.getJointId(cand)
+            jm = model.joints[jid]
+            for k in range(jm.nv):
+                cols.append(int(jm.idx_v + k))
+            added = True
+            break
+        if not added:
+            _log.debug("velocity cols: joint %s not found in model", jn)
+    return cols
+
+
+def _dls_pinv(J: np.ndarray, lambd: float) -> np.ndarray:
+    """DLS 伪逆：J 为 m×n，返回 n×m。"""
+    JJT = J @ J.T
+    m = JJT.shape[0]
+    return J.T @ np.linalg.inv(JJT + (lambd * lambd) * np.eye(m, dtype=float))
+
+
+def _log6_vec(pin_mod, iMd) -> np.ndarray:
+    """SE3 相对误差 → 6 维空间速度向量（numpy）。"""
+    m = pin_mod.log6(iMd)
+    if hasattr(m, "np"):
+        return np.asarray(m.np, dtype=np.float64).reshape(6)
+    return np.asarray(m.vector, dtype=np.float64).reshape(6)
+
+
 class KinematicsPinTrac:
-    """Pinocchio FK + 左右臂各一个 TracIKSolver。"""
+    """Pinocchio FK + Pinocchio 迭代 IK（类名保留以兼容现有 import）。"""
 
     def __init__(
         self,
@@ -98,105 +137,63 @@ class KinematicsPinTrac:
         self._data = None
         self._fid_left: int = -1
         self._fid_right: int = -1
-        self._ik_left = None
-        self._ik_right = None
         self._pin = None
 
-        if TracIKSolver is None:
-            self.load_error = f"tracikpy: {_trac_import_err or '未安装'}"
+        pin_mod = _load_pin_module()
+        if pin_mod is None:
+            self.load_error = "pinocchio 未加载（检查 NumPy 版本或安装 ros-*-pinocchio）"
             return
 
         try:
-            self._ik_left = TracIKSolver(self._urdf, BASE_LINK, LEFT_TIP_LINK)
-            self._ik_right = TracIKSolver(self._urdf, BASE_LINK, RIGHT_TIP_LINK)
+            self._model = pin_mod.buildModelFromUrdf(self._urdf)
+            self._data = self._model.createData()
         except Exception as e:  # noqa: BLE001
-            self.load_error = f"TracIKSolver 构造失败: {e}"
+            self.load_error = f"Pinocchio URDF 加载失败: {e}"
             return
 
-        nl = self._ik_left.number_of_joints
-        nr = self._ik_right.number_of_joints
-        if nl != len(self._left_chain):
+        if not self._model.existFrame(LEFT_TIP_LINK) or not self._model.existFrame(
+            RIGHT_TIP_LINK
+        ):
             self.load_error = (
-                f"左臂 TRAC‑IK 关节数 {nl} 与 FK 链长度 {len(self._left_chain)} 不一致"
-            )
-            return
-        if nr != len(self._right_chain):
-            self.load_error = (
-                f"右臂 TRAC‑IK 关节数 {nr} 与 FK 链长度 {len(self._right_chain)} 不一致"
+                f"Pinocchio URDF 缺少末端 FRAME（{LEFT_TIP_LINK} / {RIGHT_TIP_LINK}）"
             )
             return
 
+        self._fid_left = int(self._model.getFrameId(LEFT_TIP_LINK))
+        self._fid_right = int(self._model.getFrameId(RIGHT_TIP_LINK))
+        self._pin = pin_mod
+        self.pin_ok = True
         self.available = True
-
-        pin_mod = _load_pin_module()
-        if pin_mod is not None:
-            try:
-                # 仅用运动学模型：buildModelsFromUrdf 会加载 collision/visual 的 STL，
-                # 本包 URDF 引用 ../meshes/*.STL 且默认不随包分发 mesh，会报错。
-                self._model = pin_mod.buildModelFromUrdf(self._urdf)
-                self._data = self._model.createData()
-                if self._model.existFrame(LEFT_TIP_LINK) and self._model.existFrame(
-                    RIGHT_TIP_LINK
-                ):
-                    self._fid_left = int(self._model.getFrameId(LEFT_TIP_LINK))
-                    self._fid_right = int(self._model.getFrameId(RIGHT_TIP_LINK))
-                    self.pin_ok = True
-                    self._pin = pin_mod
-                else:
-                    _log.warning(
-                        "Pinocchio URDF 缺少末端 FRAME，仅用 tracikpy FK（%s / %s）",
-                        LEFT_TIP_LINK,
-                        RIGHT_TIP_LINK,
-                    )
-            except Exception as e:  # noqa: BLE001
-                _log.warning(
-                    "Pinocchio 不可用（%s），正解将使用 tracikpy.fk",
-                    e,
-                )
-
-        if self.pin_ok:
-            _log.info(
-                "[Kin] Pinocchio 正解 + TRAC‑IK 逆解已启用（左链 %d、右链 %d 关节）",
-                nl,
-                nr,
-            )
-        else:
-            _log.info(
-                "[Kin] TRAC‑IK 逆解 + tracikpy 正解已启用（左链 %d、右链 %d 关节）",
-                nl,
-                nr,
-            )
+        self.load_error = ""
+        _log.info(
+            "[Kin] Pinocchio 正解 + 迭代 IK 已启用（左链 %d、右链 %d 关节；BASE=%s）",
+            len(self._left_chain),
+            len(self._right_chain),
+            BASE_LINK,
+        )
 
     def fk_tip_T(self, side: str, joint_positions_by_name: Dict[str, float]) -> Optional[np.ndarray]:
-        """base_link 下腕部 4×4；优先 Pinocchio，否则 tracikpy.fk。"""
-        if not self.available:
+        """base_link 下腕部 4×4。"""
+        if not self.available or not self.pin_ok or self._pin is None:
             return None
-        if (
-            self.pin_ok
-            and self._pin is not None
-            and self._model is not None
-            and self._data is not None
-        ):
-            try:
-                q = _fill_pin_q(self._pin, self._model, joint_positions_by_name)
-                self._pin.forwardKinematics(self._model, self._data, q)
-                self._pin.updateFramePlacements(self._model, self._data)
-                fid = self._fid_left if side == "left" else self._fid_right
-                oMf = self._data.oMf[fid]
-                T = np.eye(4, dtype=np.float64)
-                T[:3, :3] = np.array(oMf.rotation, dtype=np.float64)
-                T[:3, 3] = np.array(oMf.translation, dtype=np.float64).reshape(3)
-                return T
-            except Exception as e:  # noqa: BLE001
-                _log.debug("Pinocchio FK 失败，回退 tracikpy: %s", e)
-        return self.fk_T_from_chain(side, joint_positions_by_name)
+        try:
+            q = _fill_pin_q(self._pin, self._model, joint_positions_by_name)
+            self._pin.forwardKinematics(self._model, self._data, q)
+            self._pin.updateFramePlacements(self._model, self._data)
+            fid = self._fid_left if side == "left" else self._fid_right
+            oMf = self._data.oMf[fid]
+            T = np.eye(4, dtype=np.float64)
+            T[:3, :3] = np.array(oMf.rotation, dtype=np.float64)
+            T[:3, 3] = np.array(oMf.translation, dtype=np.float64).reshape(3)
+            return T
+        except Exception as e:  # noqa: BLE001
+            _log.debug("Pinocchio FK 失败: %s", e)
+            return None
 
-    def chain_dict_to_q_trac(
-        self, side: str, chain_joint_q: Dict[str, float]
-    ) -> np.ndarray:
-        solver = self._ik_left if side == "left" else self._ik_right
+    def chain_dict_to_q_trac(self, side: str, chain_joint_q: Dict[str, float]) -> np.ndarray:
+        """链关节顺序 → 长度 len(chain) 的角向量（与旧 tracikpy 链顺序一致）。"""
         chain = self._left_chain if side == "left" else self._right_chain
-        q = np.zeros(solver.number_of_joints, dtype=np.float64)
+        q = np.zeros(len(chain), dtype=np.float64)
         for i, jn in enumerate(chain):
             v = chain_joint_q.get(jn)
             if v is None and not str(jn).endswith("_joint"):
@@ -204,28 +201,119 @@ class KinematicsPinTrac:
             q[i] = float(v) if v is not None else 0.0
         return q
 
+    def _chain_array_from_pin_q(self, q: np.ndarray, side: str) -> np.ndarray:
+        chain = self._left_chain if side == "left" else self._right_chain
+        out = np.zeros(len(chain), dtype=np.float64)
+        for i, jn in enumerate(chain):
+            idx = _idx_q_for_joint_name(self._model, jn)
+            if idx is not None and 0 <= idx < len(q):
+                out[i] = float(q[idx])
+        return out
+
     def solve_ik(
         self,
         side: str,
         T_target: np.ndarray,
         chain_joint_q_seed: Dict[str, float],
+        *,
+        dq_joint_names: Optional[List[str]] = None,
+        position_only: bool = False,
     ) -> Optional[np.ndarray]:
-        """返回链上关节角向量（长度 = number_of_joints）；无解返回 None。"""
-        if not self.available:
+        """
+        迭代阻尼 IK，返回链上关节角向量（长度 = len(chain)）。
+
+        ``dq_joint_names``：仅对这些关节积分速度（如 7 个臂关节，腰等保持 seed）；
+        为 ``None`` 时对整条链上的模型关节求列（与链名一一对应的可动列）。
+
+        ``position_only``：为 True 时仅用 **世界系位置误差** 与线速度雅可比（前 3 行），
+        用于直线示教（目标 ``T`` 只改平移、姿态由数值保持）；避免 6D ``log6`` 与 ``LOCAL``
+        雅可比在「锁姿态」任务上组合不当导致 **dq≈0**。
+        """
+        if not self.available or not self.pin_ok or self._pin is None:
             return None
-        solver = self._ik_left if side == "left" else self._ik_right
-        q0 = self.chain_dict_to_q_trac(side, chain_joint_q_seed)
-        try:
-            q_out = solver.ik(np.asarray(T_target, dtype=np.float64), qinit=q0)
-            if q_out is None:
-                return None
-            q_arr = np.asarray(q_out, dtype=np.float64).ravel()
-            if q_arr.size != solver.number_of_joints or not np.all(np.isfinite(q_arr)):
-                return None
-            return q_arr.copy()
-        except Exception as e:  # noqa: BLE001
-            _log.debug("TRAC‑IK 失败: %s", e)
+
+        pin = self._pin
+        model = self._model
+        data = self._data
+        chain = self._left_chain if side == "left" else self._right_chain
+        fid = self._fid_left if side == "left" else self._fid_right
+
+        dq_names = list(dq_joint_names) if dq_joint_names is not None else list(chain)
+        cols = _velocity_cols_for_joint_names(model, dq_names)
+        if not cols:
             return None
+
+        q = _fill_pin_q(pin, model, chain_joint_q_seed)
+        R = np.asarray(T_target[:3, :3], dtype=np.float64)
+        p = np.asarray(T_target[:3, 3], dtype=np.float64).reshape(3)
+        oMdes = pin.SE3(R, p)
+
+        max_iter = 400 if position_only else 200
+        if position_only:
+            # 未在 eps 内收敛时，旧版 fail_norm=2e-2（20mm）会接受过大残差，子步累积会短行程；
+            # 过严（如 0.35mm）则难姿态易弹「IK 无有效步」。折中：fail_norm≈0.5mm。
+            eps = 5.0e-5
+            fail_norm = 5.0e-4
+            damp = 0.012
+            alpha = 0.82
+            max_step = 0.32
+        else:
+            eps = 1.0e-4
+            fail_norm = 8.0e-2
+            damp = 1.0e-3
+            alpha = 0.55
+            max_step = 0.18
+
+        rf_6d = pin.LOCAL
+        rf_lin = getattr(pin, "LOCAL_WORLD_ALIGNED", pin.LOCAL)
+
+        best_err = float("inf")
+        best_q_chain: Optional[np.ndarray] = None
+
+        for _ in range(max_iter):
+            try:
+                pin.forwardKinematics(model, data, q)
+                pin.updateFramePlacements(model, data)
+                oMf = data.oMf[fid]
+                if position_only:
+                    p_cur = np.asarray(oMf.translation, dtype=np.float64).reshape(3)
+                    p_des = np.asarray(oMdes.translation, dtype=np.float64).reshape(3)
+                    err_vec = p_des - p_cur
+                    n = float(np.linalg.norm(err_vec))
+                    if n < best_err:
+                        best_err = n
+                        best_q_chain = self._chain_array_from_pin_q(q, side)
+                    if n < eps:
+                        return self._chain_array_from_pin_q(q, side)
+                    J6 = pin.computeFrameJacobian(model, data, q, fid, rf_lin)
+                    Jred = np.asarray(J6[:3, cols], dtype=np.float64)
+                    dq_red = _dls_pinv(Jred, damp) @ err_vec
+                else:
+                    iMd = oMf.actInv(oMdes)
+                    ev = _log6_vec(pin, iMd)
+                    n = float(np.linalg.norm(ev))
+                    if n < best_err:
+                        best_err = n
+                        best_q_chain = self._chain_array_from_pin_q(q, side)
+                    if n < eps:
+                        return self._chain_array_from_pin_q(q, side)
+                    J = pin.computeFrameJacobian(model, data, q, fid, rf_6d)
+                    Jred = np.asarray(J[:, cols], dtype=np.float64)
+                    dq_red = _dls_pinv(Jred, damp) @ (-ev)
+                step = float(np.linalg.norm(dq_red))
+                if step > max_step:
+                    dq_red *= max_step / step
+                v = np.zeros(model.nv, dtype=np.float64)
+                for j, c in enumerate(cols):
+                    v[c] = dq_red[j]
+                q = pin.integrate(model, q, alpha * v)
+            except Exception as e:  # noqa: BLE001
+                _log.debug("Pinocchio IK 步失败: %s", e)
+                break
+
+        if best_q_chain is not None and best_err < fail_norm:
+            return best_q_chain
+        return None
 
     def q_chain_to_arm_dict(
         self,
@@ -245,21 +333,13 @@ class KinematicsPinTrac:
         return out
 
     def fk_T_from_chain(self, side: str, chain_joint_q: Dict[str, float]) -> Optional[np.ndarray]:
-        """tracikpy 正解 4×4（与 TRAC‑IK 链一致）。"""
-        if not self.available:
-            return None
-        solver = self._ik_left if side == "left" else self._ik_right
-        q = self.chain_dict_to_q_trac(side, chain_joint_q)
-        try:
-            return np.asarray(solver.fk(q), dtype=np.float64).copy()
-        except Exception:  # noqa: BLE001
-            return None
+        """与链字典一致的正解 4×4（Pinocchio）。"""
+        return self.fk_tip_T(side, chain_joint_q)
 
     def fk_tip_xyz_trac(
         self, side: str, chain_joint_q: Dict[str, float]
     ) -> Optional[np.ndarray]:
-        """tracikpy 末端位置；Pinocchio 不可用时界面仍可用此路径。"""
-        T = self.fk_T_from_chain(side, chain_joint_q)
+        T = self.fk_tip_T(side, chain_joint_q)
         if T is None:
             return None
         return np.array(T[:3, 3], dtype=np.float64).copy()

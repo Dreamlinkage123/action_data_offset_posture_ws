@@ -1,0 +1,476 @@
+[0.000000] (-) TimerEvent: {}
+[0.001253] (action_data_offset) JobQueued: {'identifier': 'action_data_offset', 'dependencies': OrderedDict()}
+[0.001313] (crb_ros_msg) JobQueued: {'identifier': 'crb_ros_msg', 'dependencies': OrderedDict()}
+[0.001347] (casbot_arm_calibration_web) JobQueued: {'identifier': 'casbot_arm_calibration_web', 'dependencies': OrderedDict([('action_data_offset', '/workspace/action_data_offset_ws/install'), ('crb_ros_msg', '/workspace/action_data_offset_ws/install')])}
+[0.001488] (action_data_offset) JobStarted: {'identifier': 'action_data_offset'}
+[0.006664] (crb_ros_msg) JobStarted: {'identifier': 'crb_ros_msg'}
+[0.099705] (-) TimerEvent: {}
+[0.161093] (crb_ros_msg) JobProgress: {'identifier': 'crb_ros_msg', 'progress': 'cmake'}
+[0.161400] (crb_ros_msg) Command: {'cmd': ['/usr/bin/cmake', '/workspace/action_data_offset_ws/src/crb_ros_msg', '-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON', '-DCMAKE_TOOLCHAIN_FILE=/workspace/action_data_offset_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake', '-DSECURITY=ON', '-DBUILD_TESTING=OFF', '-DCMAKE_INSTALL_PREFIX=/workspace/action_data_offset_ws/install'], 'cwd': '/workspace/action_data_offset_ws/build/crb_ros_msg', 'env': OrderedDict([('PYTHON_SOABI', 'cpython-310-aarch64-linux-gnu'), ('ARCH', 'aarch64'), ('HOSTNAME', 'aarch64_2204_0508_1407_17'), ('SHLVL', '2'), ('LD_LIBRARY_PATH', '/opt/rootfs_2204_aarch64/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/rootfs_2204_aarch64/opt/ros/humble/lib/aarch64-linux-gnu:/opt/rootfs_2204_aarch64/opt/ros/humble/lib'), ('HOME', '/home/casbot'), ('OLDPWD', '/workspace/action_data_offset_ws'), ('ROS_PYTHON_VERSION', '3'), ('CROSS_FLAG', '-DCMAKE_CUSTOM_CROSS=ON -DCMAKE_TOOLCHAIN_FILE=/workspace/action_data_offset_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake'), ('project_environment_dir', '/workspace/action_data_offset_ws/docker_env/environment'), ('ROS_DISTRO', 'humble'), ('is_ubuntu_20_04', 'false'), ('_', '/usr/local/bin/colcon'), ('ROS_VERSION', '2'), ('is_orin', 'false'), ('is_ubuntu_22_04', 'true'), ('TERM', 'xterm'), ('ROS_LOCALHOST_ONLY', '0'), ('QT_X11_NO_MITSHM', '1'), ('PATH', '/opt/rootfs_2204_aarch64/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('is_pc', 'true'), ('env_is_docker', '1'), ('DISPLAY', ':1'), ('LANG', 'en_US.UTF-8'), ('AMENT_PREFIX_PATH', '/opt/rootfs_2204_aarch64/opt/ros/humble'), ('env_docker_aarch64', '1'), ('PWD', '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'), ('env_docker_x86', '0'), ('PYTHONPATH', '/opt/rootfs_2204_aarch64/opt/ros/humble/lib/python3.10/site-packages:/opt/rootfs_2204_aarch64/opt/ros/humble/local/lib/python3.10/dist-packages'), ('SYSROOT', '/opt/rootfs_2204_aarch64/'), ('TARGET_ARCH', 'aarch64'), ('TZ', 'Asia/Shanghai'), ('project_install_dir', '/workspace/action_data_offset_ws/install_aarch64'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/opt/rootfs_2204_aarch64/opt/ros/humble')]), 'shell': False}
+[0.170094] (crb_ros_msg) StdoutLine: {'line': b'-- Using SECURITY: ON.\n'}
+[0.170277] (crb_ros_msg) StdoutLine: {'line': b'-- Using BUILD_TESTING: OFF.\n'}
+[0.170341] (crb_ros_msg) StdoutLine: {'line': b'-- Using CMAKE_TOOLCHAIN_FILE: /workspace/action_data_offset_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake.\n'}
+[0.170390] (crb_ros_msg) StdoutLine: {'line': b'-- Using CATKIN_INSTALL_INTO_PREFIX_ROOT: .\n'}
+[0.170437] (crb_ros_msg) StdoutLine: {'line': b'-- Using CMAKE_CUSTOM_CROSS: .\n'}
+[0.185478] (crb_ros_msg) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.12 (/opt/rootfs_2204_aarch64/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.199830] (-) TimerEvent: {}
+[0.278369] (crb_ros_msg) StdoutLine: {'line': b'-- Found rosidl_default_generators: 1.2.1 (/opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_default_generators/cmake)\n'}
+[0.279592] (crb_ros_msg) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.281782] (crb_ros_msg) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.7 (/opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[0.299938] (-) TimerEvent: {}
+[0.304195] (crb_ros_msg) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.328992] (crb_ros_msg) StdoutLine: {'line': b'-- Found std_msgs: 4.9.0 (/opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/cmake)\n'}
+[0.353151] (crb_ros_msg) StdoutLine: {'line': b'-- Found sensor_msgs: 4.9.1 (/opt/rootfs_2204_aarch64/opt/ros/humble/share/sensor_msgs/cmake)\n'}
+[0.400078] (-) TimerEvent: {}
+[0.420176] (action_data_offset) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'egg_info', '--egg-base', '../../build_aarch64/action_data_offset', 'build', '--build-base', '/workspace/action_data_offset_ws/build/action_data_offset/build', 'install', '--record', '/workspace/action_data_offset_ws/build/action_data_offset/install.log', '--single-version-externally-managed', 'install_data'], 'cwd': '/workspace/action_data_offset_ws/src/action_data_offset', 'env': {'PYTHON_SOABI': 'cpython-310-aarch64-linux-gnu', 'ARCH': 'aarch64', 'HOSTNAME': 'aarch64_2204_0508_1407_17', 'SHLVL': '2', 'LD_LIBRARY_PATH': '/opt/rootfs_2204_aarch64/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/rootfs_2204_aarch64/opt/ros/humble/lib/aarch64-linux-gnu:/opt/rootfs_2204_aarch64/opt/ros/humble/lib', 'HOME': '/home/casbot', 'OLDPWD': '/workspace/action_data_offset_ws', 'ROS_PYTHON_VERSION': '3', 'CROSS_FLAG': '-DCMAKE_CUSTOM_CROSS=ON -DCMAKE_TOOLCHAIN_FILE=/workspace/action_data_offset_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake', 'project_environment_dir': '/workspace/action_data_offset_ws/docker_env/environment', 'ROS_DISTRO': 'humble', 'is_ubuntu_20_04': 'false', '_': '/usr/local/bin/colcon', 'ROS_VERSION': '2', 'is_orin': 'false', 'is_ubuntu_22_04': 'true', 'TERM': 'xterm', 'ROS_LOCALHOST_ONLY': '0', 'QT_X11_NO_MITSHM': '1', 'PATH': '/opt/rootfs_2204_aarch64/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'is_pc': 'true', 'env_is_docker': '1', 'DISPLAY': ':1', 'LANG': 'en_US.UTF-8', 'AMENT_PREFIX_PATH': '/opt/rootfs_2204_aarch64/opt/ros/humble', 'env_docker_aarch64': '1', 'PWD': '/workspace/action_data_offset_ws/build_aarch64/action_data_offset', 'env_docker_x86': '0', 'PYTHONPATH': '/workspace/action_data_offset_ws/build/action_data_offset/prefix_override:/usr/local/lib/python3.10/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/action_data_offset_ws/install/lib/python3.10/site-packages:/opt/rootfs_2204_aarch64/opt/ros/humble/lib/python3.10/site-packages:/opt/rootfs_2204_aarch64/opt/ros/humble/local/lib/python3.10/dist-packages', 'SYSROOT': '/opt/rootfs_2204_aarch64/', 'TARGET_ARCH': 'aarch64', 'TZ': 'Asia/Shanghai', 'project_install_dir': '/workspace/action_data_offset_ws/install_aarch64', 'COLCON': '1'}, 'shell': False}
+[0.423705] (crb_ros_msg) StdoutLine: {'line': b'-- Found action_msgs: 1.2.2 (/opt/rootfs_2204_aarch64/opt/ros/humble/share/action_msgs/cmake)\n'}
+[0.500223] (-) TimerEvent: {}
+[0.574933] (action_data_offset) StdoutLine: {'line': b'running egg_info\n'}
+[0.575536] (action_data_offset) StdoutLine: {'line': b'writing ../../build_aarch64/action_data_offset/action_data_offset.egg-info/PKG-INFO\n'}
+[0.575722] (action_data_offset) StdoutLine: {'line': b'writing dependency_links to ../../build_aarch64/action_data_offset/action_data_offset.egg-info/dependency_links.txt\n'}
+[0.575857] (action_data_offset) StdoutLine: {'line': b'writing entry points to ../../build_aarch64/action_data_offset/action_data_offset.egg-info/entry_points.txt\n'}
+[0.575973] (action_data_offset) StdoutLine: {'line': b'writing requirements to ../../build_aarch64/action_data_offset/action_data_offset.egg-info/requires.txt\n'}
+[0.576084] (action_data_offset) StdoutLine: {'line': b'writing top-level names to ../../build_aarch64/action_data_offset/action_data_offset.egg-info/top_level.txt\n'}
+[0.578738] (action_data_offset) StdoutLine: {'line': b"reading manifest file '../../build_aarch64/action_data_offset/action_data_offset.egg-info/SOURCES.txt'\n"}
+[0.581625] (action_data_offset) StdoutLine: {'line': b"writing manifest file '../../build_aarch64/action_data_offset/action_data_offset.egg-info/SOURCES.txt'\n"}
+[0.581747] (action_data_offset) StdoutLine: {'line': b'running build\n'}
+[0.581850] (action_data_offset) StdoutLine: {'line': b'running build_py\n'}
+[0.582116] (action_data_offset) StdoutLine: {'line': b'running install\n'}
+[0.582355] (action_data_offset) StdoutLine: {'line': b'running install_lib\n'}
+[0.583600] (action_data_offset) StdoutLine: {'line': b'running install_data\n'}
+[0.587643] (action_data_offset) StdoutLine: {'line': b'running install_egg_info\n'}
+[0.588920] (action_data_offset) StdoutLine: {'line': b"removing '/workspace/action_data_offset_ws/install/lib/python3.10/site-packages/action_data_offset-0.1.0-py3.10.egg-info' (and everything under it)\n"}
+[0.589114] (action_data_offset) StdoutLine: {'line': b'Copying ../../build_aarch64/action_data_offset/action_data_offset.egg-info to /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/action_data_offset-0.1.0-py3.10.egg-info\n'}
+[0.589844] (action_data_offset) StdoutLine: {'line': b'running install_scripts\n'}
+[0.600297] (-) TimerEvent: {}
+[0.603771] (action_data_offset) StdoutLine: {'line': b'Installing arm_trajectory_transform script to /workspace/action_data_offset_ws/install/lib/action_data_offset\n'}
+[0.603961] (action_data_offset) StdoutLine: {'line': b'Installing arm_trajectory_transform_jacobian script to /workspace/action_data_offset_ws/install/lib/action_data_offset\n'}
+[0.604067] (action_data_offset) StdoutLine: {'line': b'Installing mujoco_trajectory_sim script to /workspace/action_data_offset_ws/install/lib/action_data_offset\n'}
+[0.604227] (action_data_offset) StdoutLine: {'line': b"writing list of installed files to '/workspace/action_data_offset_ws/build/action_data_offset/install.log'\n"}
+[0.619565] (action_data_offset) CommandEnded: {'returncode': 0}
+[0.634107] (action_data_offset) JobEnded: {'identifier': 'action_data_offset', 'rc': 0}
+[0.672345] (crb_ros_msg) StdoutLine: {'line': b'-- Found ament_cmake_ros: 0.10.0 (/opt/rootfs_2204_aarch64/opt/ros/humble/share/ament_cmake_ros/cmake)\n'}
+[0.700409] (-) TimerEvent: {}
+[0.800699] (-) TimerEvent: {}
+[0.901017] (-) TimerEvent: {}
+[0.908033] (crb_ros_msg) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[1.001190] (-) TimerEvent: {}
+[1.101434] (-) TimerEvent: {}
+[1.174160] (crb_ros_msg) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[1.196753] (crb_ros_msg) StdoutLine: {'line': b'-- Found python_cmake_module: 0.10.0 (/opt/rootfs_2204_aarch64/opt/ros/humble/share/python_cmake_module/cmake)\n'}
+[1.201524] (-) TimerEvent: {}
+[1.227058] (crb_ros_msg) StdoutLine: {'line': b'-- Using PYTHON_EXECUTABLE: /usr/bin/python3\n'}
+[1.227331] (crb_ros_msg) StdoutLine: {'line': b'-- Using PYTHON_INCLUDE_DIRS: /opt/rootfs_2204_aarch64/usr/include/python3.10\n'}
+[1.227466] (crb_ros_msg) StdoutLine: {'line': b'-- Using PYTHON_LIBRARIES: /opt/rootfs_2204_aarch64/usr/lib/aarch64-linux-gnu/libpython3.10.so\n'}
+[1.301644] (-) TimerEvent: {}
+[1.340964] (crb_ros_msg) StdoutLine: {'line': b'-- Configuring done\n'}
+[1.376806] (crb_ros_msg) StdoutLine: {'line': b'-- Generating done\n'}
+[1.388250] (crb_ros_msg) StdoutLine: {'line': b'-- Build files have been written to: /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg\n'}
+[1.393643] (crb_ros_msg) CommandEnded: {'returncode': 0}
+[1.394322] (crb_ros_msg) JobProgress: {'identifier': 'crb_ros_msg', 'progress': 'build'}
+[1.395193] (crb_ros_msg) Command: {'cmd': ['/usr/bin/cmake', '--build', '/workspace/action_data_offset_ws/build/crb_ros_msg', '--', '-j16', '-l16'], 'cwd': '/workspace/action_data_offset_ws/build/crb_ros_msg', 'env': OrderedDict([('PYTHON_SOABI', 'cpython-310-aarch64-linux-gnu'), ('ARCH', 'aarch64'), ('HOSTNAME', 'aarch64_2204_0508_1407_17'), ('SHLVL', '2'), ('LD_LIBRARY_PATH', '/opt/rootfs_2204_aarch64/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/rootfs_2204_aarch64/opt/ros/humble/lib/aarch64-linux-gnu:/opt/rootfs_2204_aarch64/opt/ros/humble/lib'), ('HOME', '/home/casbot'), ('OLDPWD', '/workspace/action_data_offset_ws'), ('ROS_PYTHON_VERSION', '3'), ('CROSS_FLAG', '-DCMAKE_CUSTOM_CROSS=ON -DCMAKE_TOOLCHAIN_FILE=/workspace/action_data_offset_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake'), ('project_environment_dir', '/workspace/action_data_offset_ws/docker_env/environment'), ('ROS_DISTRO', 'humble'), ('is_ubuntu_20_04', 'false'), ('_', '/usr/local/bin/colcon'), ('ROS_VERSION', '2'), ('is_orin', 'false'), ('is_ubuntu_22_04', 'true'), ('TERM', 'xterm'), ('ROS_LOCALHOST_ONLY', '0'), ('QT_X11_NO_MITSHM', '1'), ('PATH', '/opt/rootfs_2204_aarch64/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('is_pc', 'true'), ('env_is_docker', '1'), ('DISPLAY', ':1'), ('LANG', 'en_US.UTF-8'), ('AMENT_PREFIX_PATH', '/opt/rootfs_2204_aarch64/opt/ros/humble'), ('env_docker_aarch64', '1'), ('PWD', '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'), ('env_docker_x86', '0'), ('PYTHONPATH', '/opt/rootfs_2204_aarch64/opt/ros/humble/lib/python3.10/site-packages:/opt/rootfs_2204_aarch64/opt/ros/humble/local/lib/python3.10/dist-packages'), ('SYSROOT', '/opt/rootfs_2204_aarch64/'), ('TARGET_ARCH', 'aarch64'), ('TZ', 'Asia/Shanghai'), ('project_install_dir', '/workspace/action_data_offset_ws/install_aarch64'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/opt/rootfs_2204_aarch64/opt/ros/humble')]), 'shell': False}
+[1.401761] (-) TimerEvent: {}
+[1.418214] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/cmake -S/workspace/action_data_offset_ws/src/crb_ros_msg -B/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg --check-build-system CMakeFiles/Makefile.cmake 0\n'}
+[1.440632] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/cmake -E cmake_progress_start /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg//CMakeFiles/progress.marks\n'}
+[1.453715] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/Makefile2 all\n'}
+[1.456968] (crb_ros_msg) StdoutLine: {'line': b"gmake[1]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.457245] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f crb_ros_msg__rs/CMakeFiles/crb_ros_msg__rs.dir/build.make crb_ros_msg__rs/CMakeFiles/crb_ros_msg__rs.dir/depend\n'}
+[1.457506] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/build.make CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/depend\n'}
+[1.457775] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__cpp.dir/build.make CMakeFiles/crb_ros_msg__cpp.dir/depend\n'}
+[1.458086] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/ament_cmake_python_copy_crb_ros_msg.dir/build.make CMakeFiles/ament_cmake_python_copy_crb_ros_msg.dir/depend\n'}
+[1.459933] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.460303] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/crb_ros_msg__rs /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/crb_ros_msg__rs /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/crb_ros_msg__rs/CMakeFiles/crb_ros_msg__rs.dir/DependInfo.cmake --color=\n'}
+[1.460967] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.461258] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__cpp.dir/DependInfo.cmake --color=\n'}
+[1.461947] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.462242] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/ament_cmake_python_copy_crb_ros_msg.dir/DependInfo.cmake --color=\n'}
+[1.463044] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.463321] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/DependInfo.cmake --color=\n'}
+[1.473253] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.473517] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f crb_ros_msg__rs/CMakeFiles/crb_ros_msg__rs.dir/build.make crb_ros_msg__rs/CMakeFiles/crb_ros_msg__rs.dir/build\n'}
+[1.473625] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.473836] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/ament_cmake_python_copy_crb_ros_msg.dir/build.make CMakeFiles/ament_cmake_python_copy_crb_ros_msg.dir/build\n'}
+[1.473903] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.473959] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__cpp.dir/build.make CMakeFiles/crb_ros_msg__cpp.dir/build\n'}
+[1.474787] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.474952] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/cmake -E copy_directory /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_generator_py/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/ament_cmake_python/crb_ros_msg/crb_ros_msg\n'}
+[1.476863] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.477002] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Nothing to be done for 'crb_ros_msg__rs/CMakeFiles/crb_ros_msg__rs.dir/build'.\n"}
+[1.477075] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.478151] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.478303] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Nothing to be done for 'CMakeFiles/crb_ros_msg__cpp.dir/build'.\n"}
+[1.478457] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.479353] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/action/detail/action_play__functions.c.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/compiler_depend.internal".\n'}
+[1.479605] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/rosidl_generator_c/crb_ros_msg/msg/detail/upper_joint_data__functions.c.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/compiler_depend.internal".\n'}
+[1.479852] (crb_ros_msg) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target crb_ros_msg__rosidl_generator_c\x1b[0m\n'}
+[1.486839] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.487390] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/build.make CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/build\n'}
+[1.490864] (crb_ros_msg) StdoutLine: {'line': b'[  2%] Built target crb_ros_msg__rs\n'}
+[1.491108] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.491268] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Nothing to be done for 'CMakeFiles/crb_ros_msg__rosidl_generator_c.dir/build'.\n"}
+[1.491406] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.493239] (crb_ros_msg) StdoutLine: {'line': b'[  5%] Built target crb_ros_msg__cpp\n'}
+[1.494149] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_cpp.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_cpp.dir/depend\n'}
+[1.494363] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_cpp.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_cpp.dir/depend\n'}
+[1.494506] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_cpp.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_cpp.dir/depend\n'}
+[1.497611] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.497767] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_cpp.dir/DependInfo.cmake --color=\n'}
+[1.497961] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.498084] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_cpp.dir/DependInfo.cmake --color=\n'}
+[1.498378] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.498494] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_cpp.dir/DependInfo.cmake --color=\n'}
+[1.500119] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.501853] (-) TimerEvent: {}
+[1.504690] (crb_ros_msg) StdoutLine: {'line': b'[ 15%] Built target crb_ros_msg__rosidl_generator_c\n'}
+[1.505417] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c.dir/depend\n'}
+[1.505688] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c.dir/depend\n'}
+[1.505866] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/depend\n'}
+[1.506893] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/crb_ros_msg/action/detail/action_play__type_support.cpp.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_cpp.dir/compiler_depend.internal".\n'}
+[1.507311] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/crb_ros_msg/msg/detail/upper_joint_data__type_support.cpp.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_cpp.dir/compiler_depend.internal".\n'}
+[1.507614] (crb_ros_msg) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target crb_ros_msg__rosidl_typesupport_introspection_cpp\x1b[0m\n'}
+[1.508520] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.508758] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c.dir/DependInfo.cmake --color=\n'}
+[1.508933] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/crb_ros_msg/action/detail/dds_fastrtps/action_play__type_support.cpp.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_cpp.dir/compiler_depend.internal".\n'}
+[1.509254] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/crb_ros_msg/msg/detail/dds_fastrtps/upper_joint_data__type_support.cpp.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_cpp.dir/compiler_depend.internal".\n'}
+[1.509466] (crb_ros_msg) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target crb_ros_msg__rosidl_typesupport_fastrtps_cpp\x1b[0m\n'}
+[1.509666] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.509834] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/DependInfo.cmake --color=\n'}
+[1.510303] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.510533] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c.dir/DependInfo.cmake --color=\n'}
+[1.511515] (crb_ros_msg) StdoutLine: {'line': b'[ 15%] Built target ament_cmake_python_copy_crb_ros_msg\n'}
+[1.512516] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/ament_cmake_python_build_crb_ros_msg_egg.dir/build.make CMakeFiles/ament_cmake_python_build_crb_ros_msg_egg.dir/depend\n'}
+[1.512693] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/crb_ros_msg/action/action_play__type_support.cpp.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_cpp.dir/compiler_depend.internal".\n'}
+[1.513009] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/crb_ros_msg/msg/upper_joint_data__type_support.cpp.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_cpp.dir/compiler_depend.internal".\n'}
+[1.513363] (crb_ros_msg) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target crb_ros_msg__rosidl_typesupport_cpp\x1b[0m\n'}
+[1.513910] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.514073] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/ament_cmake_python_build_crb_ros_msg_egg.dir/DependInfo.cmake --color=\n'}
+[1.516327] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.516535] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_cpp.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_cpp.dir/build\n'}
+[1.518441] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.518619] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_cpp.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_cpp.dir/build\n'}
+[1.518708] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/crb_ros_msg/action/detail/action_play__type_support.c.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c.dir/compiler_depend.internal".\n'}
+[1.518883] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/crb_ros_msg/msg/detail/upper_joint_data__type_support.c.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c.dir/compiler_depend.internal".\n'}
+[1.519073] (crb_ros_msg) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target crb_ros_msg__rosidl_typesupport_introspection_c\x1b[0m\n'}
+[1.521306] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.521513] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Nothing to be done for 'CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_cpp.dir/build'.\n"}
+[1.521647] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.522866] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.523054] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/ament_cmake_python_build_crb_ros_msg_egg.dir/build.make CMakeFiles/ament_cmake_python_build_crb_ros_msg_egg.dir/build\n'}
+[1.523885] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.524028] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Nothing to be done for 'CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_cpp.dir/build'.\n"}
+[1.524178] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.524308] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/crb_ros_msg/action/detail/action_play__type_support_c.cpp.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c.dir/compiler_depend.internal".\n'}
+[1.524495] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/crb_ros_msg/msg/detail/upper_joint_data__type_support_c.cpp.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c.dir/compiler_depend.internal".\n'}
+[1.524726] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.524871] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c.dir/build\n'}
+[1.525119] (crb_ros_msg) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target crb_ros_msg__rosidl_typesupport_fastrtps_c\x1b[0m\n'}
+[1.525251] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/action/action_play__type_support.cpp.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/compiler_depend.internal".\n'}
+[1.525330] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.525403] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/rosidl_typesupport_c/crb_ros_msg/msg/upper_joint_data__type_support.cpp.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/compiler_depend.internal".\n'}
+[1.525468] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_cpp.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_cpp.dir/build\n'}
+[1.525531] (crb_ros_msg) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target crb_ros_msg__rosidl_typesupport_c\x1b[0m\n'}
+[1.525600] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.525660] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/ament_cmake_python/crb_ros_msg && /usr/bin/python3 setup.py egg_info\n'}
+[1.529298] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.529550] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Nothing to be done for 'CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c.dir/build'.\n"}
+[1.529734] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.529857] (crb_ros_msg) StdoutLine: {'line': b'[ 25%] Built target crb_ros_msg__rosidl_typesupport_introspection_cpp\n'}
+[1.530002] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.530171] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/build\n'}
+[1.531484] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.531663] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c.dir/build\n'}
+[1.532911] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.533071] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Nothing to be done for 'CMakeFiles/crb_ros_msg__rosidl_typesupport_c.dir/build'.\n"}
+[1.533211] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.533882] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.534046] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Nothing to be done for 'CMakeFiles/crb_ros_msg__rosidl_typesupport_cpp.dir/build'.\n"}
+[1.534225] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.534344] (crb_ros_msg) StdoutLine: {'line': b'[ 35%] Built target crb_ros_msg__rosidl_typesupport_fastrtps_cpp\n'}
+[1.536259] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.536422] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Nothing to be done for 'CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c.dir/build'.\n"}
+[1.536550] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.539919] (crb_ros_msg) StdoutLine: {'line': b'[ 45%] Built target crb_ros_msg__rosidl_typesupport_introspection_c\n'}
+[1.542905] (crb_ros_msg) StdoutLine: {'line': b'[ 62%] Built target crb_ros_msg__rosidl_typesupport_cpp\n'}
+[1.543141] (crb_ros_msg) StdoutLine: {'line': b'[ 65%] Built target crb_ros_msg__rosidl_typesupport_c\n'}
+[1.544167] (crb_ros_msg) StdoutLine: {'line': b'[ 75%] Built target crb_ros_msg__rosidl_typesupport_fastrtps_c\n'}
+[1.544900] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg.dir/build.make CMakeFiles/crb_ros_msg.dir/depend\n'}
+[1.546299] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.546429] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg.dir/DependInfo.cmake --color=\n'}
+[1.559291] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.559574] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg.dir/build.make CMakeFiles/crb_ros_msg.dir/build\n'}
+[1.561393] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.561539] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Nothing to be done for 'CMakeFiles/crb_ros_msg.dir/build'.\n"}
+[1.561650] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.571882] (crb_ros_msg) StdoutLine: {'line': b'[ 75%] Built target crb_ros_msg\n'}
+[1.572541] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f crb_ros_msg__py/CMakeFiles/crb_ros_msg__py.dir/build.make crb_ros_msg__py/CMakeFiles/crb_ros_msg__py.dir/depend\n'}
+[1.574947] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.575075] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/crb_ros_msg__py /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/crb_ros_msg__py /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/crb_ros_msg__py/CMakeFiles/crb_ros_msg__py.dir/DependInfo.cmake --color=\n'}
+[1.586661] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.586882] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f crb_ros_msg__py/CMakeFiles/crb_ros_msg__py.dir/build.make crb_ros_msg__py/CMakeFiles/crb_ros_msg__py.dir/build\n'}
+[1.590287] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.590425] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Nothing to be done for 'crb_ros_msg__py/CMakeFiles/crb_ros_msg__py.dir/build'.\n"}
+[1.590536] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.598324] (crb_ros_msg) StdoutLine: {'line': b'[ 77%] Built target crb_ros_msg__py\n'}
+[1.599205] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_generator_py.dir/build.make CMakeFiles/crb_ros_msg__rosidl_generator_py.dir/depend\n'}
+[1.601371] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.601507] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_generator_py.dir/DependInfo.cmake --color=\n'}
+[1.601911] (-) TimerEvent: {}
+[1.610098] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_generator_py.dir/rosidl_generator_py/crb_ros_msg/action/_action_play_s.c.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_generator_py.dir/compiler_depend.internal".\n'}
+[1.610314] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_generator_py.dir/rosidl_generator_py/crb_ros_msg/msg/_upper_joint_data_s.c.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_generator_py.dir/compiler_depend.internal".\n'}
+[1.610610] (crb_ros_msg) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target crb_ros_msg__rosidl_generator_py\x1b[0m\n'}
+[1.621162] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.621334] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_generator_py.dir/build.make CMakeFiles/crb_ros_msg__rosidl_generator_py.dir/build\n'}
+[1.624964] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.625112] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Nothing to be done for 'CMakeFiles/crb_ros_msg__rosidl_generator_py.dir/build'.\n"}
+[1.625232] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.637564] (crb_ros_msg) StdoutLine: {'line': b'[ 85%] Built target crb_ros_msg__rosidl_generator_py\n'}
+[1.638783] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c__pyext.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c__pyext.dir/depend\n'}
+[1.639060] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c__pyext.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c__pyext.dir/depend\n'}
+[1.639373] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_c__pyext.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_c__pyext.dir/depend\n'}
+[1.641211] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.641449] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c__pyext.dir/DependInfo.cmake --color=\n'}
+[1.641671] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.641771] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_c__pyext.dir/DependInfo.cmake --color=\n'}
+[1.641849] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.641914] (crb_ros_msg) StdoutLine: {'line': b'cd /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/src/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c__pyext.dir/DependInfo.cmake --color=\n'}
+[1.649314] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c__pyext.dir/rosidl_generator_py/crb_ros_msg/_crb_ros_msg_s.ep.rosidl_typesupport_fastrtps_c.c.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c__pyext.dir/compiler_depend.internal".\n'}
+[1.649566] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_typesupport_c__pyext.dir/rosidl_generator_py/crb_ros_msg/_crb_ros_msg_s.ep.rosidl_typesupport_c.c.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_c__pyext.dir/compiler_depend.internal".\n'}
+[1.649675] (crb_ros_msg) StdoutLine: {'line': b'Dependencies file "CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c__pyext.dir/rosidl_generator_py/crb_ros_msg/_crb_ros_msg_s.ep.rosidl_typesupport_introspection_c.c.o.d" is newer than depends file "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c__pyext.dir/compiler_depend.internal".\n'}
+[1.649771] (crb_ros_msg) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target crb_ros_msg__rosidl_typesupport_fastrtps_c__pyext\x1b[0m\n'}
+[1.649894] (crb_ros_msg) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target crb_ros_msg__rosidl_typesupport_c__pyext\x1b[0m\n'}
+[1.649975] (crb_ros_msg) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target crb_ros_msg__rosidl_typesupport_introspection_c__pyext\x1b[0m\n'}
+[1.655565] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.655729] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.655796] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_c__pyext.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_c__pyext.dir/build\n'}
+[1.656008] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c__pyext.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c__pyext.dir/build\n'}
+[1.656138] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.656277] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/gmake  -f CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c__pyext.dir/build.make CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c__pyext.dir/build\n'}
+[1.663420] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.663607] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.663683] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Entering directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.663749] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Nothing to be done for 'CMakeFiles/crb_ros_msg__rosidl_typesupport_c__pyext.dir/build'.\n"}
+[1.663822] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Nothing to be done for 'CMakeFiles/crb_ros_msg__rosidl_typesupport_introspection_c__pyext.dir/build'.\n"}
+[1.663879] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Nothing to be done for 'CMakeFiles/crb_ros_msg__rosidl_typesupport_fastrtps_c__pyext.dir/build'.\n"}
+[1.663955] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.664039] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.664114] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.671983] (crb_ros_msg) StdoutLine: {'line': b'[ 90%] Built target crb_ros_msg__rosidl_typesupport_c__pyext\n'}
+[1.674287] (crb_ros_msg) StdoutLine: {'line': b'[ 95%] Built target crb_ros_msg__rosidl_typesupport_fastrtps_c__pyext\n'}
+[1.676535] (crb_ros_msg) StdoutLine: {'line': b'[100%] Built target crb_ros_msg__rosidl_typesupport_introspection_c__pyext\n'}
+[1.685269] (crb_ros_msg) StdoutLine: {'line': b'running egg_info\n'}
+[1.685734] (crb_ros_msg) StdoutLine: {'line': b'writing crb_ros_msg.egg-info/PKG-INFO\n'}
+[1.685908] (crb_ros_msg) StdoutLine: {'line': b'writing dependency_links to crb_ros_msg.egg-info/dependency_links.txt\n'}
+[1.686079] (crb_ros_msg) StdoutLine: {'line': b'writing top-level names to crb_ros_msg.egg-info/top_level.txt\n'}
+[1.688064] (crb_ros_msg) StdoutLine: {'line': b"reading manifest file 'crb_ros_msg.egg-info/SOURCES.txt'\n"}
+[1.688496] (crb_ros_msg) StdoutLine: {'line': b"writing manifest file 'crb_ros_msg.egg-info/SOURCES.txt'\n"}
+[1.699328] (crb_ros_msg) StdoutLine: {'line': b"gmake[2]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.702024] (-) TimerEvent: {}
+[1.709593] (crb_ros_msg) StdoutLine: {'line': b'[100%] Built target ament_cmake_python_build_crb_ros_msg_egg\n'}
+[1.710328] (crb_ros_msg) StdoutLine: {'line': b"gmake[1]: Leaving directory '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'\n"}
+[1.710502] (crb_ros_msg) StdoutLine: {'line': b'/usr/bin/cmake -E cmake_progress_start /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles 0\n'}
+[1.722533] (crb_ros_msg) CommandEnded: {'returncode': 0}
+[1.723202] (crb_ros_msg) JobProgress: {'identifier': 'crb_ros_msg', 'progress': 'install'}
+[1.731379] (crb_ros_msg) Command: {'cmd': ['/usr/bin/cmake', '--install', '/workspace/action_data_offset_ws/build/crb_ros_msg'], 'cwd': '/workspace/action_data_offset_ws/build/crb_ros_msg', 'env': OrderedDict([('PYTHON_SOABI', 'cpython-310-aarch64-linux-gnu'), ('ARCH', 'aarch64'), ('HOSTNAME', 'aarch64_2204_0508_1407_17'), ('SHLVL', '2'), ('LD_LIBRARY_PATH', '/opt/rootfs_2204_aarch64/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/rootfs_2204_aarch64/opt/ros/humble/lib/aarch64-linux-gnu:/opt/rootfs_2204_aarch64/opt/ros/humble/lib'), ('HOME', '/home/casbot'), ('OLDPWD', '/workspace/action_data_offset_ws'), ('ROS_PYTHON_VERSION', '3'), ('CROSS_FLAG', '-DCMAKE_CUSTOM_CROSS=ON -DCMAKE_TOOLCHAIN_FILE=/workspace/action_data_offset_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake'), ('project_environment_dir', '/workspace/action_data_offset_ws/docker_env/environment'), ('ROS_DISTRO', 'humble'), ('is_ubuntu_20_04', 'false'), ('_', '/usr/local/bin/colcon'), ('ROS_VERSION', '2'), ('is_orin', 'false'), ('is_ubuntu_22_04', 'true'), ('TERM', 'xterm'), ('ROS_LOCALHOST_ONLY', '0'), ('QT_X11_NO_MITSHM', '1'), ('PATH', '/opt/rootfs_2204_aarch64/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('is_pc', 'true'), ('env_is_docker', '1'), ('DISPLAY', ':1'), ('LANG', 'en_US.UTF-8'), ('AMENT_PREFIX_PATH', '/opt/rootfs_2204_aarch64/opt/ros/humble'), ('env_docker_aarch64', '1'), ('PWD', '/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg'), ('env_docker_x86', '0'), ('PYTHONPATH', '/opt/rootfs_2204_aarch64/opt/ros/humble/lib/python3.10/site-packages:/opt/rootfs_2204_aarch64/opt/ros/humble/local/lib/python3.10/dist-packages'), ('SYSROOT', '/opt/rootfs_2204_aarch64/'), ('TARGET_ARCH', 'aarch64'), ('TZ', 'Asia/Shanghai'), ('project_install_dir', '/workspace/action_data_offset_ws/install_aarch64'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/opt/rootfs_2204_aarch64/opt/ros/humble')]), 'shell': False}
+[1.742721] (crb_ros_msg) StdoutLine: {'line': b'-- Install configuration: "Release"\n'}
+[1.743004] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/ament_index/resource_index/rosidl_interfaces/crb_ros_msg\n'}
+[1.743340] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg\n'}
+[1.743519] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action\n'}
+[1.743640] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail\n'}
+[1.743753] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail/action_play__functions.c\n'}
+[1.743912] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail/action_play__struct.h\n'}
+[1.743990] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail/action_play__functions.h\n'}
+[1.744051] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail/action_play__type_support.h\n'}
+[1.744113] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/action_play.h\n'}
+[1.744165] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg\n'}
+[1.744215] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail\n'}
+[1.744268] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail/upper_joint_data__functions.h\n'}
+[1.744352] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail/upper_joint_data__type_support.h\n'}
+[1.744402] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail/upper_joint_data__functions.c\n'}
+[1.744451] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail/upper_joint_data__struct.h\n'}
+[1.744501] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/rosidl_generator_c__visibility_control.h\n'}
+[1.744549] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/upper_joint_data.h\n'}
+[1.744598] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/environment/library_path.sh\n'}
+[1.744648] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/share/crb_ros_msg/environment/library_path.dsv\n'}
+[1.744696] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/lib/libcrb_ros_msg__rosidl_generator_c.so\n'}
+[1.744851] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg\n'}
+[1.744934] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action\n'}
+[1.745009] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail\n'}
+[1.745203] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail/action_play__rosidl_typesupport_fastrtps_c.h\n'}
+[1.745373] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg\n'}
+[1.745436] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/rosidl_typesupport_fastrtps_c__visibility_control.h\n'}
+[1.745505] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail\n'}
+[1.745569] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail/upper_joint_data__rosidl_typesupport_fastrtps_c.h\n'}
+[1.746030] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/lib/libcrb_ros_msg__rosidl_typesupport_fastrtps_c.so\n'}
+[1.746564] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg\n'}
+[1.746636] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action\n'}
+[1.746714] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail\n'}
+[1.746867] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail/action_play__type_support.c\n'}
+[1.746955] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail/action_play__rosidl_typesupport_introspection_c.h\n'}
+[1.747019] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg\n'}
+[1.747081] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail\n'}
+[1.747189] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail/upper_joint_data__rosidl_typesupport_introspection_c.h\n'}
+[1.747316] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail/upper_joint_data__type_support.c\n'}
+[1.747400] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/rosidl_typesupport_introspection_c__visibility_control.h\n'}
+[1.747936] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/lib/libcrb_ros_msg__rosidl_typesupport_introspection_c.so\n'}
+[1.748797] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/lib/libcrb_ros_msg__rosidl_typesupport_c.so\n'}
+[1.749191] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg\n'}
+[1.749269] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action\n'}
+[1.749335] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail\n'}
+[1.749468] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail/action_play__traits.hpp\n'}
+[1.749541] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail/action_play__type_support.hpp\n'}
+[1.749614] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail/action_play__builder.hpp\n'}
+[1.749689] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail/action_play__struct.hpp\n'}
+[1.749766] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/action_play.hpp\n'}
+[1.749839] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg\n'}
+[1.749906] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail\n'}
+[1.749982] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail/upper_joint_data__traits.hpp\n'}
+[1.750051] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail/upper_joint_data__type_support.hpp\n'}
+[1.750139] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail/upper_joint_data__struct.hpp\n'}
+[1.750211] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail/upper_joint_data__builder.hpp\n'}
+[1.750291] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/rosidl_generator_cpp__visibility_control.hpp\n'}
+[1.750371] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/upper_joint_data.hpp\n'}
+[1.750437] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg\n'}
+[1.750524] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action\n'}
+[1.750590] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail\n'}
+[1.750694] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail/action_play__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[1.750871] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail/dds_fastrtps\n'}
+[1.751009] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg\n'}
+[1.751135] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail\n'}
+[1.751249] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail/upper_joint_data__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[1.751358] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail/dds_fastrtps\n'}
+[1.751464] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h\n'}
+[1.751651] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/lib/libcrb_ros_msg__rosidl_typesupport_fastrtps_cpp.so\n'}
+[1.752179] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg\n'}
+[1.752356] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action\n'}
+[1.752487] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail\n'}
+[1.752611] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail/action_play__rosidl_typesupport_introspection_cpp.hpp\n'}
+[1.752730] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/action/detail/action_play__type_support.cpp\n'}
+[1.752848] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg\n'}
+[1.752960] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail\n'}
+[1.753068] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail/upper_joint_data__rosidl_typesupport_introspection_cpp.hpp\n'}
+[1.753196] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/include/crb_ros_msg/crb_ros_msg/msg/detail/upper_joint_data__type_support.cpp\n'}
+[1.753461] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/lib/libcrb_ros_msg__rosidl_typesupport_introspection_cpp.so\n'}
+[1.754386] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/lib/libcrb_ros_msg__rosidl_typesupport_cpp.so\n'}
+[1.754887] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/environment/pythonpath.sh\n'}
+[1.755021] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/share/crb_ros_msg/environment/pythonpath.dsv\n'}
+[1.755362] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg-0.1.0-py3.10.egg-info\n'}
+[1.755494] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg-0.1.0-py3.10.egg-info/PKG-INFO\n'}
+[1.755810] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg-0.1.0-py3.10.egg-info/dependency_links.txt\n'}
+[1.756102] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg-0.1.0-py3.10.egg-info/SOURCES.txt\n'}
+[1.756425] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg-0.1.0-py3.10.egg-info/top_level.txt\n'}
+[1.756698] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg\n'}
+[1.756837] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/libcrb_ros_msg__rosidl_generator_py.so\n'}
+[1.756966] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/crb_ros_msg_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so\n'}
+[1.757433] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/_crb_ros_msg_s.ep.rosidl_typesupport_fastrtps_c.c\n'}
+[1.757593] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/_crb_ros_msg_s.ep.rosidl_typesupport_c.c\n'}
+[1.757715] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/action\n'}
+[1.757845] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/action/_action_play.py\n'}
+[1.757957] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/action/__init__.py\n'}
+[1.758076] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/action/_action_play_s.c\n'}
+[1.758200] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/__init__.py\n'}
+[1.758317] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/msg\n'}
+[1.758433] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/msg/_upper_joint_data.py\n'}
+[1.758548] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/msg/_upper_joint_data_s.c\n'}
+[1.758663] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/msg/__init__.py\n'}
+[1.758881] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/crb_ros_msg_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so\n'}
+[1.759149] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/crb_ros_msg_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so\n'}
+[1.759662] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/_crb_ros_msg_s.ep.rosidl_typesupport_introspection_c.c\n'}
+[1.788815] (crb_ros_msg) StdoutLine: {'line': b"Listing '/workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg'...\n"}
+[1.789039] (crb_ros_msg) StdoutLine: {'line': b"Compiling '/workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/__init__.py'...\n"}
+[1.789176] (crb_ros_msg) StdoutLine: {'line': b"Listing '/workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/action'...\n"}
+[1.789301] (crb_ros_msg) StdoutLine: {'line': b"Listing '/workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/msg'...\n"}
+[1.792542] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/crb_ros_msg_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so\n'}
+[1.793235] (crb_ros_msg) StdoutLine: {'line': b'-- Set runtime path of "/workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/crb_ros_msg_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so" to ""\n'}
+[1.793520] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/crb_ros_msg_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so\n'}
+[1.794180] (crb_ros_msg) StdoutLine: {'line': b'-- Set runtime path of "/workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/crb_ros_msg_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so" to ""\n'}
+[1.794454] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/crb_ros_msg_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so\n'}
+[1.795081] (crb_ros_msg) StdoutLine: {'line': b'-- Set runtime path of "/workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages/crb_ros_msg/crb_ros_msg_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so" to ""\n'}
+[1.795368] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/lib/libcrb_ros_msg__rosidl_generator_py.so\n'}
+[1.795645] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/ament_index/resource_index/rust_packages/crb_ros_msg\n'}
+[1.795795] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/rust\n'}
+[1.795958] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/rust/src\n'}
+[1.796107] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/rust/src/action.rs\n'}
+[1.796237] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/rust/src/lib.rs\n'}
+[1.796384] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/rust/src/action\n'}
+[1.796507] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/rust/src/action/rmw.rs\n'}
+[1.796627] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/rust/src/msg.rs\n'}
+[1.796748] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/rust/src/msg\n'}
+[1.796908] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/rust/src/msg/rmw.rs\n'}
+[1.797101] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/rust/build.rs\n'}
+[1.797270] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/rust/Cargo.toml\n'}
+[1.797388] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/msg/UpperJointData.idl\n'}
+[1.797535] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/action/ActionPlay.idl\n'}
+[1.797671] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/msg/UpperJointData.msg\n'}
+[1.797827] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/action/ActionPlay.action\n'}
+[1.797956] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/ament_index/resource_index/package_run_dependencies/crb_ros_msg\n'}
+[1.798079] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/share/ament_index/resource_index/parent_prefix_path/crb_ros_msg\n'}
+[1.798218] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/environment/ament_prefix_path.sh\n'}
+[1.798352] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/share/crb_ros_msg/environment/ament_prefix_path.dsv\n'}
+[1.798493] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/environment/path.sh\n'}
+[1.798640] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/share/crb_ros_msg/environment/path.dsv\n'}
+[1.798782] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/local_setup.bash\n'}
+[1.798937] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/local_setup.sh\n'}
+[1.799071] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/local_setup.zsh\n'}
+[1.799254] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/share/crb_ros_msg/local_setup.dsv\n'}
+[1.799439] (crb_ros_msg) StdoutLine: {'line': b'-- Installing: /workspace/action_data_offset_ws/install/share/crb_ros_msg/package.dsv\n'}
+[1.799591] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/ament_index/resource_index/packages/crb_ros_msg\n'}
+[1.799732] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/export_crb_ros_msg__rosidl_generator_cExport.cmake\n'}
+[1.799881] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/export_crb_ros_msg__rosidl_generator_cExport-release.cmake\n'}
+[1.800003] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/export_crb_ros_msg__rosidl_typesupport_fastrtps_cExport.cmake\n'}
+[1.800121] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/export_crb_ros_msg__rosidl_typesupport_fastrtps_cExport-release.cmake\n'}
+[1.800253] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/crb_ros_msg__rosidl_typesupport_introspection_cExport.cmake\n'}
+[1.800368] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/crb_ros_msg__rosidl_typesupport_introspection_cExport-release.cmake\n'}
+[1.800480] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/crb_ros_msg__rosidl_typesupport_cExport.cmake\n'}
+[1.800596] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/crb_ros_msg__rosidl_typesupport_cExport-release.cmake\n'}
+[1.800709] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/export_crb_ros_msg__rosidl_generator_cppExport.cmake\n'}
+[1.800824] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/export_crb_ros_msg__rosidl_typesupport_fastrtps_cppExport.cmake\n'}
+[1.800934] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/export_crb_ros_msg__rosidl_typesupport_fastrtps_cppExport-release.cmake\n'}
+[1.801045] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/crb_ros_msg__rosidl_typesupport_introspection_cppExport.cmake\n'}
+[1.801167] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/crb_ros_msg__rosidl_typesupport_introspection_cppExport-release.cmake\n'}
+[1.801279] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/crb_ros_msg__rosidl_typesupport_cppExport.cmake\n'}
+[1.801602] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/crb_ros_msg__rosidl_typesupport_cppExport-release.cmake\n'}
+[1.802591] (-) TimerEvent: {}
+[1.802734] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/export_crb_ros_msg__rosidl_generator_pyExport.cmake\n'}
+[1.802910] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/export_crb_ros_msg__rosidl_generator_pyExport-release.cmake\n'}
+[1.803065] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/rosidl_cmake-extras.cmake\n'}
+[1.803243] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/ament_cmake_export_dependencies-extras.cmake\n'}
+[1.803385] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/ament_cmake_export_include_directories-extras.cmake\n'}
+[1.803627] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/ament_cmake_export_libraries-extras.cmake\n'}
+[1.803751] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/ament_cmake_export_targets-extras.cmake\n'}
+[1.803892] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake\n'}
+[1.804063] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake\n'}
+[1.804207] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/crb_ros_msgConfig.cmake\n'}
+[1.804336] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/cmake/crb_ros_msgConfig-version.cmake\n'}
+[1.804468] (crb_ros_msg) StdoutLine: {'line': b'-- Up-to-date: /workspace/action_data_offset_ws/install/share/crb_ros_msg/package.xml\n'}
+[1.804692] (crb_ros_msg) CommandEnded: {'returncode': 0}
+[1.823617] (crb_ros_msg) JobEnded: {'identifier': 'crb_ros_msg', 'rc': 0}
+[1.824435] (casbot_arm_calibration_web) JobStarted: {'identifier': 'casbot_arm_calibration_web'}
+[1.902691] (-) TimerEvent: {}
+[2.003025] (-) TimerEvent: {}
+[2.103285] (-) TimerEvent: {}
+[2.203602] (-) TimerEvent: {}
+[2.236112] (casbot_arm_calibration_web) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'egg_info', '--egg-base', '../../build_aarch64/casbot_arm_calibration_web', 'build', '--build-base', '/workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build', 'install', '--record', '/workspace/action_data_offset_ws/build/casbot_arm_calibration_web/install.log', '--single-version-externally-managed', 'install_data'], 'cwd': '/workspace/action_data_offset_ws/src/casbot_arm_calibration_web', 'env': {'PYTHON_SOABI': 'cpython-310-aarch64-linux-gnu', 'ARCH': 'aarch64', 'HOSTNAME': 'aarch64_2204_0508_1407_17', 'SHLVL': '2', 'LD_LIBRARY_PATH': '/workspace/action_data_offset_ws/install/lib:/opt/rootfs_2204_aarch64/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/rootfs_2204_aarch64/opt/ros/humble/lib/aarch64-linux-gnu:/opt/rootfs_2204_aarch64/opt/ros/humble/lib', 'HOME': '/home/casbot', 'OLDPWD': '/workspace/action_data_offset_ws', 'ROS_PYTHON_VERSION': '3', 'CROSS_FLAG': '-DCMAKE_CUSTOM_CROSS=ON -DCMAKE_TOOLCHAIN_FILE=/workspace/action_data_offset_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake', 'project_environment_dir': '/workspace/action_data_offset_ws/docker_env/environment', 'ROS_DISTRO': 'humble', 'is_ubuntu_20_04': 'false', '_': '/usr/local/bin/colcon', 'ROS_VERSION': '2', 'is_orin': 'false', 'is_ubuntu_22_04': 'true', 'TERM': 'xterm', 'ROS_LOCALHOST_ONLY': '0', 'QT_X11_NO_MITSHM': '1', 'PATH': '/workspace/action_data_offset_ws/install/bin:/opt/rootfs_2204_aarch64/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'is_pc': 'true', 'env_is_docker': '1', 'DISPLAY': ':1', 'LANG': 'en_US.UTF-8', 'AMENT_PREFIX_PATH': '/workspace/action_data_offset_ws/install:/opt/rootfs_2204_aarch64/opt/ros/humble', 'env_docker_aarch64': '1', 'PWD': '/workspace/action_data_offset_ws/build_aarch64/casbot_arm_calibration_web', 'env_docker_x86': '0', 'PYTHONPATH': '/workspace/action_data_offset_ws/build/casbot_arm_calibration_web/prefix_override:/usr/local/lib/python3.10/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/action_data_offset_ws/install/lib/python3.10/site-packages:/workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages:/workspace/action_data_offset_ws/install/lib/python3.10/site-packages:/opt/rootfs_2204_aarch64/opt/ros/humble/lib/python3.10/site-packages:/opt/rootfs_2204_aarch64/opt/ros/humble/local/lib/python3.10/dist-packages', 'SYSROOT': '/opt/rootfs_2204_aarch64/', 'TARGET_ARCH': 'aarch64', 'TZ': 'Asia/Shanghai', 'project_install_dir': '/workspace/action_data_offset_ws/install_aarch64', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/workspace/action_data_offset_ws/install'}, 'shell': False}
+[2.303733] (-) TimerEvent: {}
+[2.375916] (casbot_arm_calibration_web) StdoutLine: {'line': b'running egg_info\n'}
+[2.376223] (casbot_arm_calibration_web) StdoutLine: {'line': b'writing ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/PKG-INFO\n'}
+[2.376416] (casbot_arm_calibration_web) StdoutLine: {'line': b'writing dependency_links to ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/dependency_links.txt\n'}
+[2.376563] (casbot_arm_calibration_web) StdoutLine: {'line': b'writing entry points to ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/entry_points.txt\n'}
+[2.376692] (casbot_arm_calibration_web) StdoutLine: {'line': b'writing requirements to ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/requires.txt\n'}
+[2.376803] (casbot_arm_calibration_web) StdoutLine: {'line': b'writing top-level names to ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/top_level.txt\n'}
+[2.378185] (casbot_arm_calibration_web) StdoutLine: {'line': b"reading manifest file '../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/SOURCES.txt'\n"}
+[2.379303] (casbot_arm_calibration_web) StdoutLine: {'line': b"writing manifest file '../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/SOURCES.txt'\n"}
+[2.379479] (casbot_arm_calibration_web) StdoutLine: {'line': b'running build\n'}
+[2.379593] (casbot_arm_calibration_web) StdoutLine: {'line': b'running build_py\n'}
+[2.380211] (casbot_arm_calibration_web) StdoutLine: {'line': b'running install\n'}
+[2.380415] (casbot_arm_calibration_web) StdoutLine: {'line': b'running install_lib\n'}
+[2.381869] (casbot_arm_calibration_web) StdoutLine: {'line': b'running install_data\n'}
+[2.382607] (casbot_arm_calibration_web) StdoutLine: {'line': b'running install_egg_info\n'}
+[2.383791] (casbot_arm_calibration_web) StdoutLine: {'line': b"removing '/workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web-0.1.0-py3.10.egg-info' (and everything under it)\n"}
+[2.383962] (casbot_arm_calibration_web) StdoutLine: {'line': b'Copying ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info to /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web-0.1.0-py3.10.egg-info\n'}
+[2.384650] (casbot_arm_calibration_web) StdoutLine: {'line': b'running install_scripts\n'}
+[2.398138] (casbot_arm_calibration_web) StdoutLine: {'line': b'Installing arm_calibration_web script to /workspace/action_data_offset_ws/install/lib/casbot_arm_calibration_web\n'}
+[2.398456] (casbot_arm_calibration_web) StdoutLine: {'line': b"writing list of installed files to '/workspace/action_data_offset_ws/build/casbot_arm_calibration_web/install.log'\n"}
+[2.403840] (-) TimerEvent: {}
+[2.412259] (casbot_arm_calibration_web) CommandEnded: {'returncode': 0}
+[2.422390] (casbot_arm_calibration_web) JobEnded: {'identifier': 'casbot_arm_calibration_web', 'rc': 0}
+[2.423072] (-) EventReactorShutdown: {}

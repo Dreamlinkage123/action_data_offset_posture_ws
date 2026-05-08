@@ -6,11 +6,11 @@
 - 按 ``step_size_01mm`` 逐步积分，每步用 DLS(Pseudo-Inverse) 做位置雅可比逆解；
   每一步都累计到 ``results`` 中，**调用方把全部路点按 100Hz 播放，末端即沿直线移动**。
 - 仅关心位置（3 维），姿态会漂移；测量点若不在 ``*_wrist_roll_link`` 原点，手上远点可能多几毫米弧长。
-- 主循环后对 **腕部连杆原点** 做终端位置闭环修正，减小分步雅可比累积误差。
+- 主循环后对 **腕部连杆原点** 做终端位置闭环修正，减小分步雅可比累积误差；若位移为 **单轴**（仅 dx/dy/dz 之一），修正时把位置误差投影到该轴，减轻冗余臂在正交方向的漂移。
 - :func:`cartesian_rotate_waypoints`：绕 ``base_link`` 的 X/Y/Z（RX/RY/RZ）做定轴旋转示教；
   内部按固定角度步长分步，6 维任务（位置保持 + 角速度）DLS 解算，末端再做位姿闭环修正。
-- 若已安装 **tracikpy**，:func:`cartesian_linear_waypoints_trac` /
-  :func:`cartesian_rotate_waypoints_trac` 用 TRAC‑IK 按子步解算，避免数值雅可比 DLS（见节点参数 ``use_trac_ik``）。
+- :func:`cartesian_linear_waypoints_trac` / :func:`cartesian_rotate_waypoints_trac` 使用 **Pinocchio**
+  帧雅可比迭代 IK（见节点参数 ``use_trac_ik``，语义为启用 Pin 示教 IK）。
 """
 
 from __future__ import annotations
@@ -62,6 +62,23 @@ def _dls_pinv(J: np.ndarray, lambd: float) -> np.ndarray:
     JJT = J @ J.T
     m = JJT.shape[0]
     return J.T @ np.linalg.inv(JJT + (lambd * lambd) * np.eye(m, dtype=float))
+
+
+def _is_pure_axis_cartesian_delta(total_m: np.ndarray) -> bool:
+    """``total_m`` 为 base_link 下目标位移 (m)，是否仅沿 X/Y/Z 中某一轴（用于单轴示教误差投影）。"""
+    t = np.asarray(total_m, dtype=float).reshape(3)
+    return int(np.sum(np.abs(t) > 1e-9)) == 1
+
+
+def _project_position_error_on_direction(err: np.ndarray, direction: np.ndarray) -> np.ndarray:
+    """将 3D 位置误差投影到单位方向 ``direction`` 上，避免冗余臂在正交方向被闭环硬拉。"""
+    e = np.asarray(err, dtype=float).reshape(3)
+    u = np.asarray(direction, dtype=float).reshape(3)
+    n = float(np.linalg.norm(u))
+    if n < 1e-12:
+        return e
+    u = u / n
+    return u * float(np.dot(e, u))
 
 
 def _vee_log_so3(R: np.ndarray) -> np.ndarray:
@@ -187,6 +204,7 @@ def cartesian_linear_waypoints(
         return []
 
     direction = total / dist
+    pure_axis = _is_pure_axis_cartesian_delta(total)
     step_m_target = float(step_size_01mm) * 1e-4
     # 把 dist 均分为 n_steps 段，确保每段长度 ≤ step_m_target，且最终累计恰好 dist
     n_steps = max(1, int(math.ceil(dist / step_m_target)))
@@ -241,7 +259,8 @@ def cartesian_linear_waypoints(
         p = fk.fk_tip_xyz(chain_base_to_tip, name_q_new)
         if p is None:
             break
-        err = p_target_arr - np.asarray(p, dtype=float)
+        err_full = p_target_arr - np.asarray(p, dtype=float)
+        err = _project_position_error_on_direction(err_full, direction) if pure_axis else err_full
         if float(np.linalg.norm(err)) < pos_tol_m:
             break
         J = fk.tip_position_jacobian_numeric(chain_base_to_tip, name_q_new, arm_joint_names)
@@ -405,6 +424,29 @@ def _clip_arm_joints(
         merged[jn] = float(np.clip(merged[jn], lo, hi))
 
 
+def _pin_trac_q_passive_from_merged_seed(
+    kin: KinematicsPinTrac,
+    side: str,
+    chain_base_to_tip: List[str],
+    arm_joint_names: List[str],
+    q_sol: np.ndarray,
+    merged_seed: Dict[str, float],
+) -> np.ndarray:
+    """
+    链式 IK 在整条 base→腕部上求解；积分仅对 ``arm_joint_names``（通常 7 个），腰等保持 ``merged_seed``；
+    链上被动关节（如 ``waist_yaw_joint``）必须与 ``merged_seed`` 一致，否则「只改左臂」仍会得到
+    与固定腰不一致的臂角，末端易出现 X/Z 耦合，对侧也可能因整包指令/控制耦合出现位移。
+    """
+    q_arr = np.asarray(q_sol, dtype=float).reshape(-1).copy()
+    q_seed = kin.chain_dict_to_q_trac(side, merged_seed)
+    arm_set = set(arm_joint_names)
+    n = min(len(q_arr), len(q_seed), len(chain_base_to_tip))
+    for i in range(n):
+        if chain_base_to_tip[i] not in arm_set:
+            q_arr[i] = float(q_seed[i])
+    return q_arr
+
+
 def cartesian_linear_waypoints_trac(
     kin: KinematicsPinTrac,
     side: str,
@@ -419,8 +461,8 @@ def cartesian_linear_waypoints_trac(
     step_size_01mm: float = 1.0,
 ) -> List[Dict]:
     """
-    与 :func:`cartesian_linear_waypoints` 相同输入语义，每子步用 TRAC‑IK 解目标位姿
-    （位置沿直线、姿态保持起始 R）。
+    与 :func:`cartesian_linear_waypoints` 相同输入语义，每子步用 Pinocchio 迭代 IK 解目标位姿
+    （位置沿直线、姿态保持起始 R）；仅对 ``arm_joint_names`` 积分，链上被动腰角保持 seed。
     """
     n = len(arm_joint_names)
     if len(current_arm_q_rad) != n:
@@ -438,6 +480,7 @@ def cartesian_linear_waypoints_trac(
     if dist < 1e-12:
         return []
     direction = total / dist
+    pure_axis = _is_pure_axis_cartesian_delta(total)
     step_m_target = float(step_size_01mm) * 1e-4
     n_steps = max(1, int(math.ceil(dist / step_m_target)))
     step_m = dist / n_steps
@@ -459,13 +502,41 @@ def cartesian_linear_waypoints_trac(
         T = np.eye(4, dtype=np.float64)
         T[:3, :3] = R0
         T[:3, 3] = p_i
-        q_sol = kin.solve_ik(side, T, merged)
+        q_sol = kin.solve_ik(
+            side, T, merged, dq_joint_names=arm_joint_names, position_only=True
+        )
         if q_sol is None:
             break
-        arm_d = kin.q_chain_to_arm_dict(side, q_sol, arm_joint_names)
+        q_use = _pin_trac_q_passive_from_merged_seed(
+            kin, side, chain_base_to_tip, arm_joint_names, q_sol, merged
+        )
+        arm_d = kin.q_chain_to_arm_dict(side, q_use, arm_joint_names)
         for jn, v in arm_d.items():
             merged[jn] = v
         _clip_arm_joints(merged, arm_joint_names, joint_limits)
+        # 单轴直线：主 IK 往往留正交分量；把末端拉回 p0→direction 无限直线上的垂足，减轻 X/Z 漂移
+        if pure_axis:
+            p_chk = kin.fk_tip_xyz_trac(side, merged)
+            if p_chk is not None:
+                pc_c = np.asarray(p_chk, dtype=float).reshape(3)
+                t_on = float(np.dot(pc_c - p0, direction))
+                p_foot = p0 + direction * t_on
+                perp_e = p_foot - pc_c
+                if float(np.linalg.norm(perp_e)) > 2.0e-5:
+                    T_line = np.eye(4, dtype=np.float64)
+                    T_line[:3, :3] = R0
+                    T_line[:3, 3] = p_foot
+                    q_snap = kin.solve_ik(
+                        side, T_line, merged, dq_joint_names=arm_joint_names, position_only=True
+                    )
+                    if q_snap is not None:
+                        q_use2 = _pin_trac_q_passive_from_merged_seed(
+                            kin, side, chain_base_to_tip, arm_joint_names, q_snap, merged
+                        )
+                        arm_d2 = kin.q_chain_to_arm_dict(side, q_use2, arm_joint_names)
+                        for jn, v in arm_d2.items():
+                            merged[jn] = v
+                        _clip_arm_joints(merged, arm_joint_names, joint_limits)
         p = kin.fk_tip_xyz_trac(side, merged)
         if p is None:
             break
@@ -477,23 +548,30 @@ def cartesian_linear_waypoints_trac(
             }
         )
 
-    pos_tol_m = 8e-5
-    max_refine = 25
+    pos_tol_m = 5.0e-5
+    max_refine = 45
     step_idx = len(results)
     for _ in range(max_refine):
         p = kin.fk_tip_xyz_trac(side, merged)
         if p is None:
             break
-        err = p_target_arr - np.asarray(p, dtype=float)
-        if float(np.linalg.norm(err)) < pos_tol_m:
+        pc = np.asarray(p, dtype=float).reshape(3)
+        err_full = p_target_arr - pc
+        if float(np.linalg.norm(err_full)) < pos_tol_m:
             break
+        p_des = p_target_arr
         T_fix = np.eye(4, dtype=np.float64)
         T_fix[:3, :3] = R0
-        T_fix[:3, 3] = p_target_arr
-        q_sol = kin.solve_ik(side, T_fix, merged)
+        T_fix[:3, 3] = p_des
+        q_sol = kin.solve_ik(
+            side, T_fix, merged, dq_joint_names=arm_joint_names, position_only=True
+        )
         if q_sol is None:
             break
-        arm_d = kin.q_chain_to_arm_dict(side, q_sol, arm_joint_names)
+        q_use = _pin_trac_q_passive_from_merged_seed(
+            kin, side, chain_base_to_tip, arm_joint_names, q_sol, merged
+        )
+        arm_d = kin.q_chain_to_arm_dict(side, q_use, arm_joint_names)
         for jn, v in arm_d.items():
             merged[jn] = v
         _clip_arm_joints(merged, arm_joint_names, joint_limits)
@@ -524,7 +602,7 @@ def cartesian_rotate_waypoints_trac(
     joint_limits: Dict[str, Tuple[float, float]],
     step_angle_rad: float,
 ) -> List[Dict]:
-    """与 :func:`cartesian_rotate_waypoints` 相同任务，每子步 TRAC‑IK。"""
+    """与 :func:`cartesian_rotate_waypoints` 相同任务，每子步 Pinocchio 迭代 IK。"""
     n = len(arm_joint_names)
     if len(current_arm_q_rad) != n:
         raise ValueError(
@@ -565,10 +643,13 @@ def cartesian_rotate_waypoints_trac(
         T = np.eye(4, dtype=np.float64)
         T[:3, :3] = R_curr
         T[:3, 3] = p0
-        q_sol = kin.solve_ik(side, T, merged)
+        q_sol = kin.solve_ik(side, T, merged, dq_joint_names=arm_joint_names)
         if q_sol is None:
             break
-        arm_d = kin.q_chain_to_arm_dict(side, q_sol, arm_joint_names)
+        q_use = _pin_trac_q_passive_from_merged_seed(
+            kin, side, chain_base_to_tip, arm_joint_names, q_sol, merged
+        )
+        arm_d = kin.q_chain_to_arm_dict(side, q_use, arm_joint_names)
         for jn, v in arm_d.items():
             merged[jn] = v
         _clip_arm_joints(merged, arm_joint_names, joint_limits)
@@ -601,10 +682,13 @@ def cartesian_rotate_waypoints_trac(
         T_des = np.eye(4, dtype=np.float64)
         T_des[:3, :3] = R_target
         T_des[:3, 3] = p0
-        q_sol = kin.solve_ik(side, T_des, merged)
+        q_sol = kin.solve_ik(side, T_des, merged, dq_joint_names=arm_joint_names)
         if q_sol is None:
             break
-        arm_d = kin.q_chain_to_arm_dict(side, q_sol, arm_joint_names)
+        q_use = _pin_trac_q_passive_from_merged_seed(
+            kin, side, chain_base_to_tip, arm_joint_names, q_sol, merged
+        )
+        arm_d = kin.q_chain_to_arm_dict(side, q_use, arm_joint_names)
         for jn, v in arm_d.items():
             merged[jn] = v
         _clip_arm_joints(merged, arm_joint_names, joint_limits)

@@ -1352,7 +1352,14 @@ function wireRefreshInitialButtons() {
         if (r) {
           hint += `；RX/RY/RZ ° ${Number(r.rx).toFixed(3)} / ${Number(r.ry).toFixed(3)} / ${Number(r.rz).toFixed(3)}`;
         }
-        console.info(hint);
+        const hintL = j.left && j.left.initial_ee_m
+          ? `左 XYZ m ${Number(j.left.initial_ee_m.x).toFixed(6)}, ${Number(j.left.initial_ee_m.y).toFixed(6)}, ${Number(j.left.initial_ee_m.z).toFixed(6)}`
+          : "";
+        const hintR = j.right && j.right.initial_ee_m
+          ? `右 XYZ m ${Number(j.right.initial_ee_m.x).toFixed(6)}, ${Number(j.right.initial_ee_m.y).toFixed(6)}, ${Number(j.right.initial_ee_m.z).toFixed(6)}`
+          : "";
+        const both = [hintL, hintR].filter(Boolean).join("；");
+        console.info(both ? `${j.message || "已刷新"}（${both}）` : j.message || hint);
       } catch (e) {
         console.warn("refresh initial failed", e);
         await modalAlert(e.message || String(e));

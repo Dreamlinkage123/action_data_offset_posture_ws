@@ -1,0 +1,87 @@
+[0.377s] Invoking command in '/workspace/action_data_offset_ws/src/casbot_arm_calibration_web': AMENT_PREFIX_PATH=/workspace/action_data_offset_ws/install:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/action_data_offset_ws/install LD_LIBRARY_PATH=/workspace/action_data_offset_ws/install/lib:${LD_LIBRARY_PATH} PATH=/workspace/action_data_offset_ws/install/bin:${PATH} PYTHONPATH=/workspace/action_data_offset_ws/build/casbot_arm_calibration_web/prefix_override:/usr/local/lib/python3.10/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/action_data_offset_ws/install/lib/python3.10/site-packages:/workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages:/workspace/action_data_offset_ws/install/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build_aarch64/casbot_arm_calibration_web build --build-base /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build install --record /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/install.log --single-version-externally-managed install_data
+[0.517s] running egg_info
+[0.517s] creating ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info
+[0.517s] writing ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/PKG-INFO
+[0.518s] writing dependency_links to ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/dependency_links.txt
+[0.518s] writing entry points to ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/entry_points.txt
+[0.518s] writing requirements to ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/requires.txt
+[0.518s] writing top-level names to ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/top_level.txt
+[0.518s] writing manifest file '../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/SOURCES.txt'
+[0.519s] reading manifest file '../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/SOURCES.txt'
+[0.520s] writing manifest file '../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info/SOURCES.txt'
+[0.520s] running build
+[0.520s] running build_py
+[0.520s] creating /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build
+[0.520s] creating /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib
+[0.520s] creating /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web
+[0.520s] copying casbot_arm_calibration_web/trajectory_sources.py -> /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web
+[0.520s] copying casbot_arm_calibration_web/arm_fk.py -> /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web
+[0.521s] copying casbot_arm_calibration_web/calibration_data.py -> /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web
+[0.521s] copying casbot_arm_calibration_web/offset_jacobian.py -> /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web
+[0.521s] copying casbot_arm_calibration_web/kin_pin_trac.py -> /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web
+[0.521s] copying casbot_arm_calibration_web/__init__.py -> /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web
+[0.521s] copying casbot_arm_calibration_web/arm_cartesian_ik.py -> /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web
+[0.521s] copying casbot_arm_calibration_web/diag_cartesian_ik.py -> /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web
+[0.521s] copying casbot_arm_calibration_web/web_node.py -> /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web
+[0.521s] creating /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web/web
+[0.521s] copying casbot_arm_calibration_web/web/index.html -> /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web/web
+[0.521s] copying casbot_arm_calibration_web/web/style.css -> /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web/web
+[0.522s] copying casbot_arm_calibration_web/web/app.js -> /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web/web
+[0.522s] running install
+[0.522s] running install_lib
+[0.522s] creating /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web
+[0.523s] copying /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web/trajectory_sources.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web
+[0.523s] copying /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web/arm_fk.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web
+[0.523s] copying /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web/calibration_data.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web
+[0.523s] copying /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web/offset_jacobian.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web
+[0.523s] copying /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web/kin_pin_trac.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web
+[0.523s] copying /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web/__init__.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web
+[0.523s] copying /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web/arm_cartesian_ik.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web
+[0.523s] creating /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web/web
+[0.523s] copying /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web/web/index.html -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web/web
+[0.523s] copying /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web/web/style.css -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web/web
+[0.523s] copying /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web/web/app.js -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web/web
+[0.523s] copying /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web/diag_cartesian_ik.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web
+[0.524s] copying /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build/lib/casbot_arm_calibration_web/web_node.py -> /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web
+[0.524s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web/trajectory_sources.py to trajectory_sources.cpython-310.pyc
+[0.526s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web/arm_fk.py to arm_fk.cpython-310.pyc
+[0.527s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web/calibration_data.py to calibration_data.cpython-310.pyc
+[0.528s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web/offset_jacobian.py to offset_jacobian.cpython-310.pyc
+[0.528s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web/kin_pin_trac.py to kin_pin_trac.cpython-310.pyc
+[0.530s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web/__init__.py to __init__.cpython-310.pyc
+[0.530s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web/arm_cartesian_ik.py to arm_cartesian_ik.cpython-310.pyc
+[0.533s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web/diag_cartesian_ik.py to diag_cartesian_ik.cpython-310.pyc
+[0.534s] byte-compiling /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web/web_node.py to web_node.cpython-310.pyc
+[0.546s] running install_data
+[0.546s] copying package.xml -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web
+[0.546s] creating /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/launch
+[0.546s] copying launch/arm_calibration_web.launch.py -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/launch
+[0.546s] creating /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/urdf
+[0.546s] copying urdf/CASBOT02_ENCOS_7dof_shell_20251015_P1L.urdf -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/urdf
+[0.546s] creating /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/resource
+[0.546s] creating /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/resource/bass
+[0.546s] copying resource/bass/BiaoDingA_casbot02-bass1_6R7R2R1R_hand01_upper_100hz_v1.data -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/resource/bass
+[0.546s] copying resource/bass/BiaoDingB_casbot02-bass1_6R7R2R1R_hand01_upper_100hz_v1.data -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/resource/bass
+[0.547s] copying resource/casbot_arm_calibration_web -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/resource
+[0.547s] creating /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/resource/keyboard
+[0.547s] copying resource/keyboard/BiaoDingB_casbot02-keyboard2_6R7R2R1R_hand01_whole_100hz_v1.data -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/resource/keyboard
+[0.547s] copying resource/keyboard/BiaoDingA_casbot02-keyboard2_6R7R2R1R_hand01_whole_100hz_v1.data -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/resource/keyboard
+[0.547s] creating /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/resource/guitar
+[0.547s] copying resource/guitar/BiaoDingB_casbot02-guitar2_6R7R2R1R_hand01_whole_100hz_v1.data -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/resource/guitar
+[0.547s] copying resource/guitar/BiaoDingA_casbot02-guitar2_6R7R2R1R_hand01_whole_100hz_v1.data -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/resource/guitar
+[0.548s] creating /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/new_offset_data
+[0.548s] copying new_offset_data/keyboard_start_calibration_web_offset_20260423_144518_648.data -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/new_offset_data
+[0.548s] copying new_offset_data/keyboard_start_calibration_web_offset_20260423_141738_887.data -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/new_offset_data
+[0.548s] copying new_offset_data/keyboard_start_calibration_web_offset_20260423_000202_549.data -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/new_offset_data
+[0.548s] copying new_offset_data/keyboard_start_calibration_web_offset_20260423_161209_724.data -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/new_offset_data
+[0.548s] copying new_offset_data/keyboard_start_calibration_web_offset_20260423_105349_842.data -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/new_offset_data
+[0.549s] copying new_offset_data/keyboard_start_calibration_web_offset_20260423_110354_050.data -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/new_offset_data
+[0.549s] copying new_offset_data/keyboard_start_calibration_web_offset_20260423_150558_571.data -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/new_offset_data
+[0.549s] copying new_offset_data/keyboard_start_calibration_web_offset_20260423_110545_391.data -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/new_offset_data
+[0.549s] copying new_offset_data/keyboard_start_calibration_web_offset_20260423_110050_257.data -> /workspace/action_data_offset_ws/install/share/casbot_arm_calibration_web/new_offset_data
+[0.549s] running install_egg_info
+[0.551s] Copying ../../build_aarch64/casbot_arm_calibration_web/casbot_arm_calibration_web.egg-info to /workspace/action_data_offset_ws/install/lib/python3.10/site-packages/casbot_arm_calibration_web-0.1.0-py3.10.egg-info
+[0.551s] running install_scripts
+[0.565s] Installing arm_calibration_web script to /workspace/action_data_offset_ws/install/lib/casbot_arm_calibration_web
+[0.565s] writing list of installed files to '/workspace/action_data_offset_ws/build/casbot_arm_calibration_web/install.log'
+[0.579s] Invoked command in '/workspace/action_data_offset_ws/src/casbot_arm_calibration_web' returned '0': AMENT_PREFIX_PATH=/workspace/action_data_offset_ws/install:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/workspace/action_data_offset_ws/install LD_LIBRARY_PATH=/workspace/action_data_offset_ws/install/lib:${LD_LIBRARY_PATH} PATH=/workspace/action_data_offset_ws/install/bin:${PATH} PYTHONPATH=/workspace/action_data_offset_ws/build/casbot_arm_calibration_web/prefix_override:/usr/local/lib/python3.10/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/action_data_offset_ws/install/lib/python3.10/site-packages:/workspace/action_data_offset_ws/install/local/lib/python3.10/dist-packages:/workspace/action_data_offset_ws/install/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build_aarch64/casbot_arm_calibration_web build --build-base /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/build install --record /workspace/action_data_offset_ws/build/casbot_arm_calibration_web/install.log --single-version-externally-managed install_data

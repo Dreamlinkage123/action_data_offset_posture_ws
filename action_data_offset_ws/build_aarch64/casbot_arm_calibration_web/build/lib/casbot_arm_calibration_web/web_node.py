@@ -23,6 +23,12 @@ import rclpy
 from rclpy.action import ActionClient
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
+from rclpy.qos import (
+    DurabilityPolicy,
+    HistoryPolicy,
+    QoSProfile,
+    ReliabilityPolicy,
+)
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Header
 from std_srvs.srv import SetBool
@@ -84,6 +90,32 @@ INSTRUMENT_TO_SUBDIR = {
 # JOINTS_WITH_SUFFIX 中左/右臂 7 关节下标（头、腰之后，灵巧手之前）
 _LEFT_ARM_JOINT_INDICES = slice(3, 10)
 _RIGHT_ARM_JOINT_INDICES = slice(10, 17)
+
+
+def _pin_seed_joint_dict(base_full: List[float], chain_q_base: Dict[str, float]) -> Dict[str, float]:
+    """
+    Pinocchio 全模型 FK/IK 用的关节名→弧度表。
+
+    用 ``UpperJointData`` 全身向量 ``base_full`` 与链上基线 ``chain_q_base`` 合并，后者覆盖前者
+    （如腰用 ``_apply_live_waist_to_chain_q_base`` 对齐 /joint_states）。避免仅传 8 个链关节时
+    右臂/头等在 Pin 里落 neutral、与真机不符，导致「只示教 Y」却在 X/Z 或对侧末端偏移乱跳。
+    """
+    out: Dict[str, float] = {}
+    for i, jn in enumerate(JOINTS_WITH_SUFFIX):
+        if i < len(base_full):
+            out[jn] = float(base_full[i])
+    out.update(chain_q_base)
+    return out
+
+
+# 与常见 ``ros2 topic pub``（多为 Best Effort）对齐，便于订阅外部部分关节命令
+_JOINT_CMD_SUB_QOS = QoSProfile(
+    depth=200,
+    history=HistoryPolicy.KEEP_LAST,
+    reliability=ReliabilityPolicy.BEST_EFFORT,
+    durability=DurabilityPolicy.VOLATILE,
+)
+
 
 def _web_root() -> Path:
     """静态资源目录：优先与 web_node 同目录的 web/，否则 share。"""
@@ -256,7 +288,7 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
 
     @app.post("/api/arm/<side>/initial/refresh")
     def api_refresh_initial(side: str):
-        """把当前末端 FK 位置写入左/右臂的「初始值」。"""
+        """把当前界面左右腕末端 FK 位姿写入「初始值」（任一面板触发均更新双臂，与末帧标定快照一致）。"""
         side_l = str(side).strip().lower()
         if side_l not in ("left", "right"):
             return jsonify({"ok": False, "message": "side 应为 left 或 right"}), 400
@@ -1010,6 +1042,7 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
                 return jsonify({"ok": False, "message": "服务无响应"}), 503
             if not resp.success:
                 return jsonify({"ok": False, "message": resp.message or "服务返回失败"}), 500
+            node._upper_body_debug_enabled_local = enable
             return jsonify({"ok": True, "message": resp.message or "ok"})
 
     @app.post("/api/calibration/start")
@@ -1078,9 +1111,20 @@ class ArmCalibrationWebNode(Node):
         # 空字符串：使用 share/casbot_arm_calibration_web/urdf/<默认 .urdf>（见 _package_urdf_dir）
         self.declare_parameter("robot_urdf_path", "")
         self.declare_parameter("joint_states_topic", "/joint_states")
+        # true：笛卡尔示教使用 Pinocchio 迭代 IK；false：仅用 arm_fk 数值 DLS（参数名沿用 use_trac_ik）
         self.declare_parameter("use_trac_ik", True)
-        # 单次示教发布到 /upper_body_debug/joint_cmd 时的 time_ref（秒）
+        # 单次示教 / 100Hz 轨迹发布到 /upper_body_debug/joint_cmd 时的 time_ref（秒）、vel_scale
         self.declare_parameter("joint_cmd_time_ref", 1.0)
+        self.declare_parameter("joint_cmd_vel_scale", 1.0)
+        self.declare_parameter("joint_cmd_topic", "/upper_body_debug/joint_cmd")
+        # 「刷新初始值」后若干次示教：每次前先 merge(/joint_states, last_cmd)，避免仍 hold 标定末帧。
+        # 默认 0：刷新时已把 merge 结果写入 ``_last_joint_cmd_positions``，与标定末帧后一致，避免
+        # 每次示教前用实时反馈重刷全身基线导致对侧臂/正交轴耦合异常；需要旧行为时可改为 8 等。
+        self.declare_parameter("jog_hold_baseline_feedback_merges_after_refresh", 0)
+        # 「开始标定」末帧播完后等待本秒数（默认 3），再将此时 ``_ee_*`` 拷入初值（与界面 current 数值一致）
+        self.declare_parameter("calibration_initial_ee_joint_resample_sec", 3.0)
+        # 「刷新初始值」时是否先调用 /motion/upper_body_debug(true)（与点击开始标定一致，否则 joint_cmd 可能被忽略）
+        self.declare_parameter("refresh_initial_auto_enable_upper_body_debug", True)
         # action_data_offset 包内 URDF 相对路径（由 action_data_paths 解析；
         # 现由 Pinocchio 完全承担 FK/IK，输入必须为 .urdf）
         self.declare_parameter(
@@ -1094,6 +1138,8 @@ class ArmCalibrationWebNode(Node):
         urdf_path = _resolve_robot_urdf_path(str(self.get_parameter("robot_urdf_path").value))
         js_topic = str(self.get_parameter("joint_states_topic").value)
         self._joint_cmd_time_ref = float(self.get_parameter("joint_cmd_time_ref").value)
+        self._joint_cmd_vel_scale = float(self.get_parameter("joint_cmd_vel_scale").value)
+        joint_cmd_topic = str(self.get_parameter("joint_cmd_topic").value)
 
         self.get_logger().info(f"机器人模型目录（优先 share）: {self._urdf_dir}")
 
@@ -1109,14 +1155,20 @@ class ArmCalibrationWebNode(Node):
         # 腕部连杆姿态相对 base_link：R = Rz*Ry*Rx 的 (roll, pitch, yaw) 弧度，对应 RX/RY/RZ
         self._ee_left_rpy = (0.0, 0.0, 0.0)
         self._ee_right_rpy = (0.0, 0.0, 0.0)
-        # 「开始标定」轨迹播放结束并延迟后写入，供界面「初始值」；None 表示尚未采样
+        # 「开始标定」末帧播完并等待 settle 后，由 ``/joint_states`` FK 写入；None 表示尚未写入
         self._initial_ee_left: Optional[Tuple[float, float, float]] = None
         self._initial_ee_right: Optional[Tuple[float, float, float]] = None
         self._initial_rpy_left: Optional[Tuple[float, float, float]] = None
         self._initial_rpy_right: Optional[Tuple[float, float, float]] = None
-        self._initial_capture_seq = 0
         # 上次发布的全身关节指令；joint_states 缺某臂关节时用它回退，避免误发 0 导致另一臂被拉向零位
         self._last_joint_cmd_positions: Optional[List[float]] = None
+        # 刷新初始值后：前 N 次示教在 _build_hold_baseline_for_jog 里先按反馈 merge 再 hold
+        self._hold_baseline_feedback_merges_remaining: int = 0
+        self._jog_fk_operating_side: Optional[str] = None
+        # 单臂 jog 期间：对侧整条 FK 链关节快照（含头/腰等共享关节），避免仅冻 7 臂关节时末端显示仍随反馈抖
+        self._jog_fk_freeze_opposite_chain_q: Optional[Dict[str, float]] = None
+        # 操作侧链上除该侧 7 臂关节外的快照（头/腰等），减轻躯干微抖在「只沿 Y」时耦合进 X/Z 偏移显示
+        self._jog_fk_freeze_operating_chain_except_arm: Optional[Dict[str, float]] = None
         if not self._fk_ok:
             self.get_logger().warn(
                 f"正运动学未加载: {self._fk.load_error}（当前值将显示为 —），模型文件: {urdf_path}"
@@ -1153,27 +1205,25 @@ class ArmCalibrationWebNode(Node):
 
         self._use_trac_ik = bool(self.get_parameter("use_trac_ik").value)
         self._kin_trac: Optional[KinematicsPinTrac] = None
-        if self._fk_ok and self._fk is not None and self._use_trac_ik:
+        if self._fk_ok and self._fk is not None:
             self._kin_trac = KinematicsPinTrac(
                 urdf_path,
                 list(self._fk._left_chain),
                 list(self._fk._right_chain),
             )
             if self._kin_trac.available:
-                if self._kin_trac.pin_ok:
-                    self.get_logger().info(
-                        "[Kin] 示教 IK：TRAC‑IK；关节状态 FK：Pinocchio（失败时回退 tracikpy.fk）"
-                    )
-                else:
-                    self.get_logger().info(
-                        "[Kin] 示教 IK / 关节状态 FK：tracikpy（Pinocchio 未启用或不可用）"
-                    )
+                self.get_logger().info(
+                    "[Kin] Pinocchio 已加载：末端 FK 与示教 IK（use_trac_ik=true 时）均走 Pinocchio"
+                )
             else:
                 self.get_logger().warn(
-                    f"[Kin] TRAC‑IK 未启用: {self._kin_trac.load_error}；示教仍用数值 DLS"
+                    f"[Kin] Pinocchio 未启用: {self._kin_trac.load_error}；"
+                    "示教 IK 将使用 arm_fk 数值 DLS，末端 FK 以 UrdfArmFk 为主"
                 )
-        elif not self._use_trac_ik:
-            self.get_logger().info("[Kin] 参数 use_trac_ik=false，示教使用数值 DLS IK")
+        if not self._use_trac_ik:
+            self.get_logger().info(
+                "[Kin] use_trac_ik=false：笛卡尔示教使用 arm_fk 数值 DLS（若 Pinocchio 已加载仍可用于 FK）"
+            )
 
         # 直线示教参数（可通过参数调节）
         #   _jog_step_mm_per_waypoint：每个 IK 路点的笛卡尔步长（mm）；大一点 → Δq 大，
@@ -1191,6 +1241,11 @@ class ArmCalibrationWebNode(Node):
         )
         if self._jog_rot_step_deg_per_waypoint <= 0.0:
             self._jog_rot_step_deg_per_waypoint = 0.1
+        # True：非操作臂等用 /joint_states merge（适合终端只发部分 joint_cmd 后与真机对齐）。
+        # False（默认）：全身与 base_hold 一致，标定刚结束时避免反馈微抖写进示教轨迹导致对侧末端偏移显示乱跳。
+        self.declare_parameter("jog_merge_joint_states_into_non_operating_arm", False)
+        # 单臂示教开始时把命令里的腰与当前 /joint_states 对齐一次，减轻控制器与 FK 假设不一致
+        self.declare_parameter("jog_sync_waist_from_joint_states_on_jog_start", True)
 
         self._joint_state_sub = self.create_subscription(
             JointState,
@@ -1205,6 +1260,8 @@ class ArmCalibrationWebNode(Node):
 
         self._resource_root = _resource_root()
         self._debug_cli = self.create_client(SetBool, "/motion/upper_body_debug")
+        # 与 /api/upper_body_debug、刷新初始值、band 自动关调试同步；为 True 时刷新不再重复 SetBool(true)
+        self._upper_body_debug_enabled_local: bool = False
 
         self._band_csv_playing = False
         self._band_csv_state_lock = threading.Lock()
@@ -1222,8 +1279,17 @@ class ArmCalibrationWebNode(Node):
             )
 
         if UpperJointData is not None:
-            self._joint_pub = self.create_publisher(
-                UpperJointData, "/upper_body_debug/joint_cmd", 10
+            self._joint_pub = self.create_publisher(UpperJointData, joint_cmd_topic, 10)
+            self.create_subscription(
+                UpperJointData,
+                joint_cmd_topic,
+                self._on_incoming_joint_cmd,
+                _JOINT_CMD_SUB_QOS,
+            )
+            self.get_logger().info(f"joint_cmd 发布/订阅: {joint_cmd_topic}（订阅 QoS: BEST_EFFORT）")
+            self.get_logger().info(
+                f"joint_cmd 发布默认: time_ref={self._joint_cmd_time_ref}s vel_scale={self._joint_cmd_vel_scale} "
+                "（与终端 ros2 topic pub 一致可减轻示教前后整身插补突变）"
             )
         else:
             self._joint_pub = None
@@ -1307,13 +1373,49 @@ class ArmCalibrationWebNode(Node):
         ok_exec = succeeded and if_success
         return ok_exec, ("完成" if ok_exec else f"未成功 status={st} if_success={if_success}")
 
+    def _on_incoming_joint_cmd(self, msg: Any) -> None:
+        """非轨迹播放时，把终端/其他节点发布的部分关节 UpperJointData 合并进 hold 缓存。"""
+        if self._playing:
+            return
+        js = getattr(msg, "joint", None)
+        if js is None:
+            return
+        names = getattr(js, "name", None) or []
+        positions = getattr(js, "position", None) or []
+        if not names or not positions:
+            return
+        m = min(len(names), len(positions))
+        if m <= 0:
+            return
+        row = self._merge_joint_state_from_cache_and_last_cmd()
+
+        # 若上一轮 topic 没带某关节而用 merge（反馈缺省）补了占位，本条消息可把相应关节再写精确
+        for i in range(m):
+            raw = str(names[i]).strip()
+            jn = raw if raw.endswith("_joint") else f"{raw}_joint"
+            idx = self._joint_index_by_urdf.get(jn)
+            if idx is None:
+                continue
+            if 0 <= idx < len(row):
+                row[idx] = float(positions[i])
+        with self._fk_lock:
+            self._last_joint_cmd_positions = row
+
     def _on_joint_states(self, msg: JointState) -> None:
-        if not msg.name or not msg.position or len(msg.name) != len(msg.position):
+        if not msg.name or not msg.position:
+            return
+        n_name = len(msg.name)
+        n_pos = len(msg.position)
+        if n_name != n_pos:
+            self.get_logger().debug(
+                f"/joint_states name/position 长度不一致 ({n_name}/{n_pos})，按 min 成对更新缓存"
+            )
+        m = min(n_name, n_pos)
+        if m <= 0:
             return
         with self._fk_lock:
-            for i, n in enumerate(msg.name):
-                if i >= len(msg.position):
-                    break
+            for i in range(m):
+                n = msg.name[i]
                 key = n if str(n).endswith("_joint") else f"{n}_joint"
                 self._joint_positions_by_name[key] = float(msg.position[i])
         if not self._fk_ok:
@@ -1322,6 +1424,26 @@ class ArmCalibrationWebNode(Node):
             fk = self._fk
             q_l = build_q_map_for_chain(fk._left_chain, msg.name, msg.position)
             q_r = build_q_map_for_chain(fk._right_chain, msg.name, msg.position)
+            op = self._jog_fk_operating_side
+            jog_ex = self._jog_fk_freeze_operating_chain_except_arm or {}
+            jog_opp = self._jog_fk_freeze_opposite_chain_q or {}
+            with self._traj_lock:
+                jog_disp = self._playing and (self._traj_mode == "jog")
+            if jog_disp:
+                if op == "left":
+                    q_l = dict(q_l)
+                    for jn, v in jog_ex.items():
+                        q_l[jn] = float(v)
+                    q_r = dict(q_r)
+                    for jn, v in jog_opp.items():
+                        q_r[jn] = float(v)
+                elif op == "right":
+                    q_r = dict(q_r)
+                    for jn, v in jog_ex.items():
+                        q_r[jn] = float(v)
+                    q_l = dict(q_l)
+                    for jn, v in jog_opp.items():
+                        q_l[jn] = float(v)
             kin = self._kin_trac
             Tl = None
             Tr = None
@@ -1354,7 +1476,8 @@ class ArmCalibrationWebNode(Node):
     ) -> Tuple[Optional[Tuple[float, float, float]], Optional[Tuple[float, float, float]], str]:
         """
         相对「初始值」的直线位移（毫米），用于 arm_trajectory_transform_jacobian 的 offset-left/right。
-        初始值来自开始标定播完约 1s 后的采样，或用户点击「刷新初始值」。
+        初始值来自「开始标定」末帧播完后等待若干秒，再将当时界面所用的末端位姿拷入初值（参数
+        ``calibration_initial_ee_joint_resample_sec``，默认 3s）；或用户点击「刷新初始值」。
         """
         with self._fk_lock:
             ready = self._fk_pose_ready and self._fk_ok
@@ -1366,7 +1489,7 @@ class ArmCalibrationWebNode(Node):
             return (
                 None,
                 None,
-                "左右臂「初始值」未设置：请先播放「开始标定」并等待约 1s，或分别点「刷新初始值」",
+                "左右臂「初始值」未设置：请先播放「开始标定」至结束并等待约 3s 写入初值，或点左/右任一侧「刷新初始值」（会同步双臂）",
             )
         left_mm = (
             (el[0] - il[0]) * 1000.0,
@@ -1412,7 +1535,7 @@ class ArmCalibrationWebNode(Node):
             return (
                 None,
                 None,
-                "左右臂「初始值」未设置：请先播放「开始标定」并等待约 1s，或分别点「刷新初始值」",
+                "左右臂「初始值」未设置：请先播放「开始标定」至结束并等待约 3s 写入初值，或点左/右任一侧「刷新初始值」（会同步双臂）",
             )
 
         def _rel_euler_xyz(cur_rpy: Tuple[float, float, float], init_rpy: Tuple[float, float, float]) -> Tuple[float, float, float]:
@@ -1542,9 +1665,12 @@ class ArmCalibrationWebNode(Node):
             raise RuntimeError(f"无法解析 URDF（请安装并 source action_data_offset）: {e}") from e
 
     def get_ui_state(self) -> Dict[str, Any]:
-        """供 /api/state：位置为 base_link 下腕部原点 (x,y,z)（米）；姿态 RX/RY/RZ 的初始/当前值为
-        identity→该姿态的旋转向量分量（度）；**偏移量**为 R_cur·R_init^T 的相对旋转向量分量（度），
-        与绕固定轴示教一致；因旋转不可按分量相加，偏移一般≠当前−初始。
+        """供 /api/state。
+
+        - **线性格子 X/Y/Z**：``current`` / ``initial`` / ``delta`` 均为 **毫米 (mm)**，三位小数；
+          ``delta`` = 当前 − 初始，与步进单位一致，避免原先用米显示成 ``0.000166`` 易被误解。
+        - **姿态 RX/RY/RZ**：初始/当前为 identity→该姿态的旋转向量分量（度）；偏移为
+          ``vee_log(R_cur·R_init^T)`` 分量（度），与绕固定轴示教一致。
         """
         axis_base = {"step": 1.0, "initial": 0.0, "delta": 0.0}
         dash = "—"
@@ -1584,20 +1710,22 @@ class ArmCalibrationWebNode(Node):
                 "euler_offset_deg": {"left": None, "right": None},
             }
 
-        def fmt(v: float) -> str:
-            return f"{v:.6f}"
+        def fmt_lin_mm(m: float) -> str:
+            """base_link 下平移，米 → 毫米展示。"""
+            return f"{float(m) * 1000.0:.3f}"
 
         def axis_row(
             cur: float,
             initial_comp: Optional[float],
         ) -> Dict[str, Any]:
             if initial_comp is None:
-                return {**axis_base, "current": fmt(cur), "initial": dash, "delta": dash}
+                return {**axis_base, "current": fmt_lin_mm(cur), "initial": dash, "delta": dash}
+            d_mm = (float(cur) - float(initial_comp)) * 1000.0
             return {
                 **axis_base,
-                "current": fmt(cur),
-                "initial": fmt(initial_comp),
-                "delta": fmt(cur - initial_comp),
+                "current": fmt_lin_mm(cur),
+                "initial": fmt_lin_mm(initial_comp),
+                "delta": f"{d_mm:+.3f}",
             }
 
         def rpy_rows(
@@ -1715,17 +1843,19 @@ class ArmCalibrationWebNode(Node):
     def _publish_joint_cmd(
         self,
         positions: List[float],
-        time_ref: float = 0.01,
-        vel_scale: float = 1.0,
+        time_ref: Optional[float] = None,
+        vel_scale: Optional[float] = None,
     ) -> None:
         if self._joint_pub is None or UpperJointData is None:
             return
+        tr = float(self._joint_cmd_time_ref if time_ref is None else time_ref)
+        vs = float(self._joint_cmd_vel_scale if vel_scale is None else vel_scale)
         msg = UpperJointData()
         msg.header = Header()
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.header.frame_id = ""
-        msg.time_ref = float(time_ref)
-        msg.vel_scale = float(vel_scale)
+        msg.time_ref = tr
+        msg.vel_scale = vs
         js = JointState()
         js.name = list(JOINT_NAMES_PUBLISH)
         pos = [float(x) for x in positions]
@@ -1735,49 +1865,60 @@ class ArmCalibrationWebNode(Node):
         with self._fk_lock:
             self._last_joint_cmd_positions = pos
 
-    def _merge_joint_state_from_cache_and_last_cmd(self) -> List[float]:
+    def _baseline_vector_joint_states_then_last_cmd(self) -> Tuple[List[float], int, int]:
         """
-        与 JOINTS_WITH_SUFFIX 顺序一致。优先用 joint_states 缓存；缺失则用上一条 joint_cmd，
-        避免单臂示教时未出现在 joint_states 里的关节被填 0。
+        与 ``JOINTS_WITH_SUFFIX`` 同序：每关节优先 ``/joint_states`` 缓存，否则上一条 ``joint_cmd``。
+        返回 ``(向量, n_from_joint_states, n_fallback)``。
         """
         with self._fk_lock:
             cache = dict(self._joint_positions_by_name)
             last = list(self._last_joint_cmd_positions) if self._last_joint_cmd_positions is not None else None
         out: List[float] = []
+        n_js = 0
+        n_fb = 0
         for i, jn in enumerate(JOINTS_WITH_SUFFIX):
             if jn in cache:
                 out.append(float(cache[jn]))
+                n_js += 1
             elif last is not None and i < len(last):
                 out.append(float(last[i]))
+                n_fb += 1
             else:
                 out.append(0.0)
-        return out
+                n_fb += 1
+        return out, n_js, n_fb
+
+    def _merge_joint_state_from_cache_and_last_cmd(self) -> List[float]:
+        """示教 merge：优先关节反馈，缺一臂时用历史 joint_cmd（含本节点订阅合并）补齐。"""
+        row, _, _ = self._baseline_vector_joint_states_then_last_cmd()
+        return row
 
     def _build_hold_baseline_for_jog(self) -> List[float]:
         """
-        为直线示教构造 "除操作臂外全部冻结" 的基线全身姿态。
+        单臂笛卡尔示教用全身 hold 向量。
 
-        与 :meth:`_merge_joint_state_from_cache_and_last_cmd` 的关键差异：
-        **优先沿用上一条 joint_cmd，而不是 /joint_states 缓存**。
+        默认优先整条 ``_last_joint_cmd_positions``（减 sag）。
 
-        原因：真机在关节 PID + 重力补偿下，``/joint_states`` 反馈的角度会比
-        "控制器在跟踪的指令点" 低一小段（重力 sag，通常 1–2 cm 级）。如果每次
-        示教都把 cache 当作基线下发，等于主动把全身命令拉到 sag 状态 →
-        **下游控制器会把整条手臂整体再往下拽一次**——与用户描述"不管哪个方向
-        肘部都会下掉 1–2 cm" 完全吻合。
-
-        策略：
-        - 若曾经发过 joint_cmd（如播过标定轨迹或此前跳过直线示教）：沿用上次值
-        - 否则首次示教：退回到 cache + 立即把本次 cache 记为基线，后续命令
-          的非操作段不会再被 joint_states 的 sag 影响
+        「刷新初始值」后计数参数 ``jog_hold_baseline_feedback_merges_after_refresh``（默认 0）：
+        若 >0，则前 N 次示教每次都先 merge(反馈 ∪ last_cmd) 并写回 last，再以当前姿态为起点。
         """
+        with self._fk_lock:
+            remain = int(self._hold_baseline_feedback_merges_remaining)
+        if remain > 0:
+            merged = self._merge_joint_state_from_cache_and_last_cmd()
+            with self._fk_lock:
+                self._last_joint_cmd_positions = list(merged)
+                self._hold_baseline_feedback_merges_remaining = remain - 1
+            self.get_logger().info(
+                f"[IK] refresh 后按 /joint_states 合并 hold 基线（余 {remain - 1} 次示教仍先合并）"
+            )
+            return list(merged)
+
         with self._fk_lock:
             last = list(self._last_joint_cmd_positions) if self._last_joint_cmd_positions is not None else None
             cache = dict(self._joint_positions_by_name)
         if last is not None and len(last) == len(JOINTS_WITH_SUFFIX):
             return list(last)
-        # 首次：用 cache 构造，并立刻把它固化为 "hold 基线"（last_joint_cmd_positions），
-        # 这样下一次示教就不会再读 cache 的 sag 值
         baseline: List[float] = []
         for i, jn in enumerate(JOINTS_WITH_SUFFIX):
             if jn in cache:
@@ -1791,6 +1932,206 @@ class ArmCalibrationWebNode(Node):
             "（后续示教不再读取实时 cache 的 sag 值）"
         )
         return baseline
+
+    def _sync_joint_states_into_base_full_except_operating_arm(
+        self,
+        base_full: List[float],
+        operating_side: str,
+        cache: Dict[str, float],
+    ) -> None:
+        """
+        单臂示教前：除操作侧 7 个臂关节外，凡 /joint_states 里有的关节一律写成当前反馈。
+
+        **对侧 7 个臂关节不覆盖**：保持 ``base_hold``/指令基线中的值，与「开始标定」末帧后
+        单臂笛卡尔示教一致，避免对侧腕 XYZ 随编码器微抖被写进 ``UpperJointData``，以及 Pin
+        全模型种子中对侧角抖动导致本侧「纯 Y」出现 X/Z 分量。
+
+        头、腰、灵巧手等非双臂段仍用反馈对齐，减轻与真机上身姿态不一致带来的耦合。
+        """
+        if len(base_full) != len(JOINTS_WITH_SUFFIX):
+            return
+        os = str(operating_side).strip().lower()
+        if os == "left":
+            keep = _LEFT_ARM_JOINT_INDICES
+            opp = _RIGHT_ARM_JOINT_INDICES
+        elif os == "right":
+            keep = _RIGHT_ARM_JOINT_INDICES
+            opp = _LEFT_ARM_JOINT_INDICES
+        else:
+            return
+        for i, jn in enumerate(JOINTS_WITH_SUFFIX):
+            if keep.start <= i < keep.stop:
+                continue
+            if opp.start <= i < opp.stop:
+                continue
+            if jn in cache:
+                base_full[i] = float(cache[jn])
+
+    def _finalize_jog_publish_row(
+        self,
+        row: List[float],
+        base_full: List[float],
+        arm_slice: slice,
+        wi_pub: Optional[int],
+        w_rad_pub: Optional[float],
+    ) -> None:
+        """
+        单臂示教每一帧下发向量：除操作侧 7 个臂关节外与 ``base_full`` 完全一致，再写腰（若启用示教腰对齐）。
+
+        仅依赖「未改写的槽位仍等于 base_full」不够稳健；此处显式回写，避免任何误索引污染头/对侧/手。
+        """
+        if len(row) != len(base_full):
+            return
+        for i in range(len(row)):
+            if arm_slice.start <= i < arm_slice.stop:
+                continue
+            row[i] = float(base_full[i])
+        if wi_pub is not None and w_rad_pub is not None:
+            wi = int(wi_pub)
+            if 0 <= wi < len(row):
+                row[wi] = float(w_rad_pub)
+
+    def _jog_hold_with_waist_optional_sync(self, base_hold: List[float]) -> List[float]:
+        """示教起点：可选把 ``waist_yaw_joint`` 与当前 /joint_states 对齐一次（整段轨迹保持该值）。"""
+        out = list(base_hold)
+        if not bool(self.get_parameter("jog_sync_waist_from_joint_states_on_jog_start").value):
+            return out
+        try:
+            wi = JOINTS_WITH_SUFFIX.index("waist_yaw_joint")
+        except ValueError:
+            return out
+        if wi >= len(out):
+            return out
+        with self._fk_lock:
+            wv = self._joint_positions_by_name.get("waist_yaw_joint")
+        if wv is not None:
+            out[wi] = float(wv)
+        return out
+
+    def _clear_jog_fk_display_override(self) -> None:
+        self._jog_fk_operating_side = None
+        self._jog_fk_freeze_opposite_chain_q = None
+        self._jog_fk_freeze_operating_chain_except_arm = None
+
+    def _apply_live_waist_to_chain_q_base(
+        self, chain: List[str], chain_q_base: Dict[str, float], cache: Dict[str, float]
+    ) -> None:
+        """IK 链上 ``waist_yaw_joint`` 用当前 /joint_states（有则写），与真实上身姿态一致，减轻纯 Y 时出现 X/Z 耦合。"""
+        wz = "waist_yaw_joint"
+        if wz in chain and wz in cache:
+            chain_q_base[wz] = float(cache[wz])
+
+    def _jog_publish_waist_index_and_rad(
+        self, chain_q_base: Dict[str, float], base_full: List[float]
+    ) -> Tuple[Optional[int], Optional[float]]:
+        """与 IK 一致的腰角及在 UpperJointData 向量中的下标，用于每帧下发。"""
+        wz = "waist_yaw_joint"
+        try:
+            wi = JOINTS_WITH_SUFFIX.index(wz)
+        except ValueError:
+            return None, None
+        if wi < 0 or wi >= len(base_full):
+            return None, None
+        w = chain_q_base.get(wz)
+        if w is None:
+            w = float(base_full[wi])
+        return wi, float(w)
+
+    def _setup_jog_fk_display_overrides(
+        self, side_l: str, base_full: List[float], chain_q_base: Dict[str, float]
+    ) -> None:
+        """
+        单臂 jog：界面 FK 用示教起点的链快照。
+
+        左右腕 FK 链共享头、腰等；若只冻对侧 7 个臂关节，共享关节仍随 /joint_states 微抖，
+        会表现为「只动左臂 Y」时右臂偏移 X/Y/Z 全变、左臂也出现正交方向偏移。此处对侧整条链
+        与操作侧链上「非本侧 7 臂关节」均用 ``chain_q_base``/``base_full`` 快照，仅操作侧 7
+        臂关节继续用实时反馈。
+        """
+        self._jog_fk_operating_side = str(side_l).strip().lower()
+        self._jog_fk_freeze_opposite_chain_q = None
+        self._jog_fk_freeze_operating_chain_except_arm = None
+        fk = self._fk
+        if fk is None or not getattr(fk, "_loaded", False):
+            return
+        os = self._jog_fk_operating_side
+        if os == "left":
+            op_chain = list(fk._left_chain)
+            opp_chain = list(fk._right_chain)
+            arm_set = set(self._left_arm_joint_names)
+        elif os == "right":
+            op_chain = list(fk._right_chain)
+            opp_chain = list(fk._left_chain)
+            arm_set = set(self._right_arm_joint_names)
+        else:
+            return
+
+        def snap_val(jn: str) -> Optional[float]:
+            if jn in chain_q_base:
+                return float(chain_q_base[jn])
+            pid = self._joint_index_by_urdf.get(jn)
+            if pid is not None and 0 <= pid < len(base_full):
+                return float(base_full[pid])
+            return None
+
+        opp: Dict[str, float] = {}
+        for jn in opp_chain:
+            v = snap_val(jn)
+            if v is not None:
+                opp[jn] = v
+        self._jog_fk_freeze_opposite_chain_q = opp if opp else None
+
+        ex: Dict[str, float] = {}
+        for jn in op_chain:
+            if jn in arm_set:
+                continue
+            v = snap_val(jn)
+            if v is not None:
+                ex[jn] = v
+        self._jog_fk_freeze_operating_chain_except_arm = ex if ex else None
+
+    def _pin_ik_available_for_jog(self) -> bool:
+        """Pinocchio 示教后端可用且参数允许使用（use_trac_ik）。"""
+        return bool(
+            self._use_trac_ik
+            and self._kin_trac is not None
+            and self._kin_trac.available
+        )
+
+    def _compose_jog_publish_baseline(self, base_hold: List[float], operating_side: str) -> List[float]:
+        """
+        构造示教下发的全身向量。
+
+        默认（``jog_merge_joint_states_into_non_operating_arm=false``）：**整身与 ``base_hold`` 相同**。
+        标定刚一结束即用 /joint_states 填非操作臂时，微小 sag/滤波摆幅会送进 100Hz 轨迹，
+        再经由腰与各臂耦合，易出现「只点左臂 Y」却见右臂偏移量在 X/Y/Z 变化的现象。
+
+        若需在用终端只对一侧发局部 ``joint_cmd`` 后让非操作臂跟随反馈，可把参数置为 ``true``
+        （并照常点刷新初始值）。
+        """
+        _ = operating_side  # 保留签名便于调用方与未来扩展
+
+        if len(base_hold) != len(JOINTS_WITH_SUFFIX):
+            return list(base_hold)
+        merge_non_op = bool(
+            self.get_parameter("jog_merge_joint_states_into_non_operating_arm").value
+        )
+        if not merge_non_op:
+            return list(base_hold)
+        merged_fb = self._merge_joint_state_from_cache_and_last_cmd()
+        if len(merged_fb) != len(JOINTS_WITH_SUFFIX):
+            return list(base_hold)
+        row = list(merged_fb)
+        os = str(operating_side).strip().lower()
+        if os == "left":
+            sl = _LEFT_ARM_JOINT_INDICES
+        elif os == "right":
+            sl = _RIGHT_ARM_JOINT_INDICES
+        else:
+            return list(base_hold)
+        for i in range(sl.start, sl.stop):
+            row[i] = float(base_hold[i])
+        return row
 
 
     def adjust_arm_cartesian(
@@ -1844,10 +2185,13 @@ class ArmCalibrationWebNode(Node):
         if len(arm_names) != 7 or not chain:
             return False, f"{arm_label} URDF 关节链异常（未解析到 7 关节）", None
 
-        # hold 基线：优先 last_cmd，首次退回 cache（并立刻固化成 last_cmd）
-        base_full = self._build_hold_baseline_for_jog()
+        # hold 基线（指令侧）；可选把腰与 /joint_states 对齐一次，再合成下发向量
+        base_hold = self._build_hold_baseline_for_jog()
+        base_hold = self._jog_hold_with_waist_optional_sync(base_hold)
+        base_full = list(self._compose_jog_publish_baseline(base_hold, side_l))
         with self._fk_lock:
             cache = dict(self._joint_positions_by_name)
+        self._sync_joint_states_into_base_full_except_operating_arm(base_full, side_l, cache)
         missing = [jn for jn in arm_names if jn not in cache]
         if missing:
             return False, f"joint_states 缺少{arm_label}关节: {missing}", None
@@ -1872,6 +2216,7 @@ class ArmCalibrationWebNode(Node):
                 chain_q_base[jn] = float(base_full[pub_idx])
             else:
                 chain_q_base[jn] = float(cache.get(jn, 0.0))
+        self._apply_live_waist_to_chain_q_base(chain, chain_q_base, cache)
 
         # 诊断：对比 hold 基线 vs 实时 cache，看 sag 有多大
         sag_deg: List[float] = []
@@ -1891,17 +2236,30 @@ class ArmCalibrationWebNode(Node):
         # IK 单步长（0.1 mm 单位）。例如参数 2.0 mm → step_size_01mm=20
         step_size_01mm = max(1.0, float(self._jog_step_mm_per_waypoint) * 10.0)
 
+        use_pin_ik = self._pin_ik_available_for_jog()
+        pin_chain_q = _pin_seed_joint_dict(base_full, chain_q_base) if use_pin_ik else chain_q_base
+
         # ---- 诊断：FK on 当前 q，得到 base_link 系下当前末端位置 ----
+        # Pin 示教时路点 ee 来自 Pin FK；若此处仍用 UrdfArmFk 作 p_start，两套 FK 偏差会导致
+        # 「沿请求方向投影」≈0 而误报奇异/限位。
         try:
-            start_name_q = dict(chain_q_base)
+            seed = pin_chain_q if use_pin_ik else chain_q_base
+            start_name_q = dict(seed)
             for k, jn in enumerate(arm_names):
                 start_name_q[jn] = current_arm_q[k]
-            p_start = self._fk.fk_tip_xyz(chain, start_name_q)
+            p_start = None
+            if use_pin_ik and self._kin_trac is not None:
+                p_pin = self._kin_trac.fk_tip_xyz_trac(side_l, start_name_q)
+                if p_pin is not None:
+                    p_start = [float(p_pin[0]), float(p_pin[1]), float(p_pin[2])]
+            if p_start is None:
+                ps = self._fk.fk_tip_xyz(chain, start_name_q)
+                if ps is None:
+                    return False, f"{arm_label} 起始 FK 返回 None（URDF 链异常）", None
+                p_start = [float(ps[0]), float(ps[1]), float(ps[2])]
         except Exception as e:
             self.get_logger().error(f"{arm_label} 起始 FK 失败: {e}")
             return False, f"起始 FK 失败: {e}", None
-        if p_start is None:
-            return False, f"{arm_label} 起始 FK 返回 None（URDF 链异常）", None
 
         self.get_logger().info(
             f"[IK] {arm_label} start axis={axis_l} dir={direction} step={step_mm}mm "
@@ -1919,13 +2277,13 @@ class ArmCalibrationWebNode(Node):
         )
 
         try:
-            if self._kin_trac is not None and self._kin_trac.available:
+            if use_pin_ik:
                 waypoints = cartesian_linear_waypoints_trac(
                     kin=self._kin_trac,
                     side=side_l,
                     chain_base_to_tip=chain,
                     arm_joint_names=arm_names,
-                    chain_joint_q_base=chain_q_base,
+                    chain_joint_q_base=pin_chain_q,
                     current_arm_q_rad=current_arm_q,
                     dx_01mm=dx_01mm,
                     dy_01mm=dy_01mm,
@@ -1958,10 +2316,12 @@ class ArmCalibrationWebNode(Node):
         last_q = [float(waypoints[-1]["joint_angles_rad"].get(jn, current_arm_q[k])) for k, jn in enumerate(arm_names)]
         total_dq_deg = [(last_q[k] - current_arm_q[k]) * 180.0 / 3.141592653589793 for k in range(7)]
         last_ee = waypoints[-1]["ee_position_m"]
+        # 用路点内记录的末端（与 IK 循环内 Pin FK 一致）减 p_start；勿再用 end_name_q 重算 pe，
+        # 否则 pin_chain_q 与路点内 merged 在手指/头等细节上难完全一致，易出现数百毫米假 Δ 与误拒绝。
         achieved = (
-            last_ee["x"] - float(p_start[0]),
-            last_ee["y"] - float(p_start[1]),
-            last_ee["z"] - float(p_start[2]),
+            float(last_ee["x"]) - float(p_start[0]),
+            float(last_ee["y"]) - float(p_start[1]),
+            float(last_ee["z"]) - float(p_start[2]),
         )
         requested = (dx_01mm * 1e-4, dy_01mm * 1e-4, dz_01mm * 1e-4)
         req_norm = max(1e-9, (requested[0] ** 2 + requested[1] ** 2 + requested[2] ** 2) ** 0.5)
@@ -2024,6 +2384,7 @@ class ArmCalibrationWebNode(Node):
         ticks_per_wp = self._jog_ticks_per_waypoint
         jog_rows: List[List[float]] = []
         arm_idx_in_pub = list(range(arm_slice.start, arm_slice.stop))
+        wi_pub, w_rad_pub = self._jog_publish_waist_index_and_rad(chain_q_base, base_full)
         for wp in waypoints:
             row = list(base_full)
             for k, jn in enumerate(arm_names):
@@ -2035,12 +2396,14 @@ class ArmCalibrationWebNode(Node):
                     pub_idx = arm_idx_in_pub[k]
                 if pub_idx is not None:
                     row[pub_idx] = float(val)
+            self._finalize_jog_publish_row(row, base_full, arm_slice, wi_pub, w_rad_pub)
             for _ in range(ticks_per_wp):
-                jog_rows.append(row)
+                jog_rows.append(list(row))
 
         with self._traj_lock:
             if self._playing:
                 return False, "有轨迹正在播放，请稍后再试", None
+            self._setup_jog_fk_display_overrides(side_l, base_full, chain_q_base)
             self._traj_rows = jog_rows
             self._traj_index = 0
             self._playing = True
@@ -2120,9 +2483,12 @@ class ArmCalibrationWebNode(Node):
         if len(arm_names) != 7 or not chain:
             return False, f"{arm_label} URDF 关节链异常（未解析到 7 关节）", None
 
-        base_full = self._build_hold_baseline_for_jog()
+        base_hold = self._build_hold_baseline_for_jog()
+        base_hold = self._jog_hold_with_waist_optional_sync(base_hold)
+        base_full = list(self._compose_jog_publish_baseline(base_hold, side_l))
         with self._fk_lock:
             cache = dict(self._joint_positions_by_name)
+        self._sync_joint_states_into_base_full_except_operating_arm(base_full, side_l, cache)
         missing = [jn for jn in arm_names if jn not in cache]
         if missing:
             return False, f"joint_states 缺少{arm_label}关节: {missing}", None
@@ -2142,6 +2508,10 @@ class ArmCalibrationWebNode(Node):
                 chain_q_base[jn] = float(base_full[pub_idx])
             else:
                 chain_q_base[jn] = float(cache.get(jn, 0.0))
+        self._apply_live_waist_to_chain_q_base(chain, chain_q_base, cache)
+
+        use_pin_ik = self._pin_ik_available_for_jog()
+        pin_chain_q = _pin_seed_joint_dict(base_full, chain_q_base) if use_pin_ik else chain_q_base
 
         try:
             start_name_q = dict(chain_q_base)
@@ -2163,13 +2533,13 @@ class ArmCalibrationWebNode(Node):
         )
 
         try:
-            if self._kin_trac is not None and self._kin_trac.available:
+            if use_pin_ik:
                 waypoints = cartesian_rotate_waypoints_trac(
                     kin=self._kin_trac,
                     side=side_l,
                     chain_base_to_tip=chain,
                     arm_joint_names=arm_names,
-                    chain_joint_q_base=chain_q_base,
+                    chain_joint_q_base=pin_chain_q,
                     current_arm_q_rad=current_arm_q,
                     axis=axis_l,
                     total_angle_rad=total_angle_rad,
@@ -2198,7 +2568,7 @@ class ArmCalibrationWebNode(Node):
 
         last_q = [float(waypoints[-1]["joint_angles_rad"].get(jn, current_arm_q[k])) for k, jn in enumerate(arm_names)]
         last_ee = waypoints[-1]["ee_position_m"]
-        end_name_q = dict(chain_q_base)
+        end_name_q = dict(pin_chain_q if use_pin_ik else chain_q_base)
         for k, jn in enumerate(arm_names):
             end_name_q[jn] = last_q[k]
         T_end = None
@@ -2238,6 +2608,7 @@ class ArmCalibrationWebNode(Node):
         ticks_per_wp = self._jog_ticks_per_waypoint
         jog_rows: List[List[float]] = []
         arm_idx_in_pub = list(range(arm_slice.start, arm_slice.stop))
+        wi_pub, w_rad_pub = self._jog_publish_waist_index_and_rad(chain_q_base, base_full)
         for wp in waypoints:
             row = list(base_full)
             for k, jn in enumerate(arm_names):
@@ -2249,12 +2620,14 @@ class ArmCalibrationWebNode(Node):
                     pub_idx = arm_idx_in_pub[k]
                 if pub_idx is not None:
                     row[pub_idx] = float(val)
+            self._finalize_jog_publish_row(row, base_full, arm_slice, wi_pub, w_rad_pub)
             for _ in range(ticks_per_wp):
-                jog_rows.append(row)
+                jog_rows.append(list(row))
 
         with self._traj_lock:
             if self._playing:
                 return False, "有轨迹正在播放，请稍后再试", None
+            self._setup_jog_fk_display_overrides(side_l, base_full, chain_q_base)
             self._traj_rows = jog_rows
             self._traj_index = 0
             self._playing = True
@@ -2276,78 +2649,212 @@ class ArmCalibrationWebNode(Node):
             },
         )
 
+    def enable_upper_body_debug(self, wait_srv_sec: float = 2.0, call_timeout_sec: float = 5.0) -> Tuple[bool, str, bool]:
+        """
+        在需要时将 ``/motion/upper_body_debug`` 置为 true。
+
+        若本节点已记录调试为开启（例如用户此前已点「开始标定」并调过该服务），则**不再重复**
+        调用服务，返回 ``(True, message, True)`` 第三项 ``skipped_service_call``。
+
+        Returns:
+            ``(success, message, skipped_service_call)``；失败时第三项恒为 ``False``。
+        """
+        if self._upper_body_debug_enabled_local:
+            return (
+                True,
+                "本节点已记录上半身调试为开启，跳过重复调用 /motion/upper_body_debug(true)",
+                True,
+            )
+        cli = getattr(self, "_debug_cli", None)
+        if cli is None:
+            return False, "服务客户端未初始化", False
+        if not cli.wait_for_service(timeout_sec=float(wait_srv_sec)):
+            return False, "服务 /motion/upper_body_debug 不可用", False
+        req = SetBool.Request()
+        req.data = True
+        fut = cli.call_async(req)
+        t0 = time.time()
+        while rclpy.ok() and not fut.done() and (time.time() - t0) < float(call_timeout_sec):
+            time.sleep(0.01)
+        if not fut.done():
+            return False, "调用上身调试服务超时", False
+        try:
+            resp = fut.result()
+        except Exception as ex:
+            return False, str(ex), False
+        if resp is None:
+            return False, "服务无响应", False
+        if not resp.success:
+            return False, str(resp.message or "服务返回失败"), False
+        self._upper_body_debug_enabled_local = True
+        return True, str(resp.message or "ok"), False
+
+    def _write_initial_ee_rpy_from_current_display_locked(self) -> None:
+        """在已持有 ``_fk_lock`` 时，把界面当前左右腕末端位姿写入双臂初始值（与末帧标定快照数值一致）。"""
+        self._initial_ee_left = (
+            float(self._ee_left[0]),
+            float(self._ee_left[1]),
+            float(self._ee_left[2]),
+        )
+        self._initial_ee_right = (
+            float(self._ee_right[0]),
+            float(self._ee_right[1]),
+            float(self._ee_right[2]),
+        )
+        self._initial_rpy_left = (
+            float(self._ee_left_rpy[0]),
+            float(self._ee_left_rpy[1]),
+            float(self._ee_left_rpy[2]),
+        )
+        self._initial_rpy_right = (
+            float(self._ee_right_rpy[0]),
+            float(self._ee_right_rpy[1]),
+            float(self._ee_right_rpy[2]),
+        )
+
     def refresh_initial_ee(
         self, side: str
     ) -> Tuple[bool, str, Optional[Dict[str, Any]]]:
         """
-        把当前末端 FK 位置（base_link，m）与姿态 RX/RY/RZ（Rz*Ry*Rx 欧拉，弧度存内部）写入「初始值」。
+        用 ``/joint_states`` 与当前界面 FK 更新 **左右臂**「初始值」（与「开始标定」末帧写入初值
+        一致）；并把 **以关节反馈为主** 的全身向量写入 ``_last_joint_cmd_positions``，供后续
+        X/Y/Z、RX/RY/RZ 单臂笛卡尔示教作 hold 起点（与仅播放标定末帧后示教等价）。
 
-        - ``side`` 只能是 ``"left"`` 或 ``"right"``
-        - 要求 FK 已加载且至少收到过一次 /joint_states（否则 `_fk_pose_ready=False`）
-        - 同时会清除"开始标定结束后延迟 1s 自动采样"的序号，避免随后被意外覆盖
+        左/右面板「刷新初始值」任一按钮均执行上述双臂初值同步，避免只刷一侧导致
+        ``get_linear_offsets_mm`` 等对侧初值仍为 ``None`` 而无法示教。
+
+        默认在通过双臂关节反馈检查之后，若本节点尚未记录上半身调试为开启，则调用
+        ``/motion/upper_body_debug(true)``（与「开始标定」前一致）；若此前已通过开始标定或
+        ``/api/upper_body_debug`` 成功开启，则**不再重复调用**该服务。参数
+        ``refresh_initial_auto_enable_upper_body_debug`` 置 false 可完全跳过（如无该服务的仿真）。
+
+        要求双臂各 7 个 URDF 关节均已在关节状态缓存中出现，否则拒绝（避免对侧仍停留在旧指令）。
         """
         if not self._fk_ok or self._fk is None:
             return False, "URDF FK 未加载，无法刷新初始值", None
+        side_l = str(side).strip().lower()
+        if side_l not in ("left", "right"):
+            return False, "side 应为 left 或 right", None
+        with self._traj_lock:
+            busy = self._playing
+        if busy:
+            return False, "有轨迹或示教正在执行，请等待结束后再刷新初始值", None
+
         with self._fk_lock:
             ready = self._fk_pose_ready
-            ee = self._ee_left if side == "left" else self._ee_right
-            rpy = self._ee_left_rpy if side == "left" else self._ee_right_rpy
+            cache = dict(self._joint_positions_by_name)
         if not ready:
             return False, "尚未收到 /joint_states 或 FK 未就绪，请稍后再试", None
+        need_arms = list(self._left_arm_joint_names) + list(self._right_arm_joint_names)
+        missing_fb = [jn for jn in need_arms if jn not in cache]
+        if missing_fb:
+            sample = ", ".join(missing_fb[:6])
+            if len(missing_fb) > 6:
+                sample += ", …"
+            return (
+                False,
+                "双臂关节尚未全部出现在 /joint_states 中，无法以当前关节状态刷新示教基准：缺失 "
+                f"{sample}",
+                None,
+            )
+
+        dbg: Optional[Dict[str, Any]] = None
+        if bool(self.get_parameter("refresh_initial_auto_enable_upper_body_debug").value):
+            ok_dbg, msg_dbg, skipped_dbg = self.enable_upper_body_debug()
+            dbg = {
+                "ok": ok_dbg,
+                "message": msg_dbg,
+                "skipped_service_call": skipped_dbg,
+            }
+            if not ok_dbg:
+                return (
+                    False,
+                    "无法开启「上半身调试模式」，已取消刷新（与开始标定前置条件一致；"
+                    "无该服务时可把参数 refresh_initial_auto_enable_upper_body_debug 设为 false）。"
+                    f" 详情：{msg_dbg}",
+                    None,
+                )
+
+        baseline, n_js, n_fb = self._baseline_vector_joint_states_then_last_cmd()
+        n_merge = max(0, int(self.get_parameter("jog_hold_baseline_feedback_merges_after_refresh").value))
         with self._fk_lock:
-            if side == "left":
-                self._initial_ee_left = (float(ee[0]), float(ee[1]), float(ee[2]))
-                self._initial_rpy_left = (float(rpy[0]), float(rpy[1]), float(rpy[2]))
-            else:
-                self._initial_ee_right = (float(ee[0]), float(ee[1]), float(ee[2]))
-                self._initial_rpy_right = (float(rpy[0]), float(rpy[1]), float(rpy[2]))
-            # 取消"开始标定播完后自动采样"的待处理序号，以免 1s 后把手动刷新的值覆盖
-            self._initial_capture_seq += 1
-        label = "左臂" if side == "left" else "右臂"
+            if not (self._fk_pose_ready and self._fk_ok):
+                return False, "刷新瞬间末端位姿未就绪，请稍后再试", None
+            self._write_initial_ee_rpy_from_current_display_locked()
+            self._last_joint_cmd_positions = list(baseline)
+            self._hold_baseline_feedback_merges_remaining = n_merge
+            el, er = self._initial_ee_left, self._initial_ee_right
+            rl, rr = self._initial_rpy_left, self._initial_rpy_right
+        if el is None or er is None or rl is None or rr is None:
+            return False, "刷新后初值为空，请确认末端 FK 与 /joint_states 正常", None
+        label = "左臂" if side_l == "left" else "右臂"
         deg = 180.0 / math.pi
+        ee_sel, rpy_sel = (el, rl) if side_l == "left" else (er, rr)
         self.get_logger().info(
-            f"[Web] 手动刷新{label}初始值：位置 m x={ee[0]:+.6f} y={ee[1]:+.6f} z={ee[2]:+.6f}；"
-            f"姿态 ° RX={rpy[0]*deg:+.3f} RY={rpy[1]*deg:+.3f} RZ={rpy[2]*deg:+.3f}"
+            f"[Web] 经{label}面板刷新双臂初始值（与界面当前末端一致）。"
+            f"左腕 m x={el[0]:+.6f} y={el[1]:+.6f} z={el[2]:+.6f}；"
+            f"右腕 m x={er[0]:+.6f} y={er[1]:+.6f} z={er[2]:+.6f}。"
+            f" hold：{n_js} 关节来自 /joint_states，{n_fb} 由历史指令或缺省补齐；"
+            + (
+                f"后续 {n_merge} 次示教每次先 merge 反馈再 hold。"
+                if n_merge > 0
+                else "后续示教直接使用本次 hold（与标定末帧后单臂示教一致，对侧臂不随反馈重写）。"
+            )
         )
         return (
             True,
-            f"{label}初始值已刷新",
+            "左右臂初始值已刷新，示教基线已对齐当前关节状态（与「开始标定」末帧后单臂笛卡尔示教一致）",
             {
-                "initial_ee_m": {"x": float(ee[0]), "y": float(ee[1]), "z": float(ee[2])},
+                "trigger_side": side_l,
+                "upper_body_debug": dbg
+                if dbg is not None
+                else {"skipped": True, "message": "未自动开启（refresh_initial_auto_enable_upper_body_debug=false）"},
+                "initial_ee_m": {
+                    "x": float(ee_sel[0]),
+                    "y": float(ee_sel[1]),
+                    "z": float(ee_sel[2]),
+                },
                 "initial_rpy_deg": {
-                    "rx": float(rpy[0] * deg),
-                    "ry": float(rpy[1] * deg),
-                    "rz": float(rpy[2] * deg),
+                    "rx": float(rpy_sel[0] * deg),
+                    "ry": float(rpy_sel[1] * deg),
+                    "rz": float(rpy_sel[2] * deg),
+                },
+                "left": {
+                    "initial_ee_m": {"x": float(el[0]), "y": float(el[1]), "z": float(el[2])},
+                    "initial_rpy_deg": {
+                        "rx": float(rl[0] * deg),
+                        "ry": float(rl[1] * deg),
+                        "rz": float(rl[2] * deg),
+                    },
+                },
+                "right": {
+                    "initial_ee_m": {"x": float(er[0]), "y": float(er[1]), "z": float(er[2])},
+                    "initial_rpy_deg": {
+                        "rx": float(rr[0] * deg),
+                        "ry": float(rr[1] * deg),
+                        "rz": float(rr[2] * deg),
+                    },
+                },
+                "hold_baseline": {
+                    "joints_from_joint_states": int(n_js),
+                    "joints_fallback": int(n_fb),
+                    "followup_merged_jogs": int(n_merge),
                 },
             },
         )
 
-    def _schedule_initial_ee_after_start_calibration(self) -> None:
-        """「开始标定」轨迹发完后延迟 1s，将此时手腕末端位姿写入初始值（供界面）。"""
-        self._initial_capture_seq += 1
-        seq = self._initial_capture_seq
+    def _snapshot_initial_ee_from_current_display(self) -> bool:
+        """
+        在 ``_fk_lock`` 内把 ``_ee_left`` / ``_ee_right`` 及 RPY 直接拷入初始值。
 
-        def run() -> None:
-            time.sleep(1.0)
-            if not rclpy.ok():
-                return
-            if seq != self._initial_capture_seq:
-                return
-            with self._fk_lock:
-                if not (self._fk_pose_ready and self._fk_ok):
-                    self.get_logger().warn(
-                        "开始标定结束后 1s 时仍无有效末端 FK，未更新「初始值」（请检查 joint_states 与 URDF）"
-                    )
-                    return
-                self._initial_ee_left = self._ee_left
-                self._initial_ee_right = self._ee_right
-                self._initial_rpy_left = self._ee_left_rpy
-                self._initial_rpy_right = self._ee_right_rpy
-            self.get_logger().info(
-                "开始标定轨迹已播完，延迟 1s 后已更新左右腕末端位置与 RX/RY/RZ 初始值（界面「初始值」）"
-            )
-
-        threading.Thread(target=run, daemon=True).start()
+        与「用关节缓存再算一遍 FK」相比，数值与界面「当前」完全一致，避免构链顺序/缺省 0 与
+        :meth:`_on_joint_states` 路径有细微差导致约数毫米假偏移。
+        """
+        with self._fk_lock:
+            if not (self._fk_pose_ready and self._fk_ok):
+                return False
+            self._write_initial_ee_rpy_from_current_display_locked()
+        return True
 
     def _schedule_upper_body_debug_off_after_band_play(self) -> None:
         """乐队顺序播放结束后自动关闭上半身调试（异步，避免阻塞 100Hz 定时器）。"""
@@ -2378,6 +2885,7 @@ class ArmCalibrationWebNode(Node):
                 self.get_logger().warn(f"[band] 播放结束：关闭上半身调试异常: {ex}")
                 return
             if resp and resp.success:
+                self._upper_body_debug_enabled_local = False
                 self.get_logger().info("[band] 顺序播放已结束，已自动关闭上半身调试模式")
             else:
                 self.get_logger().warn(
@@ -2396,6 +2904,8 @@ class ArmCalibrationWebNode(Node):
                 return
             if self._traj_index >= len(self._traj_rows):
                 self._playing = False
+                self._traj_mode = ""
+                self._clear_jog_fk_display_override()
                 return
             row = self._traj_rows[self._traj_index]
             self._traj_index += 1
@@ -2406,10 +2916,32 @@ class ArmCalibrationWebNode(Node):
                 elif self._traj_mode == "band_play":
                     finished_band_playback = True
                 self._traj_mode = ""
+                self._clear_jog_fk_display_override()
         if row is not None:
             self._publish_joint_cmd(row)
         if finished_start_playback:
-            self._schedule_initial_ee_after_start_calibration()
+
+            def settle_then_snapshot_initial_from_joint_states() -> None:
+                try:
+                    d = float(self.get_parameter("calibration_initial_ee_joint_resample_sec").value)
+                except Exception:
+                    d = 3.0
+                d = max(0.0, min(d, 5.0))
+                if d > 0.0:
+                    time.sleep(d)
+                if not rclpy.ok():
+                    return
+                if self._snapshot_initial_ee_from_current_display():
+                    self.get_logger().info(
+                        f"开始标定已播完：已等待 {d:.3f}s 后将左右腕「当前」末端位姿拷入初始值 "
+                        "（与 /api/state 当前值数值一致）"
+                    )
+                else:
+                    self.get_logger().warn(
+                        "开始标定已播完：等待后写入初始腕位姿失败（请检查 joint_states 与 URDF）"
+                    )
+
+            threading.Thread(target=settle_then_snapshot_initial_from_joint_states, daemon=True).start()
         if finished_band_playback:
             self._schedule_upper_body_debug_off_after_band_play()
 
