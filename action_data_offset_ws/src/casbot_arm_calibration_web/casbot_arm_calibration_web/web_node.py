@@ -2153,6 +2153,16 @@ class ArmCalibrationWebNode(Node):
             row[i] = float(base_hold[i])
         return row
 
+    def _arm_joint_positions_rad_from_row(
+        self, arm_names: List[str], row: List[float]
+    ) -> Dict[str, float]:
+        """从即将下发的 UpperJointData 向量中取出操作臂各关节角（弧度）。"""
+        out: Dict[str, float] = {}
+        for jn in arm_names:
+            ix = self._joint_index_by_urdf.get(jn)
+            if ix is not None and 0 <= ix < len(row):
+                out[jn] = float(row[ix])
+        return out
 
     def adjust_arm_cartesian(
         self,
@@ -2449,6 +2459,9 @@ class ArmCalibrationWebNode(Node):
                 "frames": len(jog_rows),
                 "duration_s": duration_s,
                 "target_ee_m": last_ee,
+                "joint_cmd_arm_last_rad": self._arm_joint_positions_rad_from_row(
+                    arm_names, jog_rows[-1]
+                ),
             },
         )
 
@@ -2666,6 +2679,9 @@ class ArmCalibrationWebNode(Node):
                 "frames": len(jog_rows),
                 "duration_s": duration_s,
                 "target_ee_m": last_ee,
+                "joint_cmd_arm_last_rad": self._arm_joint_positions_rad_from_row(
+                    arm_names, jog_rows[-1]
+                ),
             },
         )
 
