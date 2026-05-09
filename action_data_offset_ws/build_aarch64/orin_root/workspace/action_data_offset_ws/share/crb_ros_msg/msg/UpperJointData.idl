@@ -1,0 +1,20 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from crb_ros_msg/msg/UpperJointData.msg
+// generated code does not contain a copyright notice
+
+#include "sensor_msgs/msg/JointState.idl"
+#include "std_msgs/msg/Header.idl"
+
+module crb_ros_msg {
+  module msg {
+    struct UpperJointData {
+      std_msgs::msg::Header header;
+
+      float time_ref;
+
+      float vel_scale;
+
+      sensor_msgs::msg::JointState joint;
+    };
+  };
+};

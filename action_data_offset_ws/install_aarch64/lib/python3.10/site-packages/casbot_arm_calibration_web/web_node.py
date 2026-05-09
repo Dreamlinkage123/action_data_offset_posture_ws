@@ -90,6 +90,10 @@ INSTRUMENT_TO_SUBDIR = {
 # JOINTS_WITH_SUFFIX 中左/右臂 7 关节下标（头、腰之后，灵巧手之前）
 _LEFT_ARM_JOINT_INDICES = slice(3, 10)
 _RIGHT_ARM_JOINT_INDICES = slice(10, 17)
+# 单臂示教：这些关节不用 /joint_states 覆盖 base_full（与对侧臂一同保持 hold），与标定末帧后一致，减轻只动一侧时另一侧腕 mm 级视在偏
+_JOG_SYNC_SKIP_FROM_JOINT_STATES_NAMES = frozenset(
+    ("head_yaw_joint", "head_pitch_joint", "waist_yaw_joint")
+)
 
 
 def _pin_seed_joint_dict(base_full: List[float], chain_q_base: Dict[str, float]) -> Dict[str, float]:
@@ -1125,6 +1129,11 @@ class ArmCalibrationWebNode(Node):
         self.declare_parameter("calibration_initial_ee_joint_resample_sec", 3.0)
         # 「刷新初始值」时是否先调用 /motion/upper_body_debug(true)（与点击开始标定一致，否则 joint_cmd 可能被忽略）
         self.declare_parameter("refresh_initial_auto_enable_upper_body_debug", True)
+        # 刷新成功后是否向 joint_cmd 下发与 baseline 相同的全身 hold（默认开），使控制器与示教基线一致
+        self.declare_parameter("refresh_initial_publish_hold_baseline", True)
+        self.declare_parameter("refresh_initial_publish_hold_repeat_count", 1)
+        # 下发 hold 后等待本秒数，再根据 /joint_states 驱动的界面 FK 写入左右腕初值（覆盖「开始标定」写入的初值）
+        self.declare_parameter("refresh_initial_ee_resample_sec", 3.0)
         # action_data_offset 包内 URDF 相对路径（由 action_data_paths 解析；
         # 现由 Pinocchio 完全承担 FK/IK，输入必须为 .urdf）
         self.declare_parameter(
@@ -1246,6 +1255,8 @@ class ArmCalibrationWebNode(Node):
         self.declare_parameter("jog_merge_joint_states_into_non_operating_arm", False)
         # 单臂示教开始时把命令里的腰与当前 /joint_states 对齐一次，减轻控制器与 FK 假设不一致
         self.declare_parameter("jog_sync_waist_from_joint_states_on_jog_start", True)
+        # 腰角：仅当与 hold 差值超过本弧度时才用 /joint_states 覆盖（默认 ~0.057°）；≤0 则始终对齐
+        self.declare_parameter("jog_waist_resync_min_delta_rad", 1.0e-3)
 
         self._joint_state_sub = self.create_subscription(
             JointState,
@@ -1946,7 +1957,7 @@ class ArmCalibrationWebNode(Node):
         单臂笛卡尔示教一致，避免对侧腕 XYZ 随编码器微抖被写进 ``UpperJointData``，以及 Pin
         全模型种子中对侧角抖动导致本侧「纯 Y」出现 X/Z 分量。
 
-        头、腰、灵巧手等非双臂段仍用反馈对齐，减轻与真机上身姿态不一致带来的耦合。
+        **头、腰**与**对侧 7 臂**均不覆盖：保持 hold，避免外部 topic 只动一侧后首段示教用反馈微差经运动学树传到对侧腕。**灵巧手**仍用反馈对齐。
         """
         if len(base_full) != len(JOINTS_WITH_SUFFIX):
             return
@@ -1963,6 +1974,8 @@ class ArmCalibrationWebNode(Node):
             if keep.start <= i < keep.stop:
                 continue
             if opp.start <= i < opp.stop:
+                continue
+            if jn in _JOG_SYNC_SKIP_FROM_JOINT_STATES_NAMES:
                 continue
             if jn in cache:
                 base_full[i] = float(cache[jn])
@@ -2005,7 +2018,9 @@ class ArmCalibrationWebNode(Node):
         with self._fk_lock:
             wv = self._joint_positions_by_name.get("waist_yaw_joint")
         if wv is not None:
-            out[wi] = float(wv)
+            thr = float(self.get_parameter("jog_waist_resync_min_delta_rad").value)
+            if thr <= 0.0 or abs(float(wv) - float(out[wi])) >= thr:
+                out[wi] = float(wv)
         return out
 
     def _clear_jog_fk_display_override(self) -> None:
@@ -2016,10 +2031,15 @@ class ArmCalibrationWebNode(Node):
     def _apply_live_waist_to_chain_q_base(
         self, chain: List[str], chain_q_base: Dict[str, float], cache: Dict[str, float]
     ) -> None:
-        """IK 链上 ``waist_yaw_joint`` 用当前 /joint_states（有则写），与真实上身姿态一致，减轻纯 Y 时出现 X/Z 耦合。"""
+        """IK 链上 ``waist_yaw_joint``：仅当与 ``chain_q_base`` 已有值差异足够大再用 /joint_states，避免亚 mrad 噪声。"""
         wz = "waist_yaw_joint"
-        if wz in chain and wz in cache:
-            chain_q_base[wz] = float(cache[wz])
+        if wz not in chain or wz not in cache:
+            return
+        liv = float(cache[wz])
+        cur = float(chain_q_base.get(wz, liv))
+        thr = float(self.get_parameter("jog_waist_resync_min_delta_rad").value)
+        if thr <= 0.0 or abs(liv - cur) >= thr:
+            chain_q_base[wz] = liv
 
     def _jog_publish_waist_index_and_rad(
         self, chain_q_base: Dict[str, float], base_full: List[float]
@@ -2716,19 +2736,19 @@ class ArmCalibrationWebNode(Node):
         self, side: str
     ) -> Tuple[bool, str, Optional[Dict[str, Any]]]:
         """
-        用 ``/joint_states`` 与当前界面 FK 更新 **左右臂**「初始值」（与「开始标定」末帧写入初值
-        一致）；并把 **以关节反馈为主** 的全身向量写入 ``_last_joint_cmd_positions``，供后续
-        X/Y/Z、RX/RY/RZ 单臂笛卡尔示教作 hold 起点（与仅播放标定末帧后示教等价）。
+        用 ``/joint_states`` 与当前界面 FK 更新 **左右臂**「初始值」，**覆盖**此前「开始标定」
+        末帧写入的初值；并把 **以关节反馈为主** 的全身向量写入 ``_last_joint_cmd_positions``，
+        供后续单臂笛卡尔示教作 hold 起点（与仅播放标定末帧后示教等价）。
 
-        左/右面板「刷新初始值」任一按钮均执行上述双臂初值同步，避免只刷一侧导致
-        ``get_linear_offsets_mm`` 等对侧初值仍为 ``None`` 而无法示教。
+        左/右面板「刷新初始值」任一按钮均执行上述双臂初值同步。
 
-        默认在通过双臂关节反馈检查之后，若本节点尚未记录上半身调试为开启，则调用
-        ``/motion/upper_body_debug(true)``（与「开始标定」前一致）；若此前已通过开始标定或
-        ``/api/upper_body_debug`` 成功开启，则**不再重复调用**该服务。参数
-        ``refresh_initial_auto_enable_upper_body_debug`` 置 false 可完全跳过（如无该服务的仿真）。
+        流程：通过检查后可选 ``/motion/upper_body_debug(true)`` → 写 ``_last_joint_cmd`` 为
+        baseline → 可选下发同内容 joint_cmd hold → **等待** ``refresh_initial_ee_resample_sec``
+        （默认 **3s**）让关节反馈稳定 → 再按此时界面左右腕 FK 写入初值。避免「先写初值再发
+        hold」或控制器未跟上时，示教后出现约数毫米假偏移。
 
-        要求双臂各 7 个 URDF 关节均已在关节状态缓存中出现，否则拒绝（避免对侧仍停留在旧指令）。
+        单臂示教时 ``_sync_joint_states_into_base_full_except_operating_arm`` 对 **头/腰/对侧臂**
+        保持 hold，左/右面板分别只驱动对应侧腕部运动（与标定末帧后行为一致）。
         """
         if not self._fk_ok or self._fk is None:
             return False, "URDF FK 未加载，无法刷新初始值", None
@@ -2780,30 +2800,71 @@ class ArmCalibrationWebNode(Node):
         with self._fk_lock:
             if not (self._fk_pose_ready and self._fk_ok):
                 return False, "刷新瞬间末端位姿未就绪，请稍后再试", None
-            self._write_initial_ee_rpy_from_current_display_locked()
             self._last_joint_cmd_positions = list(baseline)
             self._hold_baseline_feedback_merges_remaining = n_merge
+
+        pub_hold = False
+        pub_n = 0
+        if bool(self.get_parameter("refresh_initial_publish_hold_baseline").value):
+            if self._joint_pub is not None and UpperJointData is not None:
+                try:
+                    pub_n = max(1, int(self.get_parameter("refresh_initial_publish_hold_repeat_count").value))
+                except Exception:
+                    pub_n = 1
+                for ri in range(pub_n):
+                    self._publish_joint_cmd(list(baseline))
+                    if ri + 1 < pub_n:
+                        time.sleep(0.01)
+                pub_hold = True
+                self.get_logger().info(
+                    f"[Web] 刷新后已向 joint_cmd 下发 {pub_n} 帧全身 hold，与示教基线一致"
+                )
+            else:
+                self.get_logger().warn(
+                    "[Web] refresh_initial_publish_hold_baseline=true 但未下发：joint_cmd 发布器不可用"
+                )
+
+        try:
+            resample = float(self.get_parameter("refresh_initial_ee_resample_sec").value)
+        except Exception:
+            resample = 3.0
+        resample = max(0.0, min(resample, 10.0))
+        if pub_hold and resample <= 1e-9:
+            self.get_logger().warn(
+                "[Web] 已下发 hold 但 refresh_initial_ee_resample_sec≈0："
+                "初值可能与关节反馈不一致，建议默认 3s 或 0.5～5.0"
+            )
+        if resample > 0.0:
+            time.sleep(resample)
+        if not rclpy.ok():
+            return False, "刷新过程中节点已关闭", None
+
+        with self._fk_lock:
+            if not (self._fk_pose_ready and self._fk_ok):
+                return False, "刷新后采样瞬间末端位姿未就绪，请稍后再试", None
+            self._write_initial_ee_rpy_from_current_display_locked()
             el, er = self._initial_ee_left, self._initial_ee_right
             rl, rr = self._initial_rpy_left, self._initial_rpy_right
+
         if el is None or er is None or rl is None or rr is None:
             return False, "刷新后初值为空，请确认末端 FK 与 /joint_states 正常", None
         label = "左臂" if side_l == "left" else "右臂"
         deg = 180.0 / math.pi
         ee_sel, rpy_sel = (el, rl) if side_l == "left" else (er, rr)
         self.get_logger().info(
-            f"[Web] 经{label}面板刷新双臂初始值（与界面当前末端一致）。"
+            f"[Web] 经{label}面板刷新双臂初始值（hold 后等待 {resample:.3f}s 再采样，已覆盖标定写入的初值）。"
             f"左腕 m x={el[0]:+.6f} y={el[1]:+.6f} z={el[2]:+.6f}；"
             f"右腕 m x={er[0]:+.6f} y={er[1]:+.6f} z={er[2]:+.6f}。"
             f" hold：{n_js} 关节来自 /joint_states，{n_fb} 由历史指令或缺省补齐；"
             + (
                 f"后续 {n_merge} 次示教每次先 merge 反馈再 hold。"
                 if n_merge > 0
-                else "后续示教直接使用本次 hold（与标定末帧后单臂示教一致，对侧臂不随反馈重写）。"
+                else "后续示教直接使用本次 hold（左/右面板分别只动对应侧腕）。"
             )
         )
         return (
             True,
-            "左右臂初始值已刷新，示教基线已对齐当前关节状态（与「开始标定」末帧后单臂笛卡尔示教一致）",
+            "左右臂初始值已刷新：已按当前关节状态覆盖标定初值，hold 后等待再采样，可与「开始标定」末帧后同样单臂示教",
             {
                 "trigger_side": side_l,
                 "upper_body_debug": dbg
@@ -2840,6 +2901,9 @@ class ArmCalibrationWebNode(Node):
                     "joints_fallback": int(n_fb),
                     "followup_merged_jogs": int(n_merge),
                 },
+                "published_hold_baseline": pub_hold,
+                "published_hold_frames": int(pub_n) if pub_hold else 0,
+                "initial_ee_resample_sec": float(resample),
             },
         )
 

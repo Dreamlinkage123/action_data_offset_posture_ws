@@ -1,0 +1,3 @@
+[console_scripts]
+arm_calibration_web = casbot_arm_calibration_web.web_node:main
+

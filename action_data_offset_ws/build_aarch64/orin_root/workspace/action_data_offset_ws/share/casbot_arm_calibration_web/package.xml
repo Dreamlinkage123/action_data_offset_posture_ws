@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>casbot_arm_calibration_web</name>
+  <version>0.1.0</version>
+  <description>CASBOT 手臂位姿标定 Web 界面（ROS2）</description>
+
+  <maintainer email="casbot@example.com">casbot</maintainer>
+  <license>Proprietary</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>action_msgs</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-flask</exec_depend>
+  <!-- 正运动学 / 示教 IK：Pinocchio（ros-humble-pinocchio）；NumPy 需与系统扩展匹配 -->
+  <exec_depend>ros-humble-pinocchio</exec_depend>
+  <exec_depend>crb_ros_msg</exec_depend>
+  <exec_depend>action_data_offset</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

@@ -1,0 +1,5 @@
+[console_scripts]
+arm_trajectory_transform = arm_trajectory_transform:main
+arm_trajectory_transform_jacobian = arm_trajectory_transform_jacobian:main
+mujoco_trajectory_sim = mujoco_trajectory_sim:run
+

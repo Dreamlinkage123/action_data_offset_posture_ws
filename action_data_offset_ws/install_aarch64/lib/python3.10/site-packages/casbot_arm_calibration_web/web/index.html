@@ -21,7 +21,7 @@
           type="button"
           class="btn-refresh-initial"
           data-arm="left"
-          title="同步左右腕初值到当前位姿，并尝试开启上半身调试（与开始标定一致）；本页 ± 仅控制左手腕笛卡尔平移/旋转"
+          title="覆盖标定初值：下发 joint_cmd hold 与关节对齐后默认等待 3s，再按 /joint_states 更新左右腕初值；本页 ± 仅动左腕"
         >刷新初始值</button>
       </h2>
       <div class="arm-panel__body">
@@ -189,7 +189,7 @@
           type="button"
           class="btn-refresh-initial"
           data-arm="right"
-          title="同步左右腕初值到当前位姿，并尝试开启上半身调试（与开始标定一致）；本页 ± 仅控制右手腕笛卡尔平移/旋转"
+          title="覆盖标定初值：下发 joint_cmd hold 与关节对齐后默认等待 3s，再按 /joint_states 更新左右腕初值；本页 ± 仅动右腕"
         >刷新初始值</button>
       </h2>
       <div class="arm-panel__body">
