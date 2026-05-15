@@ -3,7 +3,7 @@ set(CMAKE_HOST_SYSTEM_NAME "Linux")
 set(CMAKE_HOST_SYSTEM_VERSION "6.8.0-40-generic")
 set(CMAKE_HOST_SYSTEM_PROCESSOR "x86_64")
 
-include("/workspace/action_data_offset_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake")
+include("/workspace/action_data_offset_posture_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake")
 
 set(CMAKE_SYSTEM "Linux-1")
 set(CMAKE_SYSTEM_NAME "Linux")

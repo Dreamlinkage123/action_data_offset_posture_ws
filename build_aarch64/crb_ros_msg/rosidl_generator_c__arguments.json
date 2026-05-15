@@ -1,10 +1,10 @@
 {
   "package_name": "crb_ros_msg",
-  "output_dir": "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_generator_c/crb_ros_msg",
+  "output_dir": "/workspace/action_data_offset_posture_ws/build_aarch64/crb_ros_msg/rosidl_generator_c/crb_ros_msg",
   "template_dir": "/opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_generator_c/cmake/../resource",
   "idl_tuples": [
-    "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_adapter/crb_ros_msg:msg/UpperJointData.idl",
-    "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_adapter/crb_ros_msg:action/ActionPlay.idl"
+    "/workspace/action_data_offset_posture_ws/build_aarch64/crb_ros_msg/rosidl_adapter/crb_ros_msg:msg/UpperJointData.idl",
+    "/workspace/action_data_offset_posture_ws/build_aarch64/crb_ros_msg/rosidl_adapter/crb_ros_msg:action/ActionPlay.idl"
   ],
   "ros_interface_dependencies": [
     "std_msgs:/opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/Bool.idl",
@@ -119,8 +119,8 @@
     "/opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_generator_c/cmake/../resource/msg__struct.h.em",
     "/opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_generator_c/cmake/../resource/msg__type_support.h.em",
     "/opt/rootfs_2204_aarch64/opt/ros/humble/share/rosidl_generator_c/cmake/../resource/srv__type_support.h.em",
-    "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_adapter/crb_ros_msg/msg/UpperJointData.idl",
-    "/workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/rosidl_adapter/crb_ros_msg/action/ActionPlay.idl",
+    "/workspace/action_data_offset_posture_ws/build_aarch64/crb_ros_msg/rosidl_adapter/crb_ros_msg/msg/UpperJointData.idl",
+    "/workspace/action_data_offset_posture_ws/build_aarch64/crb_ros_msg/rosidl_adapter/crb_ros_msg/action/ActionPlay.idl",
     "/opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/Bool.idl",
     "/opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/Byte.idl",
     "/opt/rootfs_2204_aarch64/opt/ros/humble/share/std_msgs/msg/ByteMultiArray.idl",

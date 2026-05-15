@@ -1,0 +1,156 @@
+[0.292s] DEBUG:colcon:Command line arguments: ['/usr/local/bin/colcon', 'build', '--merge-install', '--cmake-force-configure', '--packages-skip', 'beverage_demo', '--parallel-workers', '12', '--event', 'console_direct+', '--base-paths', 'src/', '--cmake-args', '-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON', '-DCMAKE_TOOLCHAIN_FILE=/workspace/action_data_offset_posture_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake', '-DSECURITY=ON', '-DBUILD_TESTING=OFF']
+[0.292s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=True, symlink_install=False, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=12, event_handlers=['console_direct+'], ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['src/'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=None, packages_skip=['beverage_demo'], packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, cmake_args=['-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON', '-DCMAKE_TOOLCHAIN_FILE=/workspace/action_data_offset_posture_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake', '-DSECURITY=ON', '-DBUILD_TESTING=OFF'], cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=True, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, verb_parser=<colcon_defaults.argument_parser.defaults.DefaultArgumentsDecorator object at 0x7a1912e25390>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x7a1912e24cd0>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x7a1912e24cd0>>)
+[0.426s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.426s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.426s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.426s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.426s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.426s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/workspace/action_data_offset_posture_ws/src'
+[0.426s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ignore', 'ignore_ament_install']
+[0.426s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore'
+[0.426s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore_ament_install'
+[0.426s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_pkg']
+[0.426s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_pkg'
+[0.426s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_meta']
+[0.426s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_meta'
+[0.426s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ros']
+[0.426s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ros'
+[0.436s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['cmake', 'python']
+[0.436s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'cmake'
+[0.436s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python'
+[0.436s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['python_setup_py']
+[0.436s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python_setup_py'
+[0.436s] Level 1:colcon.colcon_core.package_identification:_identify(src/action_data_offset) by extensions ['ignore', 'ignore_ament_install']
+[0.437s] Level 1:colcon.colcon_core.package_identification:_identify(src/action_data_offset) by extension 'ignore'
+[0.437s] Level 1:colcon.colcon_core.package_identification:_identify(src/action_data_offset) by extension 'ignore_ament_install'
+[0.437s] Level 1:colcon.colcon_core.package_identification:_identify(src/action_data_offset) by extensions ['colcon_pkg']
+[0.437s] Level 1:colcon.colcon_core.package_identification:_identify(src/action_data_offset) by extension 'colcon_pkg'
+[0.437s] Level 1:colcon.colcon_core.package_identification:_identify(src/action_data_offset) by extensions ['colcon_meta']
+[0.437s] Level 1:colcon.colcon_core.package_identification:_identify(src/action_data_offset) by extension 'colcon_meta'
+[0.437s] Level 1:colcon.colcon_core.package_identification:_identify(src/action_data_offset) by extensions ['ros']
+[0.437s] Level 1:colcon.colcon_core.package_identification:_identify(src/action_data_offset) by extension 'ros'
+[0.439s] DEBUG:colcon.colcon_core.package_identification:Package 'src/action_data_offset' with type 'ros.ament_python' and name 'action_data_offset'
+[0.439s] Level 1:colcon.colcon_core.package_identification:_identify(src/casbot_arm_calibration_web) by extensions ['ignore', 'ignore_ament_install']
+[0.439s] Level 1:colcon.colcon_core.package_identification:_identify(src/casbot_arm_calibration_web) by extension 'ignore'
+[0.439s] Level 1:colcon.colcon_core.package_identification:_identify(src/casbot_arm_calibration_web) by extension 'ignore_ament_install'
+[0.439s] Level 1:colcon.colcon_core.package_identification:_identify(src/casbot_arm_calibration_web) by extensions ['colcon_pkg']
+[0.439s] Level 1:colcon.colcon_core.package_identification:_identify(src/casbot_arm_calibration_web) by extension 'colcon_pkg'
+[0.439s] Level 1:colcon.colcon_core.package_identification:_identify(src/casbot_arm_calibration_web) by extensions ['colcon_meta']
+[0.439s] Level 1:colcon.colcon_core.package_identification:_identify(src/casbot_arm_calibration_web) by extension 'colcon_meta'
+[0.439s] Level 1:colcon.colcon_core.package_identification:_identify(src/casbot_arm_calibration_web) by extensions ['ros']
+[0.439s] Level 1:colcon.colcon_core.package_identification:_identify(src/casbot_arm_calibration_web) by extension 'ros'
+[0.440s] DEBUG:colcon.colcon_core.package_identification:Package 'src/casbot_arm_calibration_web' with type 'ros.ament_python' and name 'casbot_arm_calibration_web'
+[0.440s] Level 1:colcon.colcon_core.package_identification:_identify(src/crb_ros_msg) by extensions ['ignore', 'ignore_ament_install']
+[0.440s] Level 1:colcon.colcon_core.package_identification:_identify(src/crb_ros_msg) by extension 'ignore'
+[0.440s] Level 1:colcon.colcon_core.package_identification:_identify(src/crb_ros_msg) by extension 'ignore_ament_install'
+[0.440s] Level 1:colcon.colcon_core.package_identification:_identify(src/crb_ros_msg) by extensions ['colcon_pkg']
+[0.440s] Level 1:colcon.colcon_core.package_identification:_identify(src/crb_ros_msg) by extension 'colcon_pkg'
+[0.440s] Level 1:colcon.colcon_core.package_identification:_identify(src/crb_ros_msg) by extensions ['colcon_meta']
+[0.440s] Level 1:colcon.colcon_core.package_identification:_identify(src/crb_ros_msg) by extension 'colcon_meta'
+[0.440s] Level 1:colcon.colcon_core.package_identification:_identify(src/crb_ros_msg) by extensions ['ros']
+[0.440s] Level 1:colcon.colcon_core.package_identification:_identify(src/crb_ros_msg) by extension 'ros'
+[0.441s] DEBUG:colcon.colcon_core.package_identification:Package 'src/crb_ros_msg' with type 'ros.ament_cmake' and name 'crb_ros_msg'
+[0.441s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[0.441s] WARNING:colcon.colcon_core.package_selection:ignoring unknown package 'beverage_demo' in --packages-skip
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'action_data_offset' build argument 'cmake_args' from command line to '['-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON', '-DCMAKE_TOOLCHAIN_FILE=/workspace/action_data_offset_posture_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake', '-DSECURITY=ON', '-DBUILD_TESTING=OFF']'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'action_data_offset' build argument 'cmake_target' from command line to 'None'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'action_data_offset' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'action_data_offset' build argument 'cmake_clean_cache' from command line to 'False'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'action_data_offset' build argument 'cmake_clean_first' from command line to 'False'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'action_data_offset' build argument 'cmake_force_configure' from command line to 'True'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'action_data_offset' build argument 'ament_cmake_args' from command line to 'None'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'action_data_offset' build argument 'catkin_cmake_args' from command line to 'None'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'action_data_offset' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.462s] DEBUG:colcon.colcon_core.verb:Building package 'action_data_offset' with the following arguments: {'ament_cmake_args': None, 'build_base': '/workspace/action_data_offset_posture_ws/build/action_data_offset', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': ['-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON', '-DCMAKE_TOOLCHAIN_FILE=/workspace/action_data_offset_posture_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake', '-DSECURITY=ON', '-DBUILD_TESTING=OFF'], 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': True, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/workspace/action_data_offset_posture_ws/install', 'merge_install': True, 'path': '/workspace/action_data_offset_posture_ws/src/action_data_offset', 'symlink_install': False, 'test_result_base': None}
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'crb_ros_msg' build argument 'cmake_args' from command line to '['-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON', '-DCMAKE_TOOLCHAIN_FILE=/workspace/action_data_offset_posture_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake', '-DSECURITY=ON', '-DBUILD_TESTING=OFF']'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'crb_ros_msg' build argument 'cmake_target' from command line to 'None'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'crb_ros_msg' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'crb_ros_msg' build argument 'cmake_clean_cache' from command line to 'False'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'crb_ros_msg' build argument 'cmake_clean_first' from command line to 'False'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'crb_ros_msg' build argument 'cmake_force_configure' from command line to 'True'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'crb_ros_msg' build argument 'ament_cmake_args' from command line to 'None'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'crb_ros_msg' build argument 'catkin_cmake_args' from command line to 'None'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'crb_ros_msg' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.462s] DEBUG:colcon.colcon_core.verb:Building package 'crb_ros_msg' with the following arguments: {'ament_cmake_args': None, 'build_base': '/workspace/action_data_offset_posture_ws/build/crb_ros_msg', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': ['-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON', '-DCMAKE_TOOLCHAIN_FILE=/workspace/action_data_offset_posture_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake', '-DSECURITY=ON', '-DBUILD_TESTING=OFF'], 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': True, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/workspace/action_data_offset_posture_ws/install', 'merge_install': True, 'path': '/workspace/action_data_offset_posture_ws/src/crb_ros_msg', 'symlink_install': False, 'test_result_base': None}
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'casbot_arm_calibration_web' build argument 'cmake_args' from command line to '['-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON', '-DCMAKE_TOOLCHAIN_FILE=/workspace/action_data_offset_posture_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake', '-DSECURITY=ON', '-DBUILD_TESTING=OFF']'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'casbot_arm_calibration_web' build argument 'cmake_target' from command line to 'None'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'casbot_arm_calibration_web' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'casbot_arm_calibration_web' build argument 'cmake_clean_cache' from command line to 'False'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'casbot_arm_calibration_web' build argument 'cmake_clean_first' from command line to 'False'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'casbot_arm_calibration_web' build argument 'cmake_force_configure' from command line to 'True'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'casbot_arm_calibration_web' build argument 'ament_cmake_args' from command line to 'None'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'casbot_arm_calibration_web' build argument 'catkin_cmake_args' from command line to 'None'
+[0.462s] Level 5:colcon.colcon_core.verb:set package 'casbot_arm_calibration_web' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.462s] DEBUG:colcon.colcon_core.verb:Building package 'casbot_arm_calibration_web' with the following arguments: {'ament_cmake_args': None, 'build_base': '/workspace/action_data_offset_posture_ws/build/casbot_arm_calibration_web', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': ['-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON', '-DCMAKE_TOOLCHAIN_FILE=/workspace/action_data_offset_posture_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake', '-DSECURITY=ON', '-DBUILD_TESTING=OFF'], 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': True, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/workspace/action_data_offset_posture_ws/install', 'merge_install': True, 'path': '/workspace/action_data_offset_posture_ws/src/casbot_arm_calibration_web', 'symlink_install': False, 'test_result_base': None}
+[0.463s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[0.463s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[0.463s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/workspace/action_data_offset_posture_ws/src/action_data_offset' with build type 'ament_python'
+[0.464s] Level 1:colcon.colcon_core.shell:create_environment_hook('action_data_offset', 'ament_prefix_path')
+[0.468s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[0.468s] INFO:colcon.colcon_core.shell:Creating environment hook '/workspace/action_data_offset_posture_ws/install/share/action_data_offset/hook/ament_prefix_path.ps1'
+[0.468s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/workspace/action_data_offset_posture_ws/install/share/action_data_offset/hook/ament_prefix_path.dsv'
+[0.469s] INFO:colcon.colcon_core.shell:Creating environment hook '/workspace/action_data_offset_posture_ws/install/share/action_data_offset/hook/ament_prefix_path.sh'
+[0.470s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.470s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.475s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/workspace/action_data_offset_posture_ws/src/crb_ros_msg' with build type 'ament_cmake'
+[0.475s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/workspace/action_data_offset_posture_ws/src/crb_ros_msg'
+[0.475s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.475s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.637s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/workspace/action_data_offset_posture_ws/src/action_data_offset'
+[0.637s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.637s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.640s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/workspace/action_data_offset_posture_ws/build/crb_ros_msg': CMAKE_PREFIX_PATH=/opt/rootfs_2204_aarch64/opt/ros/humble /usr/bin/cmake /workspace/action_data_offset_posture_ws/src/crb_ros_msg -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_TOOLCHAIN_FILE=/workspace/action_data_offset_posture_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake -DSECURITY=ON -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/workspace/action_data_offset_posture_ws/install
+[0.676s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/workspace/action_data_offset_posture_ws/build/crb_ros_msg' returned '1': CMAKE_PREFIX_PATH=/opt/rootfs_2204_aarch64/opt/ros/humble /usr/bin/cmake /workspace/action_data_offset_posture_ws/src/crb_ros_msg -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_TOOLCHAIN_FILE=/workspace/action_data_offset_posture_ws/docker_env/environment/cmake-toolchains/generic_aarch64.cmake -DSECURITY=ON -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/workspace/action_data_offset_posture_ws/install
+[0.678s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(crb_ros_msg)
+[0.681s] Level 1:colcon.colcon_core.environment:checking '/workspace/action_data_offset_posture_ws/install' for CMake module files
+[0.682s] Level 1:colcon.colcon_core.environment:checking '/workspace/action_data_offset_posture_ws/install' for CMake config files
+[0.683s] Level 1:colcon.colcon_core.shell:create_environment_hook('crb_ros_msg', 'cmake_prefix_path')
+[0.683s] INFO:colcon.colcon_core.shell:Creating environment hook '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/hook/cmake_prefix_path.ps1'
+[0.683s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/hook/cmake_prefix_path.dsv'
+[0.683s] INFO:colcon.colcon_core.shell:Creating environment hook '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/hook/cmake_prefix_path.sh'
+[0.684s] Level 1:colcon.colcon_core.environment:checking '/workspace/action_data_offset_posture_ws/install/lib'
+[0.684s] Level 1:colcon.colcon_core.shell:create_environment_hook('crb_ros_msg', 'ld_library_path_lib')
+[0.684s] INFO:colcon.colcon_core.shell:Creating environment hook '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/hook/ld_library_path_lib.ps1'
+[0.684s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/hook/ld_library_path_lib.dsv'
+[0.685s] INFO:colcon.colcon_core.shell:Creating environment hook '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/hook/ld_library_path_lib.sh'
+[0.685s] Level 1:colcon.colcon_core.environment:checking '/workspace/action_data_offset_posture_ws/install/bin'
+[0.685s] Level 1:colcon.colcon_core.shell:create_environment_hook('crb_ros_msg', 'path')
+[0.685s] INFO:colcon.colcon_core.shell:Creating environment hook '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/hook/path.ps1'
+[0.685s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/hook/path.dsv'
+[0.685s] INFO:colcon.colcon_core.shell:Creating environment hook '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/hook/path.sh'
+[0.686s] Level 1:colcon.colcon_core.environment:checking '/workspace/action_data_offset_posture_ws/install/lib/pkgconfig/crb_ros_msg.pc'
+[0.686s] Level 1:colcon.colcon_core.environment:checking '/workspace/action_data_offset_posture_ws/install/lib/python3.10/site-packages'
+[0.686s] Level 1:colcon.colcon_core.shell:create_environment_hook('crb_ros_msg', 'pythonpath')
+[0.686s] INFO:colcon.colcon_core.shell:Creating environment hook '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/hook/pythonpath.ps1'
+[0.686s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/hook/pythonpath.dsv'
+[0.687s] INFO:colcon.colcon_core.shell:Creating environment hook '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/hook/pythonpath.sh'
+[0.687s] Level 1:colcon.colcon_core.environment:checking '/workspace/action_data_offset_posture_ws/install/bin'
+[0.687s] Level 1:colcon.colcon_core.shell:create_environment_hook('crb_ros_msg', 'pythonscriptspath')
+[0.687s] INFO:colcon.colcon_core.shell:Creating environment hook '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/hook/pythonscriptspath.ps1'
+[0.687s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/hook/pythonscriptspath.dsv'
+[0.688s] INFO:colcon.colcon_core.shell:Creating environment hook '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/hook/pythonscriptspath.sh'
+[0.688s] INFO:colcon.colcon_core.shell:Creating package script '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/package.ps1'
+[0.689s] INFO:colcon.colcon_core.shell:Creating package descriptor '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/package.dsv'
+[0.690s] INFO:colcon.colcon_core.shell:Creating package script '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/package.sh'
+[0.693s] INFO:colcon.colcon_core.shell:Creating package script '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/package.bash'
+[0.694s] INFO:colcon.colcon_core.shell:Creating package script '/workspace/action_data_offset_posture_ws/install/share/crb_ros_msg/package.zsh'
+[0.695s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/workspace/action_data_offset_posture_ws/install/share/colcon-core/packages/crb_ros_msg)
+[0.883s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[0.883s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[0.883s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '1'
+[0.883s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[0.887s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.notify2': 'notify2' not found
+[0.888s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.notify_send': Could not find 'notify-send'
+[0.888s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[0.888s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[0.888s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[0.888s] INFO:colcon.colcon_core.shell:Creating prefix script '/workspace/action_data_offset_posture_ws/install/local_setup.ps1'
+[0.889s] INFO:colcon.colcon_core.shell:Creating prefix util module '/workspace/action_data_offset_posture_ws/install/_local_setup_util_ps1.py'
+[0.890s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/workspace/action_data_offset_posture_ws/install/setup.ps1'
+[0.891s] INFO:colcon.colcon_core.shell:Creating prefix script '/workspace/action_data_offset_posture_ws/install/local_setup.sh'
+[0.892s] INFO:colcon.colcon_core.shell:Creating prefix util module '/workspace/action_data_offset_posture_ws/install/_local_setup_util_sh.py'
+[0.892s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/workspace/action_data_offset_posture_ws/install/setup.sh'
+[0.893s] INFO:colcon.colcon_core.shell:Creating prefix script '/workspace/action_data_offset_posture_ws/install/local_setup.bash'
+[0.894s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/workspace/action_data_offset_posture_ws/install/setup.bash'
+[0.895s] INFO:colcon.colcon_core.shell:Creating prefix script '/workspace/action_data_offset_posture_ws/install/local_setup.zsh'
+[0.896s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/workspace/action_data_offset_posture_ws/install/setup.zsh'

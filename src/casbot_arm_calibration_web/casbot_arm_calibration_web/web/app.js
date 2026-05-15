@@ -443,15 +443,17 @@ document.getElementById("btn-calib-start")?.addEventListener("click", async () =
   ) {
     return;
   }
-  let debugEnabled = false;
+  let shouldRollbackDebug = false;
   try {
-    await postJson("/api/upper_body_debug", { enable: true });
-    debugEnabled = true;
+    const dbg = await postJson("/api/upper_body_debug", { enable: true });
+    if (!dbg.skipped) {
+      shouldRollbackDebug = true;
+    }
     await postJson("/api/calibration/start", { instruments });
     setCalibrationButtonsDisabled(true);
   } catch (e) {
     console.warn(e);
-    if (debugEnabled) {
+    if (shouldRollbackDebug) {
       try {
         await postJson("/api/upper_body_debug", { enable: false });
       } catch (e2) {
@@ -698,15 +700,17 @@ document.getElementById("btn-play-selected")?.addEventListener("click", async ()
   ) {
     return;
   }
-  let debugEnabled = false;
+  let shouldRollbackDebug = false;
   try {
-    await postJson("/api/upper_body_debug", { enable: true });
-    debugEnabled = true;
+    const dbg = await postJson("/api/upper_body_debug", { enable: true });
+    if (!dbg.skipped) {
+      shouldRollbackDebug = true;
+    }
     await postJson("/api/calibration/play_selected", body);
     setCalibrationButtonsDisabled(true);
   } catch (e) {
     console.warn(e);
-    if (debugEnabled) {
+    if (shouldRollbackDebug) {
       try {
         await postJson("/api/upper_body_debug", { enable: false });
       } catch (e2) {
@@ -1007,26 +1011,28 @@ document.getElementById("btn-band-play")?.addEventListener("click", async () => 
   const modeLabel = mode === "raw" ? "来源目录原数据（未做偏移）" : "已生成偏移数据";
   if (
     !(await modalConfirm(
-      "将先开启「上半身调试模式」，再按所选顺序串接播放（100Hz）。\n\n" +
+      "将先开启「上半身调试模式」（若已是开启状态则不再请求服务），再按所选顺序串接播放（100Hz）。\n\n" +
         `内容：${modeLabel}\n` +
         `片段数：${files.length}\n\n` +
-        "播放结束后将自动关闭上半身调试模式。\n\n" +
+        "播放结束后不会自动关闭上半身调试；需要时请手动点「关闭上半身调试模式」。\n\n" +
         "点击「确定」执行；「取消」则不执行。"
     ))
   ) {
     return;
   }
-  let debugEnabled = false;
+  let shouldRollbackDebug = false;
   try {
-    await postJson("/api/upper_body_debug", { enable: true });
-    debugEnabled = true;
+    const dbg = await postJson("/api/upper_body_debug", { enable: true });
+    if (!dbg.skipped) {
+      shouldRollbackDebug = true;
+    }
     await postJson("/api/band/play_sequence", { files });
     setCalibrationButtonsDisabled(true);
     await waitForCalibrationIdle();
     await refreshCalibrationPlaybackStatus();
   } catch (e) {
     console.warn("band play failed", e);
-    if (debugEnabled) {
+    if (shouldRollbackDebug) {
       try {
         await postJson("/api/upper_body_debug", { enable: false });
       } catch (e2) {
@@ -1037,7 +1043,7 @@ document.getElementById("btn-band-play")?.addEventListener("click", async () => 
   }
 });
 
-/* ================== 乐队多片段 csv 数据偏移生成播放（ActionPlay） ================== */
+/* ================== 乐队多片段 csv 数据偏移生成播放（joint_cmd 顺序播放） ================== */
 const bandCsvOrder = {
   paths: /** @type {string[]} */ ([]),
   items: /** @type {{path: string, name: string}[]} */ ([]),
@@ -1309,21 +1315,29 @@ document.getElementById("btn-band-csv-play")?.addEventListener("click", async ()
     }
   }
   const modeLabel = mode === "raw" ? "来源目录原数据（未做偏移）" : "已生成偏移数据";
+  const hzEl = document.querySelector('input[name="band-csv-joint-cmd-hz"]:checked');
+  const jointCmdHz = hzEl ? Number(hzEl.value) : 50;
+  if (jointCmdHz !== 50 && jointCmdHz !== 100) {
+    await modalAlert("请选择 joint_cmd 发布频率：50 Hz 或 100 Hz");
+    return;
+  }
   if (
     !(await modalConfirm(
-      "将按所选顺序依次发送 ActionPlay（后台执行，每段结束后自动发下一段）。\n\n" +
+      "将按所选顺序依次从 CSV 读取臂/指关节角，并通过 joint_cmd 在后台播放（每段之间可略有间隔）。\n\n" +
         `内容：${modeLabel}\n` +
-        `片段数：${files.length}\n\n` +
-        "请确保动作服务端已就绪；与标定轨迹 Web 播放互斥。\n\n" +
+        `片段数：${files.length}\n` +
+        `发布频率：${jointCmdHz} Hz → /upper_body_debug/joint_cmd\n\n` +
+        "请确认已打开上半身调试或允许页面自动开启；与标定轨迹 Web 播放互斥。\n" +
+        "顺序播放结束后不会自动关闭上半身调试。\n\n" +
         "点击「确定」执行；「取消」则不执行。"
     ))
   ) {
     return;
   }
   try {
-    await postJson("/api/band_csv/play_sequence", { files });
+    await postJson("/api/band_csv/play_sequence", { files, joint_cmd_hz: jointCmdHz });
     await modalAlert(
-      "已启动顺序播放任务（后台线程）。请查看终端日志中的 [band_csv] ActionPlay 与机器人状态。"
+      "已启动顺序播放任务（后台线程）。请查看终端日志中的 [band_csv] joint_cmd 与机器人状态。"
     );
   } catch (e) {
     console.warn("band_csv play failed", e);

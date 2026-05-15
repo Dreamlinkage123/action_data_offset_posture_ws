@@ -60,10 +60,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /workspace/action_data_offset_ws/src/crb_ros_msg
+CMAKE_SOURCE_DIR = /workspace/action_data_offset_posture_ws/src/crb_ros_msg
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg
+CMAKE_BINARY_DIR = /workspace/action_data_offset_posture_ws/build_aarch64/crb_ros_msg
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -145,9 +145,9 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/action_data_offset_posture_ws/build_aarch64/crb_ros_msg/CMakeFiles /workspace/action_data_offset_posture_ws/build_aarch64/crb_ros_msg//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/action_data_offset_posture_ws/build_aarch64/crb_ros_msg/CMakeFiles 0
 .PHONY : all
 
 # The main clean target

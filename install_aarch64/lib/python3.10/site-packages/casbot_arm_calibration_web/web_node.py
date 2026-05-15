@@ -4,6 +4,7 @@ ROS2 节点：提供 CASBOT 手臂位姿标定 Web 界面。
 
 - 上身调试：/motion/upper_body_debug (std_srvs/SetBool)
 - 标定轨迹：从 resource 读取 CSV，以 100Hz 发布 /upper_body_debug/joint_cmd (UpperJointData)
+- 乐队多片段 CSV 顺序播放：从用户 CSV 读取臂/指关节 position，按可配置频率发布同一 joint_cmd 话题
 """
 
 from __future__ import annotations
@@ -66,7 +67,14 @@ from casbot_arm_calibration_web.arm_cartesian_ik import (
     parse_joint_limits,
 )
 from casbot_arm_calibration_web.kin_pin_trac import KinematicsPinTrac
-from casbot_arm_calibration_web.calibration_data import JOINT_NAMES_PUBLISH, JOINTS_WITH_SUFFIX, load_calibration_trajectory
+from casbot_arm_calibration_web.calibration_data import (
+    JOINT_NAMES_PUBLISH,
+    JOINTS_WITH_SUFFIX,
+    count_arm_finger_columns_in_header,
+    load_calibration_trajectory,
+    merge_arm_finger_csv_row_into_full,
+    parse_trajectory_file,
+)
 from casbot_arm_calibration_web.offset_jacobian import format_offset_6, run_arm_trajectory_transform_jacobian
 from casbot_arm_calibration_web.trajectory_sources import (
     calibration_web_package_root,
@@ -86,6 +94,24 @@ INSTRUMENT_TO_SUBDIR = {
     "guitar": "guitar",
     "keyboard": "keyboard",
 }
+
+
+def _upper_debug_setbool_true_failure_treat_as_enabled(msg: str) -> bool:
+    """
+    部分现场在**已处于上半身调试**或内部拒绝切换时，仍对 ``SetBool(data=true)`` 返回 ``success=false``，
+    消息类似 ``Failed to switch to upper DEBUG mode``。此时应视为调试已可用，避免 Web 无法播轨迹。
+    """
+    m = (msg or "").strip().lower()
+    if not m:
+        return False
+    if "failed to switch" in m and "debug" in m:
+        return True
+    if "already" in m and ("upper" in m or "debug" in m or "body" in m):
+        return True
+    if "upper debug" in m and ("switch" in m or "fail" in m):
+        return True
+    return False
+
 
 # JOINTS_WITH_SUFFIX 中左/右臂 7 关节下标（头、腰之后，灵巧手之前）
 _LEFT_ARM_JOINT_INDICES = slice(3, 10)
@@ -682,7 +708,7 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
             with node._band_csv_state_lock:
                 if node._band_csv_playing:
                     return jsonify(
-                        {"ok": False, "message": "CSV Action 顺序播放中，请结束后再生成"}
+                        {"ok": False, "message": "乐队 CSV 顺序播放中，请结束后再生成"}
                     ), 409
             with node._traj_lock:
                 if node._playing:
@@ -802,12 +828,15 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
             with node._band_csv_state_lock:
                 if node._band_csv_playing:
                     return jsonify(
-                        {"ok": False, "message": "CSV Action 顺序播放中，请等待完成后再试"}
+                        {"ok": False, "message": "乐队 CSV 顺序播放中，请等待完成后再试"}
                     ), 409
             with node._traj_lock:
                 if node._playing:
                     return jsonify(
-                        {"ok": False, "message": "标定轨迹正在播放中，请等待完成后再试"}
+                        {
+                            "ok": False,
+                            "message": "其它轨迹正在播放中（含乐队 CSV joint_cmd），请等待完成后再试",
+                        }
                     ), 409
             concat_rows: List[List[float]] = []
             per_file_frames: List[Dict[str, Any]] = []
@@ -868,7 +897,7 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
             with node._band_csv_state_lock:
                 if node._band_csv_playing:
                     return jsonify(
-                        {"ok": False, "message": "CSV Action 顺序播放中，请结束后再生成"}
+                        {"ok": False, "message": "乐队 CSV 顺序播放中，请结束后再生成"}
                     ), 409
             with node._traj_lock:
                 if node._playing:
@@ -967,14 +996,17 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
 
     @app.post("/api/band_csv/play_sequence")
     def api_band_csv_play_sequence():
-        """按 ``files`` 绝对路径顺序，依次向 ``/motion/action/play`` 发送 ActionPlay（action_name = 无扩展名基名）。"""
+        """按 ``files`` 顺序读各 CSV 中手臂/手指关节 position，合入当前头腰反馈后发布 ``joint_cmd``。
+
+        请求体可选 ``joint_cmd_hz``：``50`` 或 ``100``（Hz）；缺省则用 ROS 参数 ``band_csv_play_joint_cmd_hz``（亦须为 50 或 100，否则按 50）。
+        """
         body = request.get_json(silent=True) or {}
-        node.get_logger().info(f"[Web][band_csv] Action 顺序播放: body={body!r}")
-        if node._action_play_client is None:
+        node.get_logger().info(f"[Web][band_csv] joint_cmd 顺序播放: body={body!r}")
+        if node._joint_pub is None or UpperJointData is None:
             return jsonify(
                 {
                     "ok": False,
-                    "message": "ActionPlay 不可用（请编译并 source crb_ros_msg）",
+                    "message": "joint_cmd 发布不可用（请编译并 source crb_ros_msg，检查 UpperJointData）",
                 }
             ), 503
         files = body.get("files") or []
@@ -991,18 +1023,94 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
                 return jsonify({"ok": False, "message": f"需要 .csv 文件: {p}"}), 400
             abs_list.append(p.resolve())
 
-        seg_info = [{"path": str(p), "action_name": p.stem} for p in abs_list]
+        raw_hz = body.get("joint_cmd_hz")
+        if raw_hz is not None and str(raw_hz).strip() != "":
+            try:
+                hz = float(raw_hz)
+            except (TypeError, ValueError):
+                return jsonify({"ok": False, "message": "joint_cmd_hz 须为数字"}), 400
+            if hz not in (50.0, 100.0):
+                return jsonify(
+                    {"ok": False, "message": "joint_cmd_hz 仅支持 50 或 100（Hz）"}
+                ), 400
+        else:
+            try:
+                hz = float(node.get_parameter("band_csv_play_joint_cmd_hz").value)
+            except Exception:
+                hz = 50.0
+            if hz not in (50.0, 100.0):
+                hz = 50.0
+        dt = 1.0 / hz
+        try:
+            pause_between = float(node.get_parameter("band_csv_play_pause_between_segments_sec").value)
+        except Exception:
+            pause_between = 0.15
+        pause_between = max(0.0, min(pause_between, 10.0))
+
+        seg_info: List[Dict[str, Any]] = []
+        for p in abs_list:
+            try:
+                hdr, rows = parse_trajectory_file(p)
+                n_arm = count_arm_finger_columns_in_header(hdr)
+            except Exception as ex:
+                return jsonify({"ok": False, "message": f"预读失败 {p}: {ex}"}), 400
+            if n_arm == 0:
+                return jsonify(
+                    {
+                        "ok": False,
+                        "message": f"CSV 无手臂/手指关节列（表头需为 ``*_joint`` 或 ``*_joint_pos``，如 left_shoulder_pitch_joint_pos）: {p}",
+                    }
+                ), 400
+            seg_info.append(
+                {
+                    "path": str(p),
+                    "frames": len(rows),
+                    "arm_finger_columns": n_arm,
+                }
+            )
 
         def _worker() -> None:
             try:
-                for p in abs_list:
-                    an = p.stem
-                    ok, msg = node._action_play_sync(an, node._band_csv_action_timeout_sec)
-                    node.get_logger().info(f"[band_csv] ActionPlay 片段: {an} ok={ok} {msg}")
-                    if not ok:
-                        node.get_logger().error(f"[band_csv] 顺序播放中止: {an} — {msg}")
+                auto_dbg = bool(
+                    node.get_parameter("band_csv_play_auto_enable_upper_body_debug").value
+                )
+                if auto_dbg:
+                    ok_dbg, msg_dbg, _skip = node.enable_upper_body_debug()
+                    if not ok_dbg:
+                        node.get_logger().error(
+                            f"[band_csv] 无法开启上半身调试，中止顺序播放: {msg_dbg}"
+                        )
+                        return
+                for si, p in enumerate(abs_list):
+                    if not rclpy.ok():
                         break
+                    try:
+                        header, rows = parse_trajectory_file(p)
+                    except Exception as ex:
+                        node.get_logger().error(f"[band_csv] 读取失败 {p}: {ex}")
+                        break
+                    n_arm = count_arm_finger_columns_in_header(header)
+                    if n_arm == 0:
+                        node.get_logger().error(f"[band_csv] 无臂/指列，中止: {p}")
+                        break
+                    node.get_logger().info(
+                        f"[band_csv] joint_cmd 播放 {p.name}: {len(rows)} 行 @ {hz:.1f}Hz, "
+                        f"覆盖 {n_arm} 个臂/指关节列（头/腰每帧跟关节反馈）"
+                    )
+                    for row in rows:
+                        if not rclpy.ok():
+                            break
+                        base, _, _ = node._baseline_vector_joint_states_then_last_cmd()
+                        full = merge_arm_finger_csv_row_into_full(header, row, base)
+                        node._publish_joint_cmd(full)
+                        time.sleep(dt)
+                    if si + 1 < len(abs_list) and pause_between > 0.0:
+                        time.sleep(pause_between)
+                node.get_logger().info("[band_csv] joint_cmd 顺序播放线程结束")
             finally:
+                with node._traj_lock:
+                    node._playing = False
+                    node._traj_mode = ""
                 with node._band_csv_state_lock:
                     node._band_csv_playing = False
 
@@ -1010,18 +1118,31 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
             with node._band_csv_state_lock:
                 if node._band_csv_playing:
                     return jsonify(
-                        {"ok": False, "message": "CSV Action 顺序播放已在进行中"}
+                        {"ok": False, "message": "乐队 CSV 顺序播放已在进行中"}
                     ), 409
             with node._traj_lock:
                 if node._playing:
                     return jsonify(
-                        {"ok": False, "message": "标定轨迹正在播放中，请等待完成后再试"}
+                        {
+                            "ok": False,
+                            "message": "标定或其它轨迹正在播放中，请等待完成后再试",
+                        }
                     ), 409
+                node._playing = True
+                node._traj_mode = "band_csv_joint_cmd"
             with node._band_csv_state_lock:
                 node._band_csv_playing = True
             threading.Thread(target=_worker, daemon=True).start()
 
-        return jsonify({"ok": True, "started": True, "segments": seg_info})
+        return jsonify(
+            {
+                "ok": True,
+                "started": True,
+                "hz": hz,
+                "joint_cmd_topic": str(node.get_parameter("joint_cmd_topic").value),
+                "segments": seg_info,
+            }
+        )
 
     @app.post("/api/upper_body_debug")
     def api_upper_body_debug():
@@ -1031,6 +1152,25 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
             return jsonify({"ok": False, "message": "缺少 enable"}), 400
         enable = bool(body["enable"])
         with _api_lock:
+            if enable and node._upper_body_debug_enabled_local:
+                node.get_logger().info(
+                    "[Web] 上半身调试已为开启，跳过重复调用 /motion/upper_body_debug(true)"
+                )
+                return jsonify(
+                    {
+                        "ok": True,
+                        "message": "上半身调试已是开启状态，未重复调用服务",
+                        "skipped": True,
+                    }
+                )
+            if (not enable) and (not node._upper_body_debug_enabled_local):
+                return jsonify(
+                    {
+                        "ok": True,
+                        "message": "上半身调试已是关闭状态，未重复调用服务",
+                        "skipped": True,
+                    }
+                )
             if not node._debug_cli.wait_for_service(timeout_sec=2.0):
                 return jsonify({"ok": False, "message": "服务 /motion/upper_body_debug 不可用"}), 503
             req = SetBool.Request()
@@ -1045,9 +1185,23 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
             if resp is None:
                 return jsonify({"ok": False, "message": "服务无响应"}), 503
             if not resp.success:
-                return jsonify({"ok": False, "message": resp.message or "服务返回失败"}), 500
+                msg = str(resp.message or "服务返回失败")
+                if enable and _upper_debug_setbool_true_failure_treat_as_enabled(msg):
+                    node.get_logger().warn(
+                        f"[Web] SetBool(true) 返回失败，按上半身调试已可用处理（可继续播轨迹）: {msg}"
+                    )
+                    node._upper_body_debug_enabled_local = True
+                    return jsonify(
+                        {
+                            "ok": True,
+                            "message": msg,
+                            "skipped": True,
+                            "assumed_enabled_from_service_message": True,
+                        }
+                    )
+                return jsonify({"ok": False, "message": msg}), 500
             node._upper_body_debug_enabled_local = enable
-            return jsonify({"ok": True, "message": resp.message or "ok"})
+            return jsonify({"ok": True, "message": resp.message or "ok", "skipped": False})
 
     @app.post("/api/calibration/start")
     def api_calibration_start():
@@ -1112,6 +1266,10 @@ class ArmCalibrationWebNode(Node):
         self.declare_parameter("port", 8080)
         self.declare_parameter("action_play_topic", "/motion/action/play")
         self.declare_parameter("band_csv_action_timeout_sec", 7200.0)
+        # 乐队 CSV「按顺序播放」默认发布频率（Hz）；仅允许 50 或 100；前端可在请求体传 joint_cmd_hz 覆盖
+        self.declare_parameter("band_csv_play_joint_cmd_hz", 50.0)
+        self.declare_parameter("band_csv_play_pause_between_segments_sec", 0.15)
+        self.declare_parameter("band_csv_play_auto_enable_upper_body_debug", True)
         # 空字符串：使用 share/casbot_arm_calibration_web/urdf/<默认 .urdf>（见 _package_urdf_dir）
         self.declare_parameter("robot_urdf_path", "")
         self.declare_parameter("joint_states_topic", "/joint_states")
@@ -1271,7 +1429,7 @@ class ArmCalibrationWebNode(Node):
 
         self._resource_root = _resource_root()
         self._debug_cli = self.create_client(SetBool, "/motion/upper_body_debug")
-        # 与 /api/upper_body_debug、刷新初始值、band 自动关调试同步；为 True 时刷新不再重复 SetBool(true)
+        # 与 /api/upper_body_debug、刷新初始值同步；为 True 时刷新不再重复 SetBool(true)
         self._upper_body_debug_enabled_local: bool = False
 
         self._band_csv_playing = False
@@ -2721,7 +2879,14 @@ class ArmCalibrationWebNode(Node):
         if resp is None:
             return False, "服务无响应", False
         if not resp.success:
-            return False, str(resp.message or "服务返回失败"), False
+            msg = str(resp.message or "服务返回失败")
+            if _upper_debug_setbool_true_failure_treat_as_enabled(msg):
+                self.get_logger().warn(
+                    f"SetBool(true) 返回失败，按上半身调试已可用处理: {msg}"
+                )
+                self._upper_body_debug_enabled_local = True
+                return True, msg, False
+            return False, msg, False
         self._upper_body_debug_enabled_local = True
         return True, str(resp.message or "ok"), False
 
@@ -2936,49 +3101,9 @@ class ArmCalibrationWebNode(Node):
             self._write_initial_ee_rpy_from_current_display_locked()
         return True
 
-    def _schedule_upper_body_debug_off_after_band_play(self) -> None:
-        """乐队顺序播放结束后自动关闭上半身调试（异步，避免阻塞 100Hz 定时器）。"""
-
-        def wait_fut(fut, timeout_sec: float = 5.0) -> bool:
-            t0 = time.time()
-            while rclpy.ok() and not fut.done() and (time.time() - t0) < timeout_sec:
-                time.sleep(0.01)
-            return fut.done()
-
-        def run() -> None:
-            if not rclpy.ok():
-                return
-            if not self._debug_cli.wait_for_service(timeout_sec=3.0):
-                self.get_logger().warn(
-                    "[band] 播放结束：/motion/upper_body_debug 不可用，未自动关闭调试"
-                )
-                return
-            req = SetBool.Request()
-            req.data = False
-            fut = self._debug_cli.call_async(req)
-            if not wait_fut(fut, timeout_sec=5.0):
-                self.get_logger().warn("[band] 播放结束：关闭上半身调试调用超时")
-                return
-            try:
-                resp = fut.result()
-            except Exception as ex:
-                self.get_logger().warn(f"[band] 播放结束：关闭上半身调试异常: {ex}")
-                return
-            if resp and resp.success:
-                self._upper_body_debug_enabled_local = False
-                self.get_logger().info("[band] 顺序播放已结束，已自动关闭上半身调试模式")
-            else:
-                self.get_logger().warn(
-                    f"[band] 播放结束：关闭上半身调试失败: "
-                    f"{getattr(resp, 'message', '') or 'unknown'}"
-                )
-
-        threading.Thread(target=run, daemon=True).start()
-
     def _on_timer_100hz(self) -> None:
         row: Optional[List[float]] = None
         finished_start_playback = False
-        finished_band_playback = False
         with self._traj_lock:
             if not self._playing or not self._traj_rows:
                 return
@@ -2993,8 +3118,6 @@ class ArmCalibrationWebNode(Node):
                 self._playing = False
                 if self._traj_mode == "start":
                     finished_start_playback = True
-                elif self._traj_mode == "band_play":
-                    finished_band_playback = True
                 self._traj_mode = ""
                 self._clear_jog_fk_display_override()
         if row is not None:
@@ -3022,8 +3145,6 @@ class ArmCalibrationWebNode(Node):
                     )
 
             threading.Thread(target=settle_then_snapshot_initial_from_joint_states, daemon=True).start()
-        if finished_band_playback:
-            self._schedule_upper_body_debug_off_after_band_play()
 
 
 def main(args: list | None = None) -> None:

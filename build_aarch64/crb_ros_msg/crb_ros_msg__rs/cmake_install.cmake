@@ -1,8 +1,8 @@
-# Install script for directory: /workspace/action_data_offset_ws/build_aarch64/crb_ros_msg/crb_ros_msg__rs
+# Install script for directory: /workspace/action_data_offset_posture_ws/build_aarch64/crb_ros_msg/crb_ros_msg__rs
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/workspace/action_data_offset_ws/install")
+  set(CMAKE_INSTALL_PREFIX "/workspace/action_data_offset_posture_ws/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
