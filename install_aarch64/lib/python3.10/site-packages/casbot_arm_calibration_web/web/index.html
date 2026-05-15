@@ -527,6 +527,9 @@
       </p>
       <div class="trajectory-row trajectory-actions">
         <button type="button" id="btn-band-play" class="btn-ctrl">按顺序播放</button>
+        <button type="button" id="btn-band-pause-toggle" class="btn-ctrl" disabled title="仅在「乐队 .data 顺序播放」进行中可用">
+          暂停
+        </button>
       </div>
     </section>
     <section class="trajectory-panel band-panel">
@@ -616,11 +619,15 @@
         顺序播放从各 CSV 读取<strong>手臂与手指</strong>关节的 position 列（表头可为
         <code>left_shoulder_pitch_joint</code> 或乐队采集常用的 <code>left_shoulder_pitch_joint_pos</code>；不读
         <code>*_vel</code>），每帧与当前头/腰关节反馈合成全身向量后，按上方所选频率发布到
-        <code>/upper_body_debug/joint_cmd</code>（<code>UpperJointData</code>）。未在页面选择时由 ROS 参数
+        <code>/upper_body_debug/joint_cmd</code>（<code>UpperJointData</code>）。每段会先<strong>预读全部帧</strong>写入临时臂/指
+        txt 再按 txt 播放（参数 <code>band_csv_play_frame_txt_dir</code>、<code>band_csv_play_keep_frame_txt</code>）。未在页面选择时由 ROS 参数
         <code>band_csv_play_joint_cmd_hz</code>（仅 50 或 100）决定。播放前可自动开启上半身调试；顺序播放结束后不自动关闭调试。与标定 Web 轨迹播放互斥。
       </p>
       <div class="trajectory-row trajectory-actions">
         <button type="button" id="btn-band-csv-play" class="btn-ctrl">按顺序播放</button>
+        <button type="button" id="btn-band-csv-pause-toggle" class="btn-ctrl" disabled title="仅在「乐队 CSV 顺序播放」进行中可用">
+          暂停
+        </button>
       </div>
     </section>
     <p class="page-footer-note pose-section-hint">

@@ -417,12 +417,42 @@ function setCalibrationButtonsDisabled(playing) {
   }
 }
 
+function updateBandSequencePauseButtons(st) {
+  const bandData = st.playing === true && st.traj_mode === "band_play";
+  const csvOn = st.band_csv_playing === true;
+  const paused = st.band_sequence_paused === true;
+  const label = paused ? "继续" : "暂停";
+  const btnBand = document.getElementById("btn-band-pause-toggle");
+  const btnCsv = document.getElementById("btn-band-csv-pause-toggle");
+  if (btnBand) {
+    btnBand.textContent = label;
+    btnBand.disabled = !bandData;
+    btnBand.title = bandData
+      ? paused
+        ? "从当前帧继续下发轨迹"
+        : "暂停：停止下发，从当前帧继续"
+      : "仅在「乐队多片段 .data 顺序播放」进行中可用";
+  }
+  if (btnCsv) {
+    btnCsv.textContent = label;
+    btnCsv.disabled = !csvOn;
+    btnCsv.title = csvOn
+      ? paused
+        ? "从当前帧继续下发 joint_cmd"
+        : "暂停：停止下发，从当前帧继续"
+      : "仅在「乐队 CSV 顺序播放」进行中可用";
+  }
+}
+
 async function refreshCalibrationPlaybackStatus() {
   try {
     const r = await fetch("/api/calibration/status");
     const j = await r.json();
     if (j.ok && typeof j.playing === "boolean") {
       setCalibrationButtonsDisabled(j.playing);
+    }
+    if (j.ok) {
+      updateBandSequencePauseButtons(j);
     }
   } catch (_) {
     /* 忽略轮询失败 */
@@ -1043,6 +1073,24 @@ document.getElementById("btn-band-play")?.addEventListener("click", async () => 
   }
 });
 
+async function postBandPlaybackPauseToggle() {
+  await postJson("/api/band/playback_pause_toggle", {});
+  const r = await fetch("/api/calibration/status");
+  const st = await r.json();
+  if (st.ok) {
+    updateBandSequencePauseButtons(st);
+  }
+}
+
+document.getElementById("btn-band-pause-toggle")?.addEventListener("click", async () => {
+  try {
+    await postBandPlaybackPauseToggle();
+  } catch (e) {
+    console.warn("band pause toggle failed", e);
+    await modalAlert(e.message || String(e));
+  }
+});
+
 /* ================== 乐队多片段 csv 数据偏移生成播放（joint_cmd 顺序播放） ================== */
 const bandCsvOrder = {
   paths: /** @type {string[]} */ ([]),
@@ -1342,6 +1390,15 @@ document.getElementById("btn-band-csv-play")?.addEventListener("click", async ()
   } catch (e) {
     console.warn("band_csv play failed", e);
     await modalAlert(`播放失败：${e.message || String(e)}`);
+  }
+});
+
+document.getElementById("btn-band-csv-pause-toggle")?.addEventListener("click", async () => {
+  try {
+    await postBandPlaybackPauseToggle();
+  } catch (e) {
+    console.warn("band_csv pause toggle failed", e);
+    await modalAlert(e.message || String(e));
   }
 });
 

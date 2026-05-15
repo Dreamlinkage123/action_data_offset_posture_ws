@@ -129,6 +129,35 @@ def count_arm_finger_columns_in_header(header: Sequence[str]) -> int:
     return n
 
 
+def extract_arm_finger_row_vector(header: Sequence[str], row: Sequence[float]) -> List[float]:
+    """一行 CSV 在 ``JOINTS_ARM_FINGER_SUFFIX`` 顺序下的臂/指关节角（弧度）；缺列 0.0。"""
+    idx = _header_index_map(header)
+    out: List[float] = []
+    for jn in JOINTS_ARM_FINGER_SUFFIX:
+        col = column_index_for_joint_position(idx, jn)
+        if col is None or col >= len(row):
+            out.append(0.0)
+        else:
+            out.append(float(row[col]))
+    return out
+
+
+def merge_arm_finger_values_into_full(
+    arm_finger: Sequence[float], full_base: Sequence[float]
+) -> List[float]:
+    """把与 ``JOINTS_ARM_FINGER_SUFFIX`` 等长的臂/指向量写入 ``full_base`` 对应槽位。"""
+    if len(arm_finger) != len(JOINTS_ARM_FINGER_SUFFIX):
+        raise ValueError(
+            f"臂/指向量长度应为 {len(JOINTS_ARM_FINGER_SUFFIX)}，实际 {len(arm_finger)}"
+        )
+    out = [float(x) for x in full_base]
+    for i, jn in enumerate(JOINTS_ARM_FINGER_SUFFIX):
+        ji = _JOINT_NAME_TO_INDEX[jn]
+        if ji < len(out):
+            out[ji] = float(arm_finger[i])
+    return out
+
+
 def merge_arm_finger_csv_row_into_full(
     header: Sequence[str],
     csv_row: Sequence[float],
@@ -140,14 +169,39 @@ def merge_arm_finger_csv_row_into_full(
 
     表头可为 ``left_shoulder_pitch_joint`` 或 ``left_shoulder_pitch_joint_pos``；不读取 ``*_vel``。
     """
-    idx = _header_index_map(header)
-    out = [float(x) for x in full_base]
-    for jn in JOINTS_ARM_FINGER_SUFFIX:
-        col = column_index_for_joint_position(idx, jn)
-        if col is None or col >= len(csv_row):
-            continue
-        ji = _JOINT_NAME_TO_INDEX.get(jn)
-        if ji is None or ji >= len(out):
-            continue
-        out[ji] = float(csv_row[col])
+    v = extract_arm_finger_row_vector(header, csv_row)
+    return merge_arm_finger_values_into_full(v, full_base)
+
+
+ARM_FINGER_TXT_MAGIC = "# casbot_band_arm_finger_v1"
+
+
+def write_arm_finger_frames_txt(path: Path, frames: Sequence[Sequence[float]]) -> None:
+    """将多帧臂/指数据写入文本：首行为 magic 元数据，之后每行 ``dim`` 个空格分隔浮点数。"""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    dim = len(JOINTS_ARM_FINGER_SUFFIX)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(f"{ARM_FINGER_TXT_MAGIC} n={len(frames)} dim={dim}\n")
+        for fr in frames:
+            if len(fr) != dim:
+                raise ValueError(f"帧长度 {len(fr)} != {dim}")
+            f.write(" ".join(f"{float(x):.9g}" for x in fr) + "\n")
+
+
+def read_arm_finger_frames_txt(path: Path) -> List[List[float]]:
+    """读取 :func:`write_arm_finger_frames_txt` 生成的文件，返回帧列表。"""
+    dim = len(JOINTS_ARM_FINGER_SUFFIX)
+    out: List[List[float]] = []
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            s = line.strip()
+            if not s or s.startswith("#"):
+                continue
+            parts = s.split()
+            vals = [float(x) for x in parts]
+            if len(vals) != dim:
+                raise ValueError(
+                    f"臂/指 txt 行宽度 {len(vals)} != {dim}（{path}）"
+                )
+            out.append(vals)
     return out

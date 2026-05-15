@@ -14,8 +14,10 @@ import math
 import re
 import shutil
 import socket
+import tempfile
 import threading
 import time
+import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -71,9 +73,12 @@ from casbot_arm_calibration_web.calibration_data import (
     JOINT_NAMES_PUBLISH,
     JOINTS_WITH_SUFFIX,
     count_arm_finger_columns_in_header,
+    extract_arm_finger_row_vector,
     load_calibration_trajectory,
-    merge_arm_finger_csv_row_into_full,
+    merge_arm_finger_values_into_full,
     parse_trajectory_file,
+    read_arm_finger_frames_txt,
+    write_arm_finger_frames_txt,
 )
 from casbot_arm_calibration_web.offset_jacobian import format_offset_6, run_arm_trajectory_transform_jacobian
 from casbot_arm_calibration_web.trajectory_sources import (
@@ -116,6 +121,8 @@ def _upper_debug_setbool_true_failure_treat_as_enabled(msg: str) -> bool:
 # JOINTS_WITH_SUFFIX 中左/右臂 7 关节下标（头、腰之后，灵巧手之前）
 _LEFT_ARM_JOINT_INDICES = slice(3, 10)
 _RIGHT_ARM_JOINT_INDICES = slice(10, 17)
+# 灵巧手关节下标（双臂 14 个臂关节之后）；乐队暂停示教时保持为暂停帧中的指令角
+_FINGER_JOINT_INDEX_START = 17
 # 单臂示教：这些关节不用 /joint_states 覆盖 base_full（与对侧臂一同保持 hold），与标定末帧后一致，减轻只动一侧时另一侧腕 mm 级视在偏
 _JOG_SYNC_SKIP_FROM_JOINT_STATES_NAMES = frozenset(
     ("head_yaw_joint", "head_pitch_joint", "waist_yaw_joint")
@@ -283,8 +290,9 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
         )
         with _api_lock:
             with node._traj_lock:
-                if node._playing:
-                    return jsonify({"ok": False, "message": "有轨迹正在播放，请等待播完后再点击"}), 409
+                playing = node._playing
+            if playing and not node._band_paused_for_editing():
+                return jsonify({"ok": False, "message": "有轨迹正在播放，请等待播完后再点击"}), 409
             ok, message, extra = node.adjust_arm_cartesian(side, axis, direction, step_mm)
         if not ok:
             return jsonify({"ok": False, "message": message}), 400
@@ -306,8 +314,9 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
         )
         with _api_lock:
             with node._traj_lock:
-                if node._playing:
-                    return jsonify({"ok": False, "message": "有轨迹正在播放，请等待播完后再点击"}), 409
+                playing = node._playing
+            if playing and not node._band_paused_for_editing():
+                return jsonify({"ok": False, "message": "有轨迹正在播放，请等待播完后再点击"}), 409
             ok, message, extra = node.adjust_arm_cartesian_rotate(side, axis, direction, step_deg)
         if not ok:
             return jsonify({"ok": False, "message": message}), 400
@@ -386,6 +395,9 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
                 node._traj_index = 0
                 node._playing = True
                 node._traj_mode = "start" if mode.startswith("resource") else "custom_play"
+                node._band_sequence_paused = False
+                node._band_play_resume_snapshot = None
+                node._jog_followup_restore_band_csv = False
             return jsonify({"ok": True, "frames": len(rows)})
 
     @app.post("/api/save")
@@ -603,12 +615,61 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
             playing = node._playing
             total = len(node._traj_rows)
             idx = node._traj_index
+            mode = node._traj_mode
+            paused = node._band_sequence_paused
+            csv_seg_idx = node._band_csv_segment_frame_idx
+            csv_seg_tot = node._band_csv_segment_frame_total
+        with node._band_csv_state_lock:
+            csv_playing = node._band_csv_playing
         return jsonify(
             {
                 "ok": True,
                 "playing": playing,
                 "frames_total": total,
                 "frames_sent": idx,
+                "traj_mode": mode,
+                "band_sequence_paused": paused,
+                "band_csv_playing": csv_playing,
+                "band_csv_segment_frame_index": csv_seg_idx,
+                "band_csv_segment_frames_total": csv_seg_tot,
+            }
+        )
+
+    @app.post("/api/band/playback_pause_toggle")
+    def api_band_playback_pause_toggle():
+        """乐队 .data 顺序播放（定时器）或乐队 CSV 顺序播放（线程）期间切换暂停/继续。"""
+        with node._traj_lock:
+            band_data = node._playing and node._traj_mode == "band_play"
+            traj_mode = node._traj_mode
+        with node._band_csv_state_lock:
+            csv_on = node._band_csv_playing
+        if not band_data and not csv_on:
+            return jsonify(
+                {
+                    "ok": False,
+                    "message": "当前没有乐队顺序播放任务（.data 或 CSV）",
+                }
+            ), 409
+        with node._traj_lock:
+            node._band_sequence_paused = not node._band_sequence_paused
+            paused = node._band_sequence_paused
+            traj_idx = node._traj_index
+            traj_total = len(node._traj_rows)
+            csv_idx = node._band_csv_segment_frame_idx
+            csv_tot = node._band_csv_segment_frame_total
+        node.get_logger().info(
+            f"[Web][band] 播放暂停切换: paused={paused} "
+            f"(band_play idx={traj_idx}/{traj_total}, csv seg={csv_idx}/{csv_tot})"
+        )
+        return jsonify(
+            {
+                "ok": True,
+                "paused": paused,
+                "traj_mode": traj_mode,
+                "band_play_frame_index": traj_idx if band_data else None,
+                "band_play_frames_total": traj_total if band_data else None,
+                "band_csv_frame_index": csv_idx if csv_on else None,
+                "band_csv_segment_frames_total": csv_tot if csv_on else None,
             }
         )
 
@@ -854,6 +915,9 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
                 node._traj_index = 0
                 node._playing = True
                 node._traj_mode = "band_play"
+                node._band_sequence_paused = False
+                node._band_play_resume_snapshot = None
+                node._jog_followup_restore_band_csv = False
             return jsonify(
                 {
                     "ok": True,
@@ -998,7 +1062,9 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
     def api_band_csv_play_sequence():
         """按 ``files`` 顺序读各 CSV 中手臂/手指关节 position，合入当前头腰反馈后发布 ``joint_cmd``。
 
-        请求体可选 ``joint_cmd_hz``：``50`` 或 ``100``（Hz）；缺省则用 ROS 参数 ``band_csv_play_joint_cmd_hz``（亦须为 50 或 100，否则按 50）。
+        每段 CSV 会先**预读全部数据帧**写入臂/指缓存 txt，再从 txt 逐帧播放，避免长 CSV 边解析边
+        ``sleep`` 导致节律漂移、主观「丢帧」。请求体可选 ``joint_cmd_hz``：``50`` 或 ``100``（Hz）；
+        缺省则用 ROS 参数 ``band_csv_play_joint_cmd_hz``（亦须为 50 或 100，否则按 50）。
         """
         body = request.get_json(silent=True) or {}
         node.get_logger().info(f"[Web][band_csv] joint_cmd 顺序播放: body={body!r}")
@@ -1093,17 +1159,80 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
                     if n_arm == 0:
                         node.get_logger().error(f"[band_csv] 无臂/指列，中止: {p}")
                         break
+                    frame_vecs: List[List[float]] = []
+                    for row in rows:
+                        frame_vecs.append(extract_arm_finger_row_vector(header, row))
+                    cache_dir_raw = str(
+                        node.get_parameter("band_csv_play_frame_txt_dir").value
+                    ).strip()
+                    cache_dir = (
+                        Path(cache_dir_raw).expanduser()
+                        if cache_dir_raw
+                        else Path(tempfile.gettempdir())
+                    )
+                    cache_dir.mkdir(parents=True, exist_ok=True)
+                    cache_path = (
+                        cache_dir
+                        / f"band_armfinger_{uuid.uuid4().hex[:10]}_{p.stem}.txt"
+                    )
+                    write_arm_finger_frames_txt(cache_path, frame_vecs)
                     node.get_logger().info(
-                        f"[band_csv] joint_cmd 播放 {p.name}: {len(rows)} 行 @ {hz:.1f}Hz, "
+                        f"[band_csv] 臂/指帧已写入 txt（{len(frame_vecs)} 帧）: {cache_path}"
+                    )
+                    try:
+                        playback = read_arm_finger_frames_txt(cache_path)
+                    except Exception as ex:
+                        node.get_logger().error(f"[band_csv] txt 回读失败 {cache_path}: {ex}")
+                        try:
+                            cache_path.unlink(missing_ok=True)
+                        except Exception:
+                            pass
+                        break
+                    if len(playback) != len(frame_vecs):
+                        node.get_logger().error(
+                            f"[band_csv] txt 帧数 {len(playback)} 与预读 {len(frame_vecs)} 不一致"
+                        )
+                        try:
+                            cache_path.unlink(missing_ok=True)
+                        except Exception:
+                            pass
+                        break
+                    node.get_logger().info(
+                        f"[band_csv] 自 txt 播放 {p.name}: {len(playback)} 帧 @ {hz:.1f}Hz, "
                         f"覆盖 {n_arm} 个臂/指关节列（头/腰每帧跟关节反馈）"
                     )
-                    for row in rows:
-                        if not rclpy.ok():
-                            break
-                        base, _, _ = node._baseline_vector_joint_states_then_last_cmd()
-                        full = merge_arm_finger_csv_row_into_full(header, row, base)
-                        node._publish_joint_cmd(full)
-                        time.sleep(dt)
+                    try:
+                        n_pb = len(playback)
+                        fi = 0
+                        while fi < n_pb:
+                            if not rclpy.ok():
+                                break
+                            while rclpy.ok():
+                                with node._traj_lock:
+                                    if not node._band_sequence_paused:
+                                        break
+                                time.sleep(0.05)
+                            if not rclpy.ok():
+                                break
+                            fv = playback[fi]
+                            with node._traj_lock:
+                                node._band_csv_segment_frame_total = n_pb
+                                node._band_csv_segment_frame_idx = fi
+                            base, _, _ = node._baseline_vector_joint_states_then_last_cmd()
+                            full = merge_arm_finger_values_into_full(fv, base)
+                            node._publish_joint_cmd(full)
+                            time.sleep(dt)
+                            fi += 1
+                    finally:
+                        if not bool(
+                            node.get_parameter("band_csv_play_keep_frame_txt").value
+                        ):
+                            try:
+                                cache_path.unlink(missing_ok=True)
+                            except Exception as ex:
+                                node.get_logger().warn(
+                                    f"[band_csv] 删除缓存 txt 失败: {cache_path} — {ex}"
+                                )
                     if si + 1 < len(abs_list) and pause_between > 0.0:
                         time.sleep(pause_between)
                 node.get_logger().info("[band_csv] joint_cmd 顺序播放线程结束")
@@ -1111,6 +1240,11 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
                 with node._traj_lock:
                     node._playing = False
                     node._traj_mode = ""
+                    node._band_sequence_paused = False
+                    node._band_csv_segment_frame_idx = 0
+                    node._band_csv_segment_frame_total = 0
+                    node._band_play_resume_snapshot = None
+                    node._jog_followup_restore_band_csv = False
                 with node._band_csv_state_lock:
                     node._band_csv_playing = False
 
@@ -1130,6 +1264,13 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
                     ), 409
                 node._playing = True
                 node._traj_mode = "band_csv_joint_cmd"
+                node._band_sequence_paused = False
+                node._band_csv_segment_frame_idx = 0
+                node._band_csv_segment_frame_total = 0
+                node._band_play_resume_snapshot = None
+                node._jog_followup_restore_band_csv = False
+                node._traj_rows = []
+                node._traj_index = 0
             with node._band_csv_state_lock:
                 node._band_csv_playing = True
             threading.Thread(target=_worker, daemon=True).start()
@@ -1227,6 +1368,9 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
                 node._traj_index = 0
                 node._playing = True
                 node._traj_mode = "start"
+                node._band_sequence_paused = False
+                node._band_play_resume_snapshot = None
+                node._jog_followup_restore_band_csv = False
             return jsonify({"ok": True, "frames": len(rows)})
 
     @app.post("/api/calibration/end")
@@ -1253,6 +1397,9 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
                 node._traj_index = 0
                 node._playing = True
                 node._traj_mode = "end"
+                node._band_sequence_paused = False
+                node._band_play_resume_snapshot = None
+                node._jog_followup_restore_band_csv = False
             return jsonify({"ok": True, "frames": len(rows)})
 
     return app
@@ -1270,6 +1417,9 @@ class ArmCalibrationWebNode(Node):
         self.declare_parameter("band_csv_play_joint_cmd_hz", 50.0)
         self.declare_parameter("band_csv_play_pause_between_segments_sec", 0.15)
         self.declare_parameter("band_csv_play_auto_enable_upper_body_debug", True)
+        # 顺序播放：臂/指帧先写入该目录下 txt 再从 txt 读回播放（空字符串则用系统临时目录）
+        self.declare_parameter("band_csv_play_frame_txt_dir", "")
+        self.declare_parameter("band_csv_play_keep_frame_txt", False)
         # 空字符串：使用 share/casbot_arm_calibration_web/urdf/<默认 .urdf>（见 _package_urdf_dir）
         self.declare_parameter("robot_urdf_path", "")
         self.declare_parameter("joint_states_topic", "/joint_states")
@@ -1471,6 +1621,13 @@ class ArmCalibrationWebNode(Node):
         self._traj_index = 0
         self._playing = False
         self._traj_mode: str = ""  # 当前播放来源：start | end | ""
+        self._band_sequence_paused: bool = False
+        self._band_csv_segment_frame_idx: int = 0
+        self._band_csv_segment_frame_total: int = 0
+        # 乐队 .data 暂停期间切入笛卡尔示教：备份串接轨迹以便示教结束后恢复暂停态
+        self._band_play_resume_snapshot: Optional[Tuple[List[List[float]], int]] = None
+        # 从「乐队 CSV 暂停」切入 jog 结束时需恢复 _playing/_traj_mode（避免嵌套锁读 _band_csv_playing）
+        self._jog_followup_restore_band_csv: bool = False
 
         self._recent_generated_offset_lock = threading.Lock()
         self._recent_generated_offset_rels: List[str] = []
@@ -2034,6 +2191,21 @@ class ArmCalibrationWebNode(Node):
         with self._fk_lock:
             self._last_joint_cmd_positions = pos
 
+    def _band_paused_for_editing(self) -> bool:
+        """乐队 .data 或 CSV 顺序播放已暂停时，可在该 hold 姿态下刷新初值与单臂笛卡尔示教。"""
+        with self._traj_lock:
+            paused = self._band_sequence_paused
+            mode = self._traj_mode
+        with self._band_csv_state_lock:
+            csv_on = self._band_csv_playing
+        if not paused:
+            return False
+        if mode == "band_play":
+            return True
+        if mode == "band_csv_joint_cmd" and csv_on:
+            return True
+        return False
+
     def _baseline_vector_joint_states_then_last_cmd(self) -> Tuple[List[float], int, int]:
         """
         与 ``JOINTS_WITH_SUFFIX`` 同序：每关节优先 ``/joint_states`` 缓存，否则上一条 ``joint_cmd``。
@@ -2107,6 +2279,8 @@ class ArmCalibrationWebNode(Node):
         base_full: List[float],
         operating_side: str,
         cache: Dict[str, float],
+        *,
+        hold_fingers_from_baseline: bool = False,
     ) -> None:
         """
         单臂示教前：除操作侧 7 个臂关节外，凡 /joint_states 里有的关节一律写成当前反馈。
@@ -2115,7 +2289,9 @@ class ArmCalibrationWebNode(Node):
         单臂笛卡尔示教一致，避免对侧腕 XYZ 随编码器微抖被写进 ``UpperJointData``，以及 Pin
         全模型种子中对侧角抖动导致本侧「纯 Y」出现 X/Z 分量。
 
-        **头、腰**与**对侧 7 臂**均不覆盖：保持 hold，避免外部 topic 只动一侧后首段示教用反馈微差经运动学树传到对侧腕。**灵巧手**仍用反馈对齐。
+        **头、腰**与**对侧 7 臂**均不覆盖：保持 hold，避免外部 topic 只动一侧后首段示教用反馈微差经运动学树传到对侧腕。
+        默认 **灵巧手** 仍用反馈对齐；若 ``hold_fingers_from_baseline=True``（乐队暂停中示教），
+        双手手指保持 ``base_full`` 中暂停帧的指令角，与 CSV/轨迹最后一帧一致。
         """
         if len(base_full) != len(JOINTS_WITH_SUFFIX):
             return
@@ -2132,6 +2308,8 @@ class ArmCalibrationWebNode(Node):
             if keep.start <= i < keep.stop:
                 continue
             if opp.start <= i < opp.stop:
+                continue
+            if hold_fingers_from_baseline and i >= _FINGER_JOINT_INDEX_START:
                 continue
             if jn in _JOG_SYNC_SKIP_FROM_JOINT_STATES_NAMES:
                 continue
@@ -2352,6 +2530,8 @@ class ArmCalibrationWebNode(Node):
         if not self._fk_ok or self._fk is None:
             return False, "URDF FK 未加载，无法做笛卡尔 IK", None
 
+        band_paused = self._band_paused_for_editing()
+
         # base_link 系下位移，单位 0.1 mm
         sgn = 1.0 if direction == "+" else -1.0
         mag_01mm = float(step_mm) * 10.0 * sgn
@@ -2379,7 +2559,9 @@ class ArmCalibrationWebNode(Node):
         base_full = list(self._compose_jog_publish_baseline(base_hold, side_l))
         with self._fk_lock:
             cache = dict(self._joint_positions_by_name)
-        self._sync_joint_states_into_base_full_except_operating_arm(base_full, side_l, cache)
+        self._sync_joint_states_into_base_full_except_operating_arm(
+            base_full, side_l, cache, hold_fingers_from_baseline=band_paused
+        )
         missing = [jn for jn in arm_names if jn not in cache]
         if missing:
             return False, f"joint_states 缺少{arm_label}关节: {missing}", None
@@ -2589,13 +2771,23 @@ class ArmCalibrationWebNode(Node):
                 jog_rows.append(list(row))
 
         with self._traj_lock:
-            if self._playing:
+            if self._playing and not band_paused:
                 return False, "有轨迹正在播放，请稍后再试", None
+            snap: Optional[Tuple[List[List[float]], int]] = None
+            if band_paused and self._traj_mode == "band_play":
+                snap = ([list(r) for r in self._traj_rows], int(self._traj_index))
+            self._jog_followup_restore_band_csv = bool(
+                band_paused and self._traj_mode == "band_csv_joint_cmd"
+            )
             self._setup_jog_fk_display_overrides(side_l, base_full, chain_q_base)
             self._traj_rows = jog_rows
             self._traj_index = 0
             self._playing = True
             self._traj_mode = "jog"
+            self._band_play_resume_snapshot = snap
+            if not band_paused:
+                self._band_sequence_paused = False
+                self._jog_followup_restore_band_csv = False
 
         duration_s = len(jog_rows) * 0.01
         cartesian_speed_mms = (
@@ -2656,6 +2848,8 @@ class ArmCalibrationWebNode(Node):
         if not self._fk_ok or self._fk is None:
             return False, "URDF FK 未加载，无法做笛卡尔 IK", None
 
+        band_paused = self._band_paused_for_editing()
+
         sgn = 1.0 if direction == "+" else -1.0
         total_angle_rad = math.radians(step_q) * sgn
         step_angle_rad = math.radians(float(self._jog_rot_step_deg_per_waypoint))
@@ -2679,7 +2873,9 @@ class ArmCalibrationWebNode(Node):
         base_full = list(self._compose_jog_publish_baseline(base_hold, side_l))
         with self._fk_lock:
             cache = dict(self._joint_positions_by_name)
-        self._sync_joint_states_into_base_full_except_operating_arm(base_full, side_l, cache)
+        self._sync_joint_states_into_base_full_except_operating_arm(
+            base_full, side_l, cache, hold_fingers_from_baseline=band_paused
+        )
         missing = [jn for jn in arm_names if jn not in cache]
         if missing:
             return False, f"joint_states 缺少{arm_label}关节: {missing}", None
@@ -2816,13 +3012,23 @@ class ArmCalibrationWebNode(Node):
                 jog_rows.append(list(row))
 
         with self._traj_lock:
-            if self._playing:
+            if self._playing and not band_paused:
                 return False, "有轨迹正在播放，请稍后再试", None
+            snap: Optional[Tuple[List[List[float]], int]] = None
+            if band_paused and self._traj_mode == "band_play":
+                snap = ([list(r) for r in self._traj_rows], int(self._traj_index))
+            self._jog_followup_restore_band_csv = bool(
+                band_paused and self._traj_mode == "band_csv_joint_cmd"
+            )
             self._setup_jog_fk_display_overrides(side_l, base_full, chain_q_base)
             self._traj_rows = jog_rows
             self._traj_index = 0
             self._playing = True
             self._traj_mode = "jog"
+            self._band_play_resume_snapshot = snap
+            if not band_paused:
+                self._band_sequence_paused = False
+                self._jog_followup_restore_band_csv = False
 
         duration_s = len(jog_rows) * 0.01
         msg = (
@@ -2936,9 +3142,10 @@ class ArmCalibrationWebNode(Node):
         side_l = str(side).strip().lower()
         if side_l not in ("left", "right"):
             return False, "side 应为 left 或 right", None
+        band_edit = self._band_paused_for_editing()
         with self._traj_lock:
             busy = self._playing
-        if busy:
+        if busy and not band_edit:
             return False, "有轨迹或示教正在执行，请等待结束后再刷新初始值", None
 
         with self._fk_lock:
@@ -2976,7 +3183,24 @@ class ArmCalibrationWebNode(Node):
                     None,
                 )
 
-        baseline, n_js, n_fb = self._baseline_vector_joint_states_then_last_cmd()
+        if band_edit:
+            with self._fk_lock:
+                last_cmd = (
+                    list(self._last_joint_cmd_positions)
+                    if self._last_joint_cmd_positions is not None
+                    else None
+                )
+            if last_cmd is not None and len(last_cmd) == len(JOINTS_WITH_SUFFIX):
+                baseline = last_cmd
+                n_js, n_fb = 0, 0
+                self.get_logger().info(
+                    "[Web] 乐队暂停中刷新初始值：示教基线采用暂停前最后一帧 joint_cmd（含双臂与手指），"
+                    "避免用 /joint_states 重力差替代暂停位姿"
+                )
+            else:
+                baseline, n_js, n_fb = self._baseline_vector_joint_states_then_last_cmd()
+        else:
+            baseline, n_js, n_fb = self._baseline_vector_joint_states_then_last_cmd()
         n_merge = max(0, int(self.get_parameter("jog_hold_baseline_feedback_merges_after_refresh").value))
         with self._fk_lock:
             if not (self._fk_pose_ready and self._fk_ok):
@@ -3105,21 +3329,56 @@ class ArmCalibrationWebNode(Node):
         row: Optional[List[float]] = None
         finished_start_playback = False
         with self._traj_lock:
-            if not self._playing or not self._traj_rows:
+            if not self._playing:
+                return
+            # 乐队 CSV 仅由后台线程按节拍发 joint_cmd；此处若仍遍历旧 _traj_rows（上次 .data 串接
+            # 或 jog 残留），会与 CSV 并发下发，表现为暂停后双臂「继续播」且示教起点错乱。
+            if self._traj_mode == "band_csv_joint_cmd":
+                return
+            if not self._traj_rows:
                 return
             if self._traj_index >= len(self._traj_rows):
                 self._playing = False
                 self._traj_mode = ""
+                self._band_sequence_paused = False
+                self._band_play_resume_snapshot = None
+                self._jog_followup_restore_band_csv = False
                 self._clear_jog_fk_display_override()
+                return
+            if self._traj_mode == "band_play" and self._band_sequence_paused:
                 return
             row = self._traj_rows[self._traj_index]
             self._traj_index += 1
             if self._traj_index >= len(self._traj_rows):
-                self._playing = False
-                if self._traj_mode == "start":
-                    finished_start_playback = True
-                self._traj_mode = ""
-                self._clear_jog_fk_display_override()
+                if self._traj_mode == "jog" and self._band_play_resume_snapshot is not None:
+                    rows, idx = self._band_play_resume_snapshot
+                    self._band_play_resume_snapshot = None
+                    self._traj_rows = rows
+                    self._traj_index = idx
+                    self._traj_mode = "band_play"
+                    self._playing = True
+                    self._band_sequence_paused = True
+                    self._jog_followup_restore_band_csv = False
+                    self._clear_jog_fk_display_override()
+                else:
+                    finished_flag = self._traj_mode == "start"
+                    was_jog = self._traj_mode == "jog"
+                    self._playing = False
+                    if finished_flag:
+                        finished_start_playback = True
+                    self._traj_mode = ""
+                    self._band_play_resume_snapshot = None
+                    self._clear_jog_fk_display_override()
+                    if was_jog and self._jog_followup_restore_band_csv:
+                        self._jog_followup_restore_band_csv = False
+                        self._playing = True
+                        self._traj_mode = "band_csv_joint_cmd"
+                        self._traj_rows = []
+                        self._traj_index = 0
+                    else:
+                        self._band_sequence_paused = False
+                        if was_jog:
+                            self._jog_followup_restore_band_csv = False
         if row is not None:
             self._publish_joint_cmd(row)
         if finished_start_playback:
