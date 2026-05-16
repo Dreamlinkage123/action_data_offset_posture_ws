@@ -94,3 +94,44 @@ def extract_upper_body_rows(header: Sequence[str], rows: Sequence[Sequence[float
 def load_calibration_trajectory(path: Path) -> List[List[float]]:
     h, r = parse_trajectory_file(path)
     return extract_upper_body_rows(h, r)
+
+
+def extract_upper_body_rows_flexible(
+    header: Sequence[str], rows: Sequence[Sequence[float]]
+) -> List[List[float]]:
+    """按 JOINTS_WITH_SUFFIX 从每行抽取位置；支持列名带 _pos 后缀（如 left_shoulder_pitch_joint_pos）。
+
+    优先精确匹配；若无精确匹配则尝试去掉 _pos 后缀匹配。
+    """
+    # Build lookup: joint_name -> column index
+    idx: Dict[str, int] = {}
+    for i, h in enumerate(header):
+        h_clean = h.strip()
+        if h_clean in idx:
+            continue
+        idx[h_clean] = i
+        # Also register without _pos suffix if applicable
+        if h_clean.endswith("_pos"):
+            base = h_clean[:-4]
+            if base not in idx:
+                idx[base] = i
+    out: List[List[float]] = []
+    for row in rows:
+        vals = []
+        for jname in JOINTS_WITH_SUFFIX:
+            ii = idx.get(jname)
+            if ii is None:
+                # Try with _pos suffix
+                ii = idx.get(jname + "_pos")
+            if ii is None or ii >= len(row):
+                vals.append(0.0)
+            else:
+                vals.append(float(row[ii]))
+        out.append(vals)
+    return out
+
+
+def load_calibration_trajectory_flexible(path: Path) -> List[List[float]]:
+    """读取 CSV 轨迹文件，兼容列名带 _pos 后缀的格式。"""
+    h, r = parse_trajectory_file(path)
+    return extract_upper_body_rows_flexible(h, r)

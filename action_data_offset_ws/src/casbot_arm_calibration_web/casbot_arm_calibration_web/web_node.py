@@ -60,7 +60,7 @@ from casbot_arm_calibration_web.arm_cartesian_ik import (
     parse_joint_limits,
 )
 from casbot_arm_calibration_web.kin_pin_trac import KinematicsPinTrac
-from casbot_arm_calibration_web.calibration_data import JOINT_NAMES_PUBLISH, JOINTS_WITH_SUFFIX, load_calibration_trajectory
+from casbot_arm_calibration_web.calibration_data import JOINT_NAMES_PUBLISH, JOINTS_WITH_SUFFIX, load_calibration_trajectory, load_calibration_trajectory_flexible
 from casbot_arm_calibration_web.offset_jacobian import format_offset_6, run_arm_trajectory_transform_jacobian
 from casbot_arm_calibration_web.trajectory_sources import (
     calibration_web_package_root,
@@ -221,7 +221,7 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
         )
         with _api_lock:
             with node._traj_lock:
-                if node._playing:
+                if node._playing and not node._is_band_playback_paused():
                     return jsonify({"ok": False, "message": "有轨迹正在播放，请等待播完后再点击"}), 409
             ok, message, extra = node.adjust_arm_cartesian(side, axis, direction, step_mm)
         if not ok:
@@ -244,7 +244,7 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
         )
         with _api_lock:
             with node._traj_lock:
-                if node._playing:
+                if node._playing and not node._is_band_playback_paused():
                     return jsonify({"ok": False, "message": "有轨迹正在播放，请等待播完后再点击"}), 409
             ok, message, extra = node.adjust_arm_cartesian_rotate(side, axis, direction, step_deg)
         if not ok:
@@ -541,12 +541,24 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
             playing = node._playing
             total = len(node._traj_rows)
             idx = node._traj_index
+            traj_mode = node._traj_mode
+            paused = (
+                node._band_play_paused
+                if traj_mode == "band_play"
+                else node._band_csv_play_paused
+                if traj_mode == "band_csv_play"
+                else False
+            )
+            freq_hz = node._band_play_freq_hz
         return jsonify(
             {
                 "ok": True,
                 "playing": playing,
                 "frames_total": total,
                 "frames_sent": idx,
+                "paused": paused,
+                "traj_mode": traj_mode,
+                "freq_hz": freq_hz,
             }
         )
 
@@ -603,6 +615,26 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
             )
         except Exception:
             return []
+
+    def _generate_playback_txt(
+        node: "ArmCalibrationWebNode",
+        rows: List[List[float]],
+        save_dir: str,
+    ) -> Path:
+        """将关节位置数据帧写入带时间戳的 TXT 文件，每行空格分隔。"""
+        import datetime
+
+        save_p = Path(save_dir).expanduser()
+        save_p.mkdir(parents=True, exist_ok=True)
+        ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        txt_path = save_p / f"band_csv_playback_{ts}.txt"
+        with open(txt_path, "w", encoding="utf-8") as f:
+            for row in rows:
+                f.write(" ".join(str(v) for v in row) + "\n")
+        node.get_logger().info(
+            f"[band_csv] TXT 轨迹文件已生成: {txt_path} ({len(rows)} 帧)"
+        )
+        return txt_path
 
     @app.post("/api/band/list_dir")
     def api_band_list_dir():
@@ -766,7 +798,7 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
             with node._band_csv_state_lock:
                 if node._band_csv_playing:
                     return jsonify(
-                        {"ok": False, "message": "CSV Action 顺序播放中，请等待完成后再试"}
+                        {"ok": False, "message": "CSV 顺序播放中，请等待完成后再试"}
                     ), 409
             with node._traj_lock:
                 if node._playing:
@@ -789,6 +821,8 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
                 node._traj_index = 0
                 node._playing = True
                 node._traj_mode = "band_play"
+                node._band_play_paused = False
+                node._band_play_tick_counter = 0
             return jsonify(
                 {
                     "ok": True,
@@ -796,6 +830,45 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
                     "segments": per_file_frames,
                 }
             )
+
+    @app.post("/api/band/pause")
+    def api_band_pause():
+        """切换暂停/继续：暂停时停止发送关节命令但保留当前帧位置，继续时从暂停帧恢复。"""
+        with node._traj_lock:
+            if not node._playing or node._traj_mode != "band_play":
+                return jsonify(
+                    {
+                        "ok": False,
+                        "message": "当前未在乐队顺序播放中",
+                        "paused": False,
+                        "frame_index": 0,
+                    }
+                ), 409
+            node._band_play_paused = not node._band_play_paused
+            return jsonify(
+                {
+                    "ok": True,
+                    "paused": node._band_play_paused,
+                    "frame_index": node._traj_index,
+                    "frames_total": len(node._traj_rows),
+                }
+            )
+
+    @app.post("/api/band/set_frequency")
+    def api_band_set_frequency():
+        """设置乐队播放发布频率（Hz）。"""
+        body = request.get_json(silent=True) or {}
+        try:
+            hz = int(body.get("hz", 100))
+        except (TypeError, ValueError):
+            return jsonify({"ok": False, "message": "hz 必须为整数"}), 400
+        if hz not in (50, 100):
+            return jsonify({"ok": False, "message": "hz 仅支持 50 或 100"}), 400
+        with node._traj_lock:
+            node._band_play_freq_hz = hz
+            node._band_play_tick_counter = 0
+        node.get_logger().info(f"[Web][band] 发布频率已设置为 {hz} Hz")
+        return jsonify({"ok": True, "freq_hz": hz})
 
     @app.post("/api/band_csv/list_dir")
     def api_band_csv_list_dir():
@@ -931,16 +1004,10 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
 
     @app.post("/api/band_csv/play_sequence")
     def api_band_csv_play_sequence():
-        """按 ``files`` 绝对路径顺序，依次向 ``/motion/action/play`` 发送 ActionPlay（action_name = 无扩展名基名）。"""
+        """读取 CSV 文件的手臂关节和手指关节 position 数据帧，生成 TXT 文件，
+        从 TXT 文件读取数据后通过 /upper_body_debug/joint_cmd 顺序播放。"""
         body = request.get_json(silent=True) or {}
-        node.get_logger().info(f"[Web][band_csv] Action 顺序播放: body={body!r}")
-        if node._action_play_client is None:
-            return jsonify(
-                {
-                    "ok": False,
-                    "message": "ActionPlay 不可用（请编译并 source crb_ros_msg）",
-                }
-            ), 503
+        node.get_logger().info(f"[Web][band_csv] 顺序播放: body={body!r}")
         files = body.get("files") or []
         if not isinstance(files, list) or not files:
             return jsonify({"ok": False, "message": "files 为空"}), 400
@@ -955,37 +1022,92 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
                 return jsonify({"ok": False, "message": f"需要 .csv 文件: {p}"}), 400
             abs_list.append(p.resolve())
 
-        seg_info = [{"path": str(p), "action_name": p.stem} for p in abs_list]
-
-        def _worker() -> None:
-            try:
-                for p in abs_list:
-                    an = p.stem
-                    ok, msg = node._action_play_sync(an, node._band_csv_action_timeout_sec)
-                    node.get_logger().info(f"[band_csv] ActionPlay 片段: {an} ok={ok} {msg}")
-                    if not ok:
-                        node.get_logger().error(f"[band_csv] 顺序播放中止: {an} — {msg}")
-                        break
-            finally:
-                with node._band_csv_state_lock:
-                    node._band_csv_playing = False
+        save_dir = str(body.get("save_dir", "")).strip()
+        if not save_dir:
+            save_dir = str(abs_list[0].parent) if abs_list else "/tmp"
 
         with _api_lock:
             with node._band_csv_state_lock:
                 if node._band_csv_playing:
                     return jsonify(
-                        {"ok": False, "message": "CSV Action 顺序播放已在进行中"}
+                        {"ok": False, "message": "CSV 顺序播放已在进行中"}
                     ), 409
             with node._traj_lock:
                 if node._playing:
                     return jsonify(
                         {"ok": False, "message": "标定轨迹正在播放中，请等待完成后再试"}
                     ), 409
+
+            # Step 1: 用 flexible 解析读取 CSV（兼容 _pos 后缀列名）
+            concat_rows: List[List[float]] = []
+            per_file_frames: List[Dict[str, Any]] = []
+            for p in abs_list:
+                try:
+                    rows = load_calibration_trajectory_flexible(p)
+                except Exception as ex:
+                    return jsonify({"ok": False, "message": f"读取失败 {p}: {ex}"}), 400
+                if not rows:
+                    return jsonify({"ok": False, "message": f"轨迹为空: {p}"}), 400
+                per_file_frames.append({"path": str(p), "frames": len(rows)})
+                concat_rows.extend(rows)
+
+            # Step 2: 生成 TXT 文件（每行空格分隔的关节位置值）
+            txt_path = _generate_playback_txt(node, concat_rows, save_dir)
+
+            # Step 3: 从 TXT 文件读取数据用于播放
+            playback_rows: List[List[float]] = []
+            with open(txt_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    playback_rows.append([float(x) for x in line.split()])
+            node.get_logger().info(
+                f"[band_csv] 从 TXT 读取 {len(playback_rows)} 帧用于播放"
+            )
+
+            with node._traj_lock:
+                node._traj_rows = playback_rows
+                node._traj_index = 0
+                node._playing = True
+                node._traj_mode = "band_csv_play"
+                node._band_csv_play_paused = False
+                node._band_play_tick_counter = 0
+
             with node._band_csv_state_lock:
                 node._band_csv_playing = True
-            threading.Thread(target=_worker, daemon=True).start()
 
-        return jsonify({"ok": True, "started": True, "segments": seg_info})
+        return jsonify(
+            {
+                "ok": True,
+                "frames": len(playback_rows),
+                "segments": per_file_frames,
+                "txt_file": str(txt_path),
+            }
+        )
+
+    @app.post("/api/band_csv/pause")
+    def api_band_csv_pause():
+        """切换暂停/继续：暂停时停止发送关节命令但保留当前帧位置，继续时从暂停帧恢复。"""
+        with node._traj_lock:
+            if not node._playing or node._traj_mode != "band_csv_play":
+                return jsonify(
+                    {
+                        "ok": False,
+                        "message": "当前未在 CSV 乐队顺序播放中",
+                        "paused": False,
+                        "frame_index": 0,
+                    }
+                ), 409
+            node._band_csv_play_paused = not node._band_csv_play_paused
+            return jsonify(
+                {
+                    "ok": True,
+                    "paused": node._band_csv_play_paused,
+                    "frame_index": node._traj_index,
+                    "frames_total": len(node._traj_rows),
+                }
+            )
 
     @app.post("/api/upper_body_debug")
     def api_upper_body_debug():
@@ -995,6 +1117,8 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
             return jsonify({"ok": False, "message": "缺少 enable"}), 400
         enable = bool(body["enable"])
         with _api_lock:
+            if enable and node._upper_body_debug_enabled:
+                return jsonify({"ok": True, "message": "上半身调试已开启，跳过重复请求"})
             if not node._debug_cli.wait_for_service(timeout_sec=2.0):
                 return jsonify({"ok": False, "message": "服务 /motion/upper_body_debug 不可用"}), 503
             req = SetBool.Request()
@@ -1010,6 +1134,7 @@ def create_app(node: "ArmCalibrationWebNode") -> Flask:
                 return jsonify({"ok": False, "message": "服务无响应"}), 503
             if not resp.success:
                 return jsonify({"ok": False, "message": resp.message or "服务返回失败"}), 500
+            node._upper_body_debug_enabled = enable
             return jsonify({"ok": True, "message": resp.message or "ok"})
 
     @app.post("/api/calibration/start")
@@ -1236,6 +1361,11 @@ class ArmCalibrationWebNode(Node):
         self._traj_index = 0
         self._playing = False
         self._traj_mode: str = ""  # 当前播放来源：start | end | ""
+        self._band_play_paused = False
+        self._band_csv_play_paused = False
+        self._band_play_freq_hz = 100
+        self._band_play_tick_counter = 0
+        self._upper_body_debug_enabled = False
 
         self._recent_generated_offset_lock = threading.Lock()
         self._recent_generated_offset_rels: List[str] = []
@@ -2039,8 +2169,15 @@ class ArmCalibrationWebNode(Node):
                 jog_rows.append(row)
 
         with self._traj_lock:
-            if self._playing:
+            if self._playing and not self._is_band_playback_paused():
                 return False, "有轨迹正在播放，请稍后再试", None
+            # 暂停状态下进行示教时，清除乐队播放状态
+            if self._is_band_playback_paused():
+                self._band_play_paused = False
+                self._band_csv_play_paused = False
+                with self._band_csv_state_lock:
+                    self._band_csv_playing = False
+                self.get_logger().info("[jog] 乐队播放已暂停，示教将接管轨迹队列")
             self._traj_rows = jog_rows
             self._traj_index = 0
             self._playing = True
@@ -2253,8 +2390,15 @@ class ArmCalibrationWebNode(Node):
                 jog_rows.append(row)
 
         with self._traj_lock:
-            if self._playing:
+            if self._playing and not self._is_band_playback_paused():
                 return False, "有轨迹正在播放，请稍后再试", None
+            # 暂停状态下进行示教时，清除乐队播放状态
+            if self._is_band_playback_paused():
+                self._band_play_paused = False
+                self._band_csv_play_paused = False
+                with self._band_csv_state_lock:
+                    self._band_csv_playing = False
+                self.get_logger().info("[jog] 乐队播放已暂停，示教将接管轨迹队列")
             self._traj_rows = jog_rows
             self._traj_index = 0
             self._playing = True
@@ -2349,69 +2493,49 @@ class ArmCalibrationWebNode(Node):
 
         threading.Thread(target=run, daemon=True).start()
 
-    def _schedule_upper_body_debug_off_after_band_play(self) -> None:
-        """乐队顺序播放结束后自动关闭上半身调试（异步，避免阻塞 100Hz 定时器）。"""
-
-        def wait_fut(fut, timeout_sec: float = 5.0) -> bool:
-            t0 = time.time()
-            while rclpy.ok() and not fut.done() and (time.time() - t0) < timeout_sec:
-                time.sleep(0.01)
-            return fut.done()
-
-        def run() -> None:
-            if not rclpy.ok():
-                return
-            if not self._debug_cli.wait_for_service(timeout_sec=3.0):
-                self.get_logger().warn(
-                    "[band] 播放结束：/motion/upper_body_debug 不可用，未自动关闭调试"
-                )
-                return
-            req = SetBool.Request()
-            req.data = False
-            fut = self._debug_cli.call_async(req)
-            if not wait_fut(fut, timeout_sec=5.0):
-                self.get_logger().warn("[band] 播放结束：关闭上半身调试调用超时")
-                return
-            try:
-                resp = fut.result()
-            except Exception as ex:
-                self.get_logger().warn(f"[band] 播放结束：关闭上半身调试异常: {ex}")
-                return
-            if resp and resp.success:
-                self.get_logger().info("[band] 顺序播放已结束，已自动关闭上半身调试模式")
-            else:
-                self.get_logger().warn(
-                    f"[band] 播放结束：关闭上半身调试失败: "
-                    f"{getattr(resp, 'message', '') or 'unknown'}"
-                )
-
-        threading.Thread(target=run, daemon=True).start()
+    def _is_band_playback_paused(self) -> bool:
+        """乐队顺序播放是否处于暂停状态。"""
+        return (
+            self._traj_mode == "band_play"
+            and self._band_play_paused
+        ) or (
+            self._traj_mode == "band_csv_play"
+            and self._band_csv_play_paused
+        )
 
     def _on_timer_100hz(self) -> None:
         row: Optional[List[float]] = None
         finished_start_playback = False
-        finished_band_playback = False
         with self._traj_lock:
             if not self._playing or not self._traj_rows:
                 return
             if self._traj_index >= len(self._traj_rows):
                 self._playing = False
                 return
+            # Pause check: skip publishing but keep index
+            if self._traj_mode == "band_play" and self._band_play_paused:
+                return
+            if self._traj_mode == "band_csv_play" and self._band_csv_play_paused:
+                return
+            # Frequency gating for band play modes
+            if self._traj_mode in ("band_play", "band_csv_play"):
+                self._band_play_tick_counter += 1
+                if self._band_play_freq_hz == 50 and self._band_play_tick_counter % 2 != 0:
+                    return
             row = self._traj_rows[self._traj_index]
             self._traj_index += 1
             if self._traj_index >= len(self._traj_rows):
                 self._playing = False
                 if self._traj_mode == "start":
                     finished_start_playback = True
-                elif self._traj_mode == "band_play":
-                    finished_band_playback = True
+                elif self._traj_mode in ("band_play", "band_csv_play"):
+                    with self._band_csv_state_lock:
+                        self._band_csv_playing = False
                 self._traj_mode = ""
         if row is not None:
             self._publish_joint_cmd(row)
         if finished_start_playback:
             self._schedule_initial_ee_after_start_calibration()
-        if finished_band_playback:
-            self._schedule_upper_body_debug_off_after_band_play()
 
 
 def main(args: list | None = None) -> None:

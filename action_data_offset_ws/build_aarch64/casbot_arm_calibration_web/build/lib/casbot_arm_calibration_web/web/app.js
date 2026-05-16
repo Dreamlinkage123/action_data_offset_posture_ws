@@ -423,6 +423,30 @@ async function refreshCalibrationPlaybackStatus() {
     const j = await r.json();
     if (j.ok && typeof j.playing === "boolean") {
       setCalibrationButtonsDisabled(j.playing);
+      const trajMode = j.traj_mode || "";
+      if (trajMode === "band_play") {
+        setBandPlayButtonsDisabled(j.playing);
+        const pauseBtn = document.getElementById("btn-band-pause");
+        if (pauseBtn) {
+          pauseBtn.textContent = j.paused ? "继续" : "暂停";
+        }
+      } else if (trajMode === "band_csv_play") {
+        setBandCsvPlayButtonsDisabled(j.playing);
+        const pauseBtn = document.getElementById("btn-band-csv-pause");
+        if (pauseBtn) {
+          pauseBtn.textContent = j.paused ? "继续" : "暂停";
+        }
+      } else if (!j.playing) {
+        // Reset all band buttons when nothing is playing
+        const bandPlay = document.getElementById("btn-band-play");
+        const bandPause = document.getElementById("btn-band-pause");
+        const csvPlay = document.getElementById("btn-band-csv-play");
+        const csvPause = document.getElementById("btn-band-csv-pause");
+        if (bandPlay) bandPlay.disabled = false;
+        if (bandPause) { bandPause.disabled = true; bandPause.textContent = "暂停"; }
+        if (csvPlay) csvPlay.disabled = false;
+        if (csvPause) { csvPause.disabled = true; csvPause.textContent = "暂停"; }
+      }
     }
   } catch (_) {
     /* 忽略轮询失败 */
@@ -1004,40 +1028,68 @@ document.getElementById("btn-band-play")?.addEventListener("click", async () => 
       return;
     }
   }
+  const freqEl = document.getElementById("band-play-freq");
+  const freqHz = freqEl ? parseInt(freqEl.value, 10) || 100 : 100;
   const modeLabel = mode === "raw" ? "来源目录原数据（未做偏移）" : "已生成偏移数据";
   if (
     !(await modalConfirm(
-      "将先开启「上半身调试模式」，再按所选顺序串接播放（100Hz）。\n\n" +
+      "将开启「上半身调试模式」（如已开启则跳过），再按所选顺序串接播放。\n\n" +
         `内容：${modeLabel}\n` +
-        `片段数：${files.length}\n\n` +
-        "播放结束后将自动关闭上半身调试模式。\n\n" +
+        `片段数：${files.length}\n` +
+        `发布频率：${freqHz} Hz\n\n` +
+        "播放结束后不会自动关闭上半身调试模式。\n\n" +
         "点击「确定」执行；「取消」则不执行。"
     ))
   ) {
     return;
   }
-  let debugEnabled = false;
   try {
+    await postJson("/api/band/set_frequency", { hz: freqHz });
     await postJson("/api/upper_body_debug", { enable: true });
-    debugEnabled = true;
     await postJson("/api/band/play_sequence", { files });
-    setCalibrationButtonsDisabled(true);
+    setBandPlayButtonsDisabled(true);
     await waitForCalibrationIdle();
     await refreshCalibrationPlaybackStatus();
   } catch (e) {
     console.warn("band play failed", e);
-    if (debugEnabled) {
-      try {
-        await postJson("/api/upper_body_debug", { enable: false });
-      } catch (e2) {
-        console.warn("回滚关闭上半身调试失败", e2);
-      }
-    }
     await modalAlert(`播放失败：${e.message || String(e)}`);
   }
 });
 
-/* ================== 乐队多片段 csv 数据偏移生成播放（ActionPlay） ================== */
+document.getElementById("btn-band-pause")?.addEventListener("click", async () => {
+  const btn = document.getElementById("btn-band-pause");
+  try {
+    const j = await postJson("/api/band/pause", {});
+    if (btn) {
+      btn.textContent = j.paused ? "继续" : "暂停";
+    }
+  } catch (e) {
+    console.warn("band pause failed", e);
+    await modalAlert(`暂停操作失败：${e.message || String(e)}`);
+  }
+});
+
+document.getElementById("band-play-freq")?.addEventListener("change", async (e) => {
+  const hz = parseInt(e.target.value, 10) || 100;
+  try {
+    await postJson("/api/band/set_frequency", { hz });
+  } catch (err) {
+    console.warn("set frequency failed", err);
+  }
+});
+
+function setBandPlayButtonsDisabled(playing) {
+  const playBtn = document.getElementById("btn-band-play");
+  const pauseBtn = document.getElementById("btn-band-pause");
+  const csvPlayBtn = document.getElementById("btn-band-csv-play");
+  const csvPauseBtn = document.getElementById("btn-band-csv-pause");
+  if (playBtn) playBtn.disabled = playing;
+  if (pauseBtn) pauseBtn.disabled = !playing;
+  if (csvPlayBtn) csvPlayBtn.disabled = playing;
+  if (csvPauseBtn) csvPauseBtn.disabled = true;
+}
+
+/* ================== 乐队多片段 csv 数据偏移生成播放（/upper_body_debug/joint_cmd） ================== */
 const bandCsvOrder = {
   paths: /** @type {string[]} */ ([]),
   items: /** @type {{path: string, name: string}[]} */ ([]),
@@ -1308,28 +1360,68 @@ document.getElementById("btn-band-csv-play")?.addEventListener("click", async ()
       return;
     }
   }
+  const freqEl = document.getElementById("band-csv-play-freq");
+  const freqHz = freqEl ? parseInt(freqEl.value, 10) || 100 : 100;
+  const saveDir = getBandCsvSaveDirOrEmpty();
   const modeLabel = mode === "raw" ? "来源目录原数据（未做偏移）" : "已生成偏移数据";
   if (
     !(await modalConfirm(
-      "将按所选顺序依次发送 ActionPlay（后台执行，每段结束后自动发下一段）。\n\n" +
+      "将读取 CSV 数据生成 TXT 文件，再按所选顺序串接播放。\n\n" +
         `内容：${modeLabel}\n` +
-        `片段数：${files.length}\n\n` +
-        "请确保动作服务端已就绪；与标定轨迹 Web 播放互斥。\n\n" +
+        `片段数：${files.length}\n` +
+        `发布频率：${freqHz} Hz\n\n` +
+        "将开启「上半身调试模式」（如已开启则跳过），播放结束后不会自动关闭。\n\n" +
         "点击「确定」执行；「取消」则不执行。"
     ))
   ) {
     return;
   }
   try {
-    await postJson("/api/band_csv/play_sequence", { files });
-    await modalAlert(
-      "已启动顺序播放任务（后台线程）。请查看终端日志中的 [band_csv] ActionPlay 与机器人状态。"
-    );
+    await postJson("/api/band/set_frequency", { hz: freqHz });
+    await postJson("/api/upper_body_debug", { enable: true });
+    const j = await postJson("/api/band_csv/play_sequence", { files, save_dir: saveDir });
+    console.info("CSV band play started, txt:", j.txt_file, "frames:", j.frames);
+    setBandCsvPlayButtonsDisabled(true);
+    await waitForCalibrationIdle();
+    await refreshCalibrationPlaybackStatus();
   } catch (e) {
     console.warn("band_csv play failed", e);
     await modalAlert(`播放失败：${e.message || String(e)}`);
   }
 });
+
+document.getElementById("btn-band-csv-pause")?.addEventListener("click", async () => {
+  const btn = document.getElementById("btn-band-csv-pause");
+  try {
+    const j = await postJson("/api/band_csv/pause", {});
+    if (btn) {
+      btn.textContent = j.paused ? "继续" : "暂停";
+    }
+  } catch (e) {
+    console.warn("band_csv pause failed", e);
+    await modalAlert(`暂停操作失败：${e.message || String(e)}`);
+  }
+});
+
+document.getElementById("band-csv-play-freq")?.addEventListener("change", async (e) => {
+  const hz = parseInt(e.target.value, 10) || 100;
+  try {
+    await postJson("/api/band/set_frequency", { hz });
+  } catch (err) {
+    console.warn("set frequency failed", err);
+  }
+});
+
+function setBandCsvPlayButtonsDisabled(playing) {
+  const playBtn = document.getElementById("btn-band-csv-play");
+  const pauseBtn = document.getElementById("btn-band-csv-pause");
+  const bandPlayBtn = document.getElementById("btn-band-play");
+  const bandPauseBtn = document.getElementById("btn-band-pause");
+  if (playBtn) playBtn.disabled = playing;
+  if (pauseBtn) pauseBtn.disabled = !playing;
+  if (bandPlayBtn) bandPlayBtn.disabled = playing;
+  if (bandPauseBtn) bandPauseBtn.disabled = true;
+}
 
 function wireRefreshInitialButtons() {
   document.querySelectorAll(".btn-refresh-initial").forEach((btn) => {

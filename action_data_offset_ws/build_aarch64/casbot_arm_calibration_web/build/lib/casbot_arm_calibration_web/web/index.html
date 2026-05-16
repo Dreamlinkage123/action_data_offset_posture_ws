@@ -523,10 +523,20 @@
         </label>
       </div>
       <p class="band-play-mode-hint pose-section-hint">
-        原数据模式：须先「列出来源」，在来源列表中按点击顺序选号（与下方偏移列表交互一致）。播完后自动关闭上半身调试。
+        原数据模式：须先「列出来源」，在来源列表中按点击顺序选号（与下方偏移列表交互一致）。如已开启上半身调试则跳过开启，播完后不会自动关闭。
       </p>
+      <div class="trajectory-row band-row band-play-options-row">
+        <label class="trajectory-label">
+          <span>发布频率</span>
+          <select id="band-play-freq" class="trajectory-select">
+            <option value="100" selected>100 Hz</option>
+            <option value="50">50 Hz</option>
+          </select>
+        </label>
+      </div>
       <div class="trajectory-row trajectory-actions">
         <button type="button" id="btn-band-play" class="btn-ctrl">按顺序播放</button>
+        <button type="button" id="btn-band-pause" class="btn-ctrl" disabled>暂停</button>
       </div>
     </section>
     <section class="trajectory-panel band-panel">
@@ -602,11 +612,21 @@
         </label>
       </div>
       <p class="band-play-mode-hint pose-section-hint">
-        播放通过 ROS2 Action <code>/motion/action/play</code>（<code>crb_ros_msg/action/ActionPlay</code>），<code>action_name</code> 为所选文件去掉
-        <code>.csv</code> 后的基名（与命令行示例一致）。与「乐队多片段数据偏移生成播放」互斥：一边播放时另一边不可用。
+        读取 CSV 数据的手臂关节和手指关节 position 数据帧，生成 TXT 文件，然后通过
+        <code>/upper_body_debug/joint_cmd</code> 顺序播放。与「乐队多片段数据偏移生成播放」互斥：一边播放时另一边不可用。
       </p>
+      <div class="trajectory-row band-row band-play-options-row">
+        <label class="trajectory-label">
+          <span>发布频率</span>
+          <select id="band-csv-play-freq" class="trajectory-select">
+            <option value="100" selected>100 Hz</option>
+            <option value="50">50 Hz</option>
+          </select>
+        </label>
+      </div>
       <div class="trajectory-row trajectory-actions">
         <button type="button" id="btn-band-csv-play" class="btn-ctrl">按顺序播放</button>
+        <button type="button" id="btn-band-csv-pause" class="btn-ctrl" disabled>暂停</button>
       </div>
     </section>
     <p class="page-footer-note pose-section-hint">
